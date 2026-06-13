@@ -1,6 +1,7 @@
-# kyopro_lib
+# kyopro_libraries
 
 競技プログラミング用の C++ ライブラリ置き場です。
+ドキュメント等はLLMに投げてるので信頼しすぎないでね。
 
 ## Requirements
 
@@ -8,6 +9,8 @@
 - AtCoder Library
   - `libraries/HLD_seg.hpp`
   - `libraries/HLD_lseg.hpp`
+  - `libraries/HLD_seg_edge.hpp`
+  - `libraries/HLD_lseg_edge.hpp`
   - `tools/expand_includes.py` で ACL include を展開する場合
 
 ## Contents
@@ -15,6 +18,9 @@
 - `libraries/HLD.hpp`: Heavy-Light Decomposition
 - `libraries/HLD_seg.hpp`: HLD + `atcoder::segtree`
 - `libraries/HLD_lseg.hpp`: HLD + `atcoder::lazy_segtree`
+- `libraries/HLD_seg_edge.hpp`: 辺値用 HLD + `atcoder::segtree`
+- `libraries/HLD_lseg_edge.hpp`: 辺値用 HLD + `atcoder::lazy_segtree`
+- `libraries/edge.hpp`: 辺値用 HLD で使う重み付き辺
 - `template.cpp`: 提出用 C++ テンプレート
 - `tools/expand_includes.py`: `#include` したローカルライブラリと ACL を 1 ファイルに展開するツール
 - `tests/`: ライブラリのランダムテスト
@@ -25,6 +31,8 @@
 - [HLD](docs/HLD.md): LCA、距離、level ancestor、パス上の k 番目の頂点
 - [HLD_seg](docs/HLD_seg.md): 頂点値の一点更新とパス積クエリ
 - [HLD_lseg](docs/HLD_lseg.md): 頂点値の一点更新、パス作用、パス積クエリ
+- [HLD_seg_edge](docs/HLD_seg_edge.md): 辺値の一点更新とパス積クエリ
+- [HLD_lseg_edge](docs/HLD_lseg_edge.md): 辺値の一点更新、パス作用、パス積クエリ
 
 ## Include Expander
 
@@ -76,22 +84,36 @@ g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 HLD の基本クエリ:
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I. tests/HLD_random_test.cpp -o /tmp/hld_random_test
+g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_random_test.cpp -o /tmp/hld_random_test
 /tmp/hld_random_test
 ```
 
 HLD + lazy segtree:
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I. tests/HLD_lseg_random_test.cpp -o /tmp/hld_lseg_random_test
+g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_lseg_random_test.cpp -o /tmp/hld_lseg_random_test
 /tmp/hld_lseg_random_test
 ```
 
 HLD + segtree:
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I. tests/HLD_seg_random_test.cpp -o /tmp/hld_seg_random_test
+g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_seg_random_test.cpp -o /tmp/hld_seg_random_test
 /tmp/hld_seg_random_test
+```
+
+HLD + segtree, edge values:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_seg_edge_random_test.cpp -o /tmp/hld_seg_edge_random_test
+/tmp/hld_seg_edge_random_test
+```
+
+HLD + lazy segtree, edge values:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_lseg_edge_random_test.cpp -o /tmp/hld_lseg_edge_random_test
+/tmp/hld_lseg_edge_random_test
 ```
 
 展開後のソースも include path なしでコンパイルできます。
