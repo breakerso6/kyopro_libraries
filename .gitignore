@@ -1,0 +1,6 @@
+*.out
+combined.cpp
+main.cpp
+*Zone.Identifier*
+ac-library/
+.DS_Store
