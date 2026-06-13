@@ -2,6 +2,14 @@
 
 競技プログラミング用の C++ ライブラリ置き場です。
 
+## Requirements
+
+- C++17
+- AtCoder Library
+  - `libraries/HLD_seg.hpp`
+  - `libraries/HLD_lseg.hpp`
+  - `tools/expand_includes.py` で ACL include を展開する場合
+
 ## Contents
 
 - `libraries/HLD.hpp`: Heavy-Light Decomposition
@@ -11,6 +19,12 @@
 - `tools/expand_includes.py`: `#include` したローカルライブラリと ACL を 1 ファイルに展開するツール
 - `tests/`: ライブラリのランダムテスト
 - `ac-library/`: AtCoder Library をローカルに配置してください（Git 管理対象外）
+
+## Documentation
+
+- [HLD](docs/HLD.md): LCA、距離、level ancestor、パス上の k 番目の頂点
+- [HLD_seg](docs/HLD_seg.md): 頂点値の一点更新とパス積クエリ
+- [HLD_lseg](docs/HLD_lseg.md): 頂点値の一点更新、パス作用、パス積クエリ
 
 ## Include Expander
 
@@ -71,6 +85,13 @@ HLD + lazy segtree:
 ```bash
 g++ -std=c++17 -O2 -Wall -Wextra -I. tests/HLD_lseg_random_test.cpp -o /tmp/hld_lseg_random_test
 /tmp/hld_lseg_random_test
+```
+
+HLD + segtree:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -I. tests/HLD_seg_random_test.cpp -o /tmp/hld_seg_random_test
+/tmp/hld_seg_random_test
 ```
 
 展開後のソースも include path なしでコンパイルできます。
