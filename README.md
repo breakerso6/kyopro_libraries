@@ -21,6 +21,8 @@
 - `libraries/HLD_seg_edge.hpp`: 辺値用 HLD + `atcoder::segtree`
 - `libraries/HLD_lseg_edge.hpp`: 辺値用 HLD + `atcoder::lazy_segtree`
 - `libraries/edge.hpp`: 辺値用 HLD で使う重み付き辺
+- `libraries/Indexset.hpp`: `0..n-1` の部分集合を `O(1)` で更新・ランダム取得
+- `libraries/Random.hpp`: 軽量な乱数生成器
 - `template.cpp`: 提出用 C++ テンプレート
 - `tools/expand_includes.py`: `#include` したローカルライブラリと ACL を 1 ファイルに展開するツール
 - `tests/`: ライブラリのランダムテスト
@@ -33,6 +35,7 @@
 - [HLD_lseg](docs/HLD_lseg.md): 頂点値の一点更新、パス作用、パス積クエリ
 - [HLD_seg_edge](docs/HLD_seg_edge.md): 辺値の一点更新とパス積クエリ
 - [HLD_lseg_edge](docs/HLD_lseg_edge.md): 辺値の一点更新、パス作用、パス積クエリ
+- [IndexSet](docs/Indexset.md): `0..n-1` の部分集合の追加、削除、所属判定、ランダム取得
 
 ## Include Expander
 
@@ -114,6 +117,13 @@ HLD + lazy segtree, edge values:
 ```bash
 g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_lseg_edge_random_test.cpp -o /tmp/hld_lseg_edge_random_test
 /tmp/hld_lseg_edge_random_test
+```
+
+IndexSet:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -I. tests/Indexset_test.cpp -o /tmp/indexset_test
+/tmp/indexset_test
 ```
 
 展開後のソースも include path なしでコンパイルできます。
