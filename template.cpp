@@ -1,7 +1,7 @@
 // #pragma GCC optimize("Ofast")
 #include <bits/stdc++.h>
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 using namespace std;
 
 using ll = long long;
@@ -17,15 +17,15 @@ using vec2di = std::vector<vecint>;
 using vec2dd = std::vector<vecdou>;
 using vec2db = std::vector<vecbool>;
 using pl = pair<long long,long long>;
-using mint998 = modint998244353;
-using mint107 = modint1000000007;
-using mint = modint;
-using vecmint = std::vector<mint>;
-using vecmint998 = std::vector<mint998>;
-using vecmint107 = std::vector<mint107>;
-using vec2dmint = std::vector<vecmint>; 
-using vec2dmint998 = std::vector<vecmint998>;
-using vec2dmint107 = std::vector<vecmint107>;
+// using mint998 = modint998244353;
+// using mint107 = modint1000000007;
+// using mint = modint;
+// using vecmint = std::vector<mint>;
+// using vecmint998 = std::vector<mint998>;
+// using vecmint107 = std::vector<mint107>;
+// using vec2dmint = std::vector<vecmint>; 
+// using vec2dmint998 = std::vector<vecmint998>;
+// using vec2dmint107 = std::vector<vecmint107>;
 #define rep(i,n) for (ll i = 0; i < (ll)(n); i++)
 #define rep1(i,n) for (ll i = 1; i <= (ll)(n); i++)
 #define REP(i,l,r) for (ll i = (ll)(l); i < (ll)(r); i++)
@@ -111,8 +111,13 @@ vecll vecinp(ll n){
     return v;
 }
 
+// vecll dx = {1,0,-1,0};
+// vecll dy = {0,1,0,-1};
+// vector<char> dir = {'D','R','U','L'};
 
-void solve();
+void solve(){
+    
+}
 
 int main() {
     std::cin.tie(nullptr);
@@ -120,12 +125,4 @@ int main() {
     ll t=1;
     // std::cin >> t;
     rep(i,t)solve();
-}
-
-// vecll dx = {1,0,-1,0};
-// vecll dy = {0,1,0,-1};
-// vector<char> dir = {'D','R','U','L'};
-
-void solve(){
-    
 }
