@@ -1,20 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#include "libraries/RollbackDSU.hpp"
-#include "libraries/WeightedDSU.hpp"
-#include "libraries/SparseTable.hpp"
-#include "libraries/DisjointSparseTable.hpp"
-#include "libraries/SWAG.hpp"
-#include "libraries/BinaryTrie.hpp"
-#include "libraries/XorBasis.hpp"
-#include "libraries/LowLink.hpp"
-#include "libraries/EulerianTrail.hpp"
-#include "libraries/CentroidDecomposition.hpp"
-#include "libraries/RollingHash.hpp"
-#include "libraries/AhoCorasick.hpp"
-#include "libraries/Mo.hpp"
-#include "libraries/LiChaoTree.hpp"
+#include "libraries/data_structure/RollbackDSU.hpp"
+#include "libraries/data_structure/WeightedDSU.hpp"
+#include "libraries/data_structure/SparseTable.hpp"
+#include "libraries/data_structure/DisjointSparseTable.hpp"
+#include "libraries/data_structure/SWAG.hpp"
+#include "libraries/data_structure/BinaryTrie.hpp"
+#include "libraries/math/XorBasis.hpp"
+#include "libraries/graph/LowLink.hpp"
+#include "libraries/graph/EulerianTrail.hpp"
+#include "libraries/tree/CentroidDecomposition.hpp"
+#include "libraries/string/RollingHash.hpp"
+#include "libraries/string/AhoCorasick.hpp"
+#include "libraries/algorithm/Mo.hpp"
+#include "libraries/data_structure/LiChaoTree.hpp"
 
 struct Minimum { int operator()(int a, int b) const { return min(a, b); } };
 struct Sum { long long operator()(long long a, long long b) const { return a + b; } };

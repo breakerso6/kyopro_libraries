@@ -1,4 +1,4 @@
-#include "../libraries/HLD_seg.hpp"
+#include "libraries/tree/HLD_seg.hpp"
 
 struct S {
     string value;

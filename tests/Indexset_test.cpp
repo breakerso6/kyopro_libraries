@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#include "libraries/Indexset.hpp"
+#include "libraries/data_structure/Indexset.hpp"
 
 static void assert_state(IndexSet& s, const vector<bool>& in) {
   int expected_size = 0;

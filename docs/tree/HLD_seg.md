@@ -1,13 +1,13 @@
 # HLD_seg
 
-`libraries/HLD_seg.hpp` は HLD と `atcoder::segtree` を組み合わせたライブラリです。各頂点に値を持たせ、一点更新とパス上の積を扱えます。
+`libraries/tree/HLD_seg.hpp` は HLD と `atcoder::segtree` を組み合わせたライブラリです。各頂点に値を持たせ、一点更新とパス上の積を扱えます。
 
 `prod_path(s, t)` は `s` から `t` へのパスの頂点列 `(v0, ..., vk)` に対して `op(value[v0], ..., value[vk])` を返します。非可換な演算にも対応しています。
 
 ## Include
 
 ```cpp
-#include "libraries/HLD_seg.hpp"
+#include "libraries/tree/HLD_seg.hpp"
 ```
 
 AtCoder Library の `atcoder/segtree` が必要です。
@@ -88,7 +88,7 @@ S prod_path(int s, int t);
 ## Example
 
 ```cpp
-#include "libraries/HLD_seg.hpp"
+#include "libraries/tree/HLD_seg.hpp"
 
 long long op(long long a, long long b) {
     return a + b;

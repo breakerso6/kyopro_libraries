@@ -1,13 +1,13 @@
-# HLD_lseg
+# HLD_lseg_edge
 
-`libraries/HLD_lseg.hpp` は HLD と `atcoder::lazy_segtree` を組み合わせたライブラリです。各頂点に値を持たせ、パスへの遅延作用、一点更新、パス上の積を扱えます。
+`libraries/tree/HLD_lseg_edge.hpp` は HLD と `atcoder::lazy_segtree` を組み合わせた、辺値用のライブラリです。各辺に値を持たせ、パスへの遅延作用、辺 ID による一点更新、パス上の積を扱えます。
 
-`prod_path(s, t)` は `s` から `t` へのパスの頂点列 `(v0, ..., vk)` に対して `op(value[v0], ..., value[vk])` を返します。非可換な演算にも対応しています。
+`prod_path(s, t)` は `s` から `t` へのパスの辺列 `(e0, ..., ek)` に対して `op(value[e0], ..., value[ek])` を返します。非可換な演算にも対応しています。`s == t` の場合は辺を通らないため `e()` を返します。
 
 ## Include
 
 ```cpp
-#include "libraries/HLD_lseg.hpp"
+#include "libraries/tree/HLD_lseg_edge.hpp"
 ```
 
 AtCoder Library の `atcoder/lazysegtree` が必要です。
@@ -24,7 +24,7 @@ template <
     F (*composition)(F, F),
     F (*id_)()
 >
-struct HLD_lseg;
+struct HLD_lseg_edge;
 ```
 
 `atcoder::lazy_segtree<S, op, e, F, mapping, composition, id_>` と同じ形式です。
@@ -40,14 +40,14 @@ struct HLD_lseg;
 ## Constructor
 
 ```cpp
-HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, root);
-HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, initial_values, root);
+HLD_lseg_edge<S, op, e, F, mapping, composition, id_> hld(n, edges, root);
 ```
 
-- `graph`: `vector<vector<ll>>`
-- `initial_values`: 頂点番号順の初期値。`initial_values[v]` が頂点 `v` の値になります。
+- `n`: 頂点数
+- `edges`: `vector<edge<S>>`
 - `root`: 根。省略時は `0`
-- `graph` は無向木を想定します。
+- `edges[i]` の `from`, `to` は無向木の辺の両端、`weight` は辺 `i` の初期値です。
+- `set(i, x)`、`get(i)` の `i` は `edges` に渡した順番の辺 ID です。
 
 計算量:
 
@@ -56,7 +56,7 @@ HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, initial_values, root
 
 ## HLD API
 
-`HLD_lseg` は `HLD` と同じ補助 API を持ちます。
+`HLD_lseg_edge` は `HLD` と同じ補助 API を持ちます。これらは頂点に対するクエリです。
 
 | function | description | complexity |
 | --- | --- | --- |
@@ -70,20 +70,20 @@ HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, initial_values, root
 ### set
 
 ```cpp
-void set(int v, S x);
+void set(int edge_id, S x);
 ```
 
-頂点 `v` の値を `x` に更新します。
+辺 `edge_id` の値を `x` に更新します。
 
 計算量: `O(log N)`
 
 ### get
 
 ```cpp
-S get(int v);
+S get(int edge_id);
 ```
 
-頂点 `v` の現在の値を返します。
+辺 `edge_id` の現在の値を返します。
 
 計算量: `O(log N)`
 
@@ -93,7 +93,7 @@ S get(int v);
 S prod_path(int s, int t);
 ```
 
-`s` から `t` へのパス上の頂点値を、パスの順番で畳み込みます。
+`s` から `t` へのパス上の辺値を、パスの順番で畳み込みます。
 
 計算量: `O(log^2 N)`
 
@@ -103,7 +103,7 @@ S prod_path(int s, int t);
 void apply_path(int s, int t, F f);
 ```
 
-`s` から `t` へのパス上の全頂点に `f` を作用させます。
+`s` から `t` へのパス上の全辺に `f` を作用させます。`s == t` の場合は何もしません。
 
 計算量: `O(log^2 N)`
 
@@ -112,7 +112,7 @@ void apply_path(int s, int t, F f);
 パス加算、パス和クエリの例です。`S` に区間長を持たせると、lazy propagation で区間全体への加算を扱えます。
 
 ```cpp
-#include "libraries/HLD_lseg.hpp"
+#include "libraries/tree/HLD_lseg_edge.hpp"
 
 struct S {
     long long sum;
@@ -143,27 +143,22 @@ F id() {
 
 int main() {
     int n = 5;
-    vector<vector<ll>> g(n);
-    auto add_edge = [&](int u, int v) {
-        g[u].push_back(v);
-        g[v].push_back(u);
-    };
-    add_edge(0, 1);
-    add_edge(1, 2);
-    add_edge(1, 3);
-    add_edge(3, 4);
+    vector<edge<S>> edges;
+    edges.emplace_back(0, 1, S{10, 1});  // edge id 0
+    edges.emplace_back(1, 2, S{20, 1});  // edge id 1
+    edges.emplace_back(1, 3, S{30, 1});  // edge id 2
+    edges.emplace_back(3, 4, S{40, 1});  // edge id 3
 
-    vector<S> a = {{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}};
-    HLD_lseg<S, op, e, F, mapping, composition, id> hld(g, a, 0);
+    HLD_lseg_edge<S, op, e, F, mapping, composition, id> hld(n, edges, 0);
 
-    cout << hld.prod_path(2, 4).sum << '\n';  // 14
+    cout << hld.prod_path(2, 4).sum << '\n';  // 90
 
     hld.apply_path(2, 4, 10);
-    cout << hld.prod_path(2, 4).sum << '\n';  // 54
+    cout << hld.prod_path(2, 4).sum << '\n';  // 120
 }
 ```
 
 ## Notes
 
-- `apply_path(s, t, f)` は頂点に作用します。辺に値を持たせたい場合は、子側の頂点に辺の値を載せるなどの変換が必要です。
+- `apply_path(s, t, f)` は辺に作用します。LCA の頂点自体には対応する辺がないため、パス上の頂点数より 1 個少ない要素が対象です。
 - パス集約は非可換演算に対応していますが、`op` は結合的である必要があります。

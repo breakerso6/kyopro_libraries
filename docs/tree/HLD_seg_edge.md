@@ -1,13 +1,13 @@
 # HLD_seg_edge
 
-`libraries/HLD_seg_edge.hpp` は HLD と `atcoder::segtree` を組み合わせた、辺値用のライブラリです。各辺に値を持たせ、辺 ID による一点更新とパス上の積を扱えます。
+`libraries/tree/HLD_seg_edge.hpp` は HLD と `atcoder::segtree` を組み合わせた、辺値用のライブラリです。各辺に値を持たせ、辺 ID による一点更新とパス上の積を扱えます。
 
 `prod_path(s, t)` は `s` から `t` へのパスの辺列 `(e0, ..., ek)` に対して `op(value[e0], ..., value[ek])` を返します。非可換な演算にも対応しています。`s == t` の場合は辺を通らないため `e()` を返します。
 
 ## Include
 
 ```cpp
-#include "libraries/HLD_seg_edge.hpp"
+#include "libraries/tree/HLD_seg_edge.hpp"
 ```
 
 AtCoder Library の `atcoder/segtree` が必要です。
@@ -88,7 +88,7 @@ S prod_path(int s, int t);
 ## Example
 
 ```cpp
-#include "libraries/HLD_seg_edge.hpp"
+#include "libraries/tree/HLD_seg_edge.hpp"
 
 long long op(long long a, long long b) {
     return a + b;

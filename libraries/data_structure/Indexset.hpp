@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-#include "libraries/Random.hpp"
+#include "libraries/utility/Random.hpp"
 Random rnd;
 
 struct IndexSet {

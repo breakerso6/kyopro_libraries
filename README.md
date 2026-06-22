@@ -1,156 +1,69 @@
 # kyopro_libraries
 
-競技プログラミング用の C++ ライブラリ置き場です。
-ドキュメント等はLLMに投げてるので信頼しすぎないでね。
+ICPC・競技プログラミング用の C++17 ライブラリ集です。
+
+## Directory Layout
+
+`libraries/` と `docs/` は同じ分野名で整理しています。
+
+| category | contents | documentation |
+| --- | --- | --- |
+| `algorithm` | Mo's algorithm | [docs/algorithm](docs/algorithm/README.md) |
+| `data_structure` | DSU、区間積、Trie、永続データ構造 | [docs/data_structure](docs/data_structure/README.md) |
+| `geometry` | 整数・実数幾何、最近点対、KD-tree、長方形和集合 | [docs/geometry](docs/geometry/README.md) |
+| `graph` | LowLink、Euler路、二部マッチング | [docs/graph](docs/graph/README.md) |
+| `math` | XOR線形基底 | [docs/math](docs/math/README.md) |
+| `string` | Aho-Corasick、Rolling Hash | [docs/string](docs/string/README.md) |
+| `tree` | HLD、重心分解、全方位木DP | [docs/tree](docs/tree/README.md) |
+| `utility` | 乱数生成器 | [docs/utility](docs/utility/README.md) |
+
+ライブラリはリポジトリルートからのパスでincludeします。
+
+```cpp
+#include "libraries/geometry/GeometryInt.hpp"
+#include "libraries/tree/HLD.hpp"
+```
 
 ## Requirements
 
 - C++17
 - AtCoder Library
-  - `libraries/HLD_seg.hpp`
-  - `libraries/HLD_lseg.hpp`
-  - `libraries/HLD_seg_edge.hpp`
-  - `libraries/HLD_lseg_edge.hpp`
-  - `tools/expand_includes.py` で ACL include を展開する場合
+  - `libraries/tree/HLD_seg.hpp`
+  - `libraries/tree/HLD_lseg.hpp`
+  - `libraries/tree/HLD_seg_edge.hpp`
+  - `libraries/tree/HLD_lseg_edge.hpp`
+  - ACL includeを展開する場合
 
-## Contents
-
-- `libraries/HLD.hpp`: Heavy-Light Decomposition
-- `libraries/HLD_seg.hpp`: HLD + `atcoder::segtree`
-- `libraries/HLD_lseg.hpp`: HLD + `atcoder::lazy_segtree`
-- `libraries/HLD_seg_edge.hpp`: 辺値用 HLD + `atcoder::segtree`
-- `libraries/HLD_lseg_edge.hpp`: 辺値用 HLD + `atcoder::lazy_segtree`
-- `libraries/edge.hpp`: 辺値用 HLD で使う重み付き辺
-- `libraries/Indexset.hpp`: `0..n-1` の部分集合を `O(1)` で更新・ランダム取得
-- `libraries/Random.hpp`: 軽量な乱数生成器
-- `libraries/RollbackDSU.hpp`: undo・snapshot が可能な Union-Find
-- `libraries/WeightedDSU.hpp`: 頂点間のポテンシャル差を管理する Union-Find
-- `libraries/SparseTable.hpp`: 冪等な演算の静的区間積を `O(1)` で取得
-- `libraries/DisjointSparseTable.hpp`: 結合的な演算の静的区間積を `O(1)` で取得
-- `libraries/SWAG.hpp`: queue 全体の積を償却 `O(1)` で管理
-- `libraries/BinaryTrie.hpp`: multiset の追加・削除と XOR 最小/最大値
-- `libraries/XorBasis.hpp`: XOR 線形基底、表現可能性と最大 XOR
-- `libraries/LiChaoTree.hpp`: 整数座標上の直線追加・最小値クエリ
-- `libraries/LowLink.hpp`: 無向多重グラフの橋・関節点
-- `libraries/EulerianTrail.hpp`: 有向/無向グラフの Euler trail 構築
-- `libraries/CentroidDecomposition.hpp`: 木の重心分解
-- `libraries/RollingHash.hpp`: mod `2^61-1` の部分文字列ハッシュ
-- `libraries/AhoCorasick.hpp`: 複数パターンの同時文字列検索
-- `libraries/Mo.hpp`: 区間クエリを処理する Mo's algorithm
-- `template.cpp`: 提出用 C++ テンプレート
-- `tools/expand_includes.py`: `#include` したローカルライブラリと ACL を 1 ファイルに展開するツール
-- `tests/`: ライブラリのランダムテスト
-- `ac-library/`: AtCoder Library をローカルに配置してください（Git 管理対象外）
-
-## Documentation
-
-- [HLD](docs/HLD.md): LCA、距離、level ancestor、パス上の k 番目の頂点
-- [HLD_seg](docs/HLD_seg.md): 頂点値の一点更新とパス積クエリ
-- [HLD_lseg](docs/HLD_lseg.md): 頂点値の一点更新、パス作用、パス積クエリ
-- [HLD_seg_edge](docs/HLD_seg_edge.md): 辺値の一点更新とパス積クエリ
-- [HLD_lseg_edge](docs/HLD_lseg_edge.md): 辺値の一点更新、パス作用、パス積クエリ
-- [IndexSet](docs/Indexset.md): `0..n-1` の部分集合の追加、削除、所属判定、ランダム取得
+`ac-library/` はGit管理対象外です。必要な場合はリポジトリ直下へ配置してください。
 
 ## Include Expander
 
-`tools/expand_includes.py` は、提出用に C++ ソースを 1 ファイルへまとめるためのスクリプトです。
-
-展開対象:
-
-- `#include "libraries/HLD.hpp"` のようなローカル include
-- `#include <atcoder/segtree>` のような ACL include
-- ACL 内部の再帰 include
-
-`ac-library/` は Git 管理対象外です。`tools/expand_includes.py` を使う前に、このリポジトリ直下へ AtCoder Library を配置してください。
-
-標準ライブラリの include、例えば `#include <bits/stdc++.h>` はそのまま残します。
-
-### Basic Usage
+`tools/expand_includes.py` はローカルライブラリとACLの再帰includeを展開し、提出用の単一ファイルを生成します。標準ライブラリのincludeはそのまま残します。
 
 ```bash
 tools/expand_includes.py main.cpp -o combined.cpp
-```
-
-出力先を指定しない場合は `combined.cpp` に出力します。
-
-```bash
-tools/expand_includes.py main.cpp
-```
-
-標準出力に出したい場合:
-
-```bash
 tools/expand_includes.py main.cpp --stdout
-```
-
-追加の include ディレクトリを指定したい場合:
-
-```bash
 tools/expand_includes.py main.cpp -I other_libs -o combined.cpp
-```
-
-### Compile Example
-
-```bash
-tools/expand_includes.py main.cpp -o combined.cpp
-g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 ```
 
 ## Tests
 
-HLD の基本クエリ:
+すべてのテストを実行する例です。
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_random_test.cpp -o /tmp/hld_random_test
-/tmp/hld_random_test
+for source in tests/*_test.cpp; do
+  name=$(basename "$source" .cpp)
+  g++ -std=c++17 -O2 -Wall -Wextra -Wshadow -I. -Iac-library "$source" -o "/tmp/$name"
+  "/tmp/$name"
+done
 ```
 
-HLD + lazy segtree:
+展開後のソースもinclude pathなしでコンパイルできます。
 
 ```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_lseg_random_test.cpp -o /tmp/hld_lseg_random_test
-/tmp/hld_lseg_random_test
+tools/expand_includes.py tests/geometry_and_more_test.cpp -o /tmp/combined.cpp
+g++ -std=c++17 -O2 -Wall -Wextra /tmp/combined.cpp -o /tmp/combined
+/tmp/combined
 ```
 
-HLD + segtree:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_seg_random_test.cpp -o /tmp/hld_seg_random_test
-/tmp/hld_seg_random_test
-```
-
-HLD + segtree, edge values:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_seg_edge_random_test.cpp -o /tmp/hld_seg_edge_random_test
-/tmp/hld_seg_edge_random_test
-```
-
-HLD + lazy segtree, edge values:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I ac-library tests/HLD_lseg_edge_random_test.cpp -o /tmp/hld_lseg_edge_random_test
-/tmp/hld_lseg_edge_random_test
-```
-
-IndexSet:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra -I. tests/Indexset_test.cpp -o /tmp/indexset_test
-/tmp/indexset_test
-```
-
-ACL にない追加ライブラリ一式:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra -Wshadow -I. tests/extra_libraries_test.cpp -o /tmp/extra_libraries_test
-/tmp/extra_libraries_test
-```
-
-展開後のソースも include path なしでコンパイルできます。
-
-```bash
-tools/expand_includes.py tests/HLD_lseg_random_test.cpp -o /tmp/hld_lseg_combined.cpp
-g++ -std=c++17 -O2 -Wall -Wextra /tmp/hld_lseg_combined.cpp -o /tmp/hld_lseg_combined
-/tmp/hld_lseg_combined
-```
+`template.cpp` は提出用テンプレート、`tests/` は決定的テストとランダムテストです。

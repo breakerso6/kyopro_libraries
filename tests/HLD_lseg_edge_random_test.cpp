@@ -1,4 +1,4 @@
-#include "../libraries/HLD_lseg_edge.hpp"
+#include "libraries/tree/HLD_lseg_edge.hpp"
 
 struct S {
     string value;

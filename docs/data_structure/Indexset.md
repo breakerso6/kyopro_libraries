@@ -1,16 +1,16 @@
 # IndexSet
 
-`libraries/Indexset.hpp` は `0, 1, ..., n - 1` の部分集合を管理するライブラリです。
+`libraries/data_structure/Indexset.hpp` は `0, 1, ..., n - 1` の部分集合を管理するライブラリです。
 
 要素の追加、削除、所属判定、ランダム取得を `O(1)` で行えます。
 
 ## Include
 
 ```cpp
-#include "libraries/Indexset.hpp"
+#include "libraries/data_structure/Indexset.hpp"
 ```
 
-`libraries/Random.hpp` を内部で include し、グローバル変数 `rnd` を使ってランダム取得します。
+`libraries/utility/Random.hpp` を内部で include し、グローバル変数 `rnd` を使ってランダム取得します。
 
 ## Constructor
 
@@ -103,7 +103,7 @@ int random();
 ## Example
 
 ```cpp
-#include "libraries/Indexset.hpp"
+#include "libraries/data_structure/Indexset.hpp"
 
 int main() {
     IndexSet s(5);  // {0, 1, 2, 3, 4}

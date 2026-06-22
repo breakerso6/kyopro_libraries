@@ -1,11 +1,11 @@
 # HLD
 
-`libraries/HLD.hpp` は木を Heavy-Light Decomposition で前処理し、LCA、距離、祖先、パス上の頂点を高速に求めるライブラリです。
+`libraries/tree/HLD.hpp` は木を Heavy-Light Decomposition で前処理し、LCA、距離、祖先、パス上の頂点を高速に求めるライブラリです。
 
 ## Include
 
 ```cpp
-#include "libraries/HLD.hpp"
+#include "libraries/tree/HLD.hpp"
 ```
 
 ## Constructor
@@ -83,7 +83,7 @@ int jump(int s, int t, int i);
 ## Example
 
 ```cpp
-#include "libraries/HLD.hpp"
+#include "libraries/tree/HLD.hpp"
 
 int main() {
     int n = 5;
