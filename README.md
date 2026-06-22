@@ -23,6 +23,20 @@
 - `libraries/edge.hpp`: 辺値用 HLD で使う重み付き辺
 - `libraries/Indexset.hpp`: `0..n-1` の部分集合を `O(1)` で更新・ランダム取得
 - `libraries/Random.hpp`: 軽量な乱数生成器
+- `libraries/RollbackDSU.hpp`: undo・snapshot が可能な Union-Find
+- `libraries/WeightedDSU.hpp`: 頂点間のポテンシャル差を管理する Union-Find
+- `libraries/SparseTable.hpp`: 冪等な演算の静的区間積を `O(1)` で取得
+- `libraries/DisjointSparseTable.hpp`: 結合的な演算の静的区間積を `O(1)` で取得
+- `libraries/SWAG.hpp`: queue 全体の積を償却 `O(1)` で管理
+- `libraries/BinaryTrie.hpp`: multiset の追加・削除と XOR 最小/最大値
+- `libraries/XorBasis.hpp`: XOR 線形基底、表現可能性と最大 XOR
+- `libraries/LiChaoTree.hpp`: 整数座標上の直線追加・最小値クエリ
+- `libraries/LowLink.hpp`: 無向多重グラフの橋・関節点
+- `libraries/EulerianTrail.hpp`: 有向/無向グラフの Euler trail 構築
+- `libraries/CentroidDecomposition.hpp`: 木の重心分解
+- `libraries/RollingHash.hpp`: mod `2^61-1` の部分文字列ハッシュ
+- `libraries/AhoCorasick.hpp`: 複数パターンの同時文字列検索
+- `libraries/Mo.hpp`: 区間クエリを処理する Mo's algorithm
 - `template.cpp`: 提出用 C++ テンプレート
 - `tools/expand_includes.py`: `#include` したローカルライブラリと ACL を 1 ファイルに展開するツール
 - `tests/`: ライブラリのランダムテスト
@@ -124,6 +138,13 @@ IndexSet:
 ```bash
 g++ -std=c++17 -O2 -Wall -Wextra -I. tests/Indexset_test.cpp -o /tmp/indexset_test
 /tmp/indexset_test
+```
+
+ACL にない追加ライブラリ一式:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -Wshadow -I. tests/extra_libraries_test.cpp -o /tmp/extra_libraries_test
+/tmp/extra_libraries_test
 ```
 
 展開後のソースも include path なしでコンパイルできます。
