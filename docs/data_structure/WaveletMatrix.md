@@ -8,7 +8,7 @@
 #include "libraries/data_structure/WaveletMatrix.hpp"
 ```
 
-## Template Parameter
+## テンプレート引数
 
 ```cpp
 template<class T>
@@ -17,7 +17,7 @@ struct WaveletMatrix;
 
 `T` は比較とコピーが可能な値型です。
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 WaveletMatrix<T> wm(values);
@@ -25,12 +25,18 @@ WaveletMatrix<T> wm(values);
 
 `values` を保持する静的構造を構築します。構築後の値変更には対応しません。
 
-- 構築: `O(N log sigma)`
-- メモリ: `O(N log sigma)`
+**制約**
+
+- `T` は比較可能
+
+**計算量**
+
+- 構築: $O(N \log \sigma)$
+- メモリ: $O(N \log \sigma)$
 
 `sigma` は異なる値の個数です。
 
-## API
+## 関数
 
 ### size
 
@@ -39,6 +45,10 @@ int size() const;
 ```
 
 構築時の配列長を返します。
+
+**計算量**
+
+- $O(1)$
 
 ### kth_smallest / kth_largest
 
@@ -49,7 +59,14 @@ T kth_largest(int l, int r, int k) const;
 
 半開区間 `[l,r)` の値を昇順または降順に並べたときの、0-indexedで `k` 番目の値を返します。`0 <= k < r-l` が必要です。
 
-計算量: `O(log sigma)`
+**制約**
+
+- $0 \leq l < r \leq N$
+- $0 \leq k < r-l$
+
+**計算量**
+
+- `O(log sigma)`
 
 ### count_less / range_freq / count
 
@@ -63,7 +80,13 @@ int count(int l, int r, const T& value) const;
 - `range_freq`: `lower <= value < upper` を満たす要素数
 - `count`: `value` と等しい要素数
 
-計算量: `O(log sigma)`
+**制約**
+
+- $0 \leq l \leq r \leq N$
+
+**計算量**
+
+- `O(log sigma)`
 
 ### prev_value / next_value
 
@@ -74,9 +97,15 @@ optional<T> next_value(int l, int r, const T& lower) const;
 
 `prev_value` は `upper` 未満の最大値、`next_value` は `lower` 以上の最小値を返します。条件を満たす値がなければ `nullopt` です。
 
-計算量: `O(log sigma)`
+**制約**
 
-## Example
+- $0 \leq l \leq r \leq N$
+
+**計算量**
+
+- `O(log sigma)`
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -95,7 +124,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - すべての区間は0-indexed半開区間です。
 - `kth_*` に空区間を渡すことはできません。頻度クエリは空区間に対して `0` を返します。

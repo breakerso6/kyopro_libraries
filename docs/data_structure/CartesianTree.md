@@ -8,7 +8,7 @@
 #include "libraries/data_structure/CartesianTree.hpp"
 ```
 
-## Template Parameters
+## テンプレート引数
 
 ```cpp
 template<class T, class Compare = std::less<T>>
@@ -18,7 +18,11 @@ struct CartesianTree;
 - `T`: 配列要素型
 - `Compare`: 親に置く値を判定する比較。`less<T>` なら最小、`greater<T>` なら最大Cartesian Tree
 
-## Constructor
+**制約**
+
+- `T` は `Compare` で比較可能
+
+## コンストラクタ
 
 ```cpp
 CartesianTree<T, Compare> tree(values, compare);
@@ -26,9 +30,13 @@ CartesianTree<T, Compare> tree(values, compare);
 
 `compare` は省略できます。構築時間・メモリは `O(N)` です。
 
-## Public Members
+**計算量**
 
-| member | description |
+- $O(N)$
+
+## メンバ変数
+
+| メンバ | 説明 |
 | --- | --- |
 | `root` | 根の添字。空配列なら `-1` |
 | `parent[v]` | 親。根は `-1` |
@@ -43,7 +51,7 @@ void build(const vector<T>& values, Compare compare = Compare());
 
 既存インスタンスを新しい配列で再構築します。
 
-## Example
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -60,7 +68,7 @@ int main() {
 }
 ```
 
-## Properties and Notes
+## 性質と注意
 
 - 各辺 `parent -> child` で、既定では `a[parent] <= a[child]` です。
 - 中間順巡回すると添字 `0,1,...,N-1` が得られます。

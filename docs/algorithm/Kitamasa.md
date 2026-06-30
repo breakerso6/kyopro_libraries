@@ -8,14 +8,11 @@
 #include "libraries/algorithm/Kitamasa.hpp"
 ```
 
-## Functions
+## kitamasa
 
 ```cpp
 template<class T>
 T kitamasa(long long n, const vector<T>& initial, const vector<T>& c);
-
-template<class T>
-vector<T> kitamasa_coefficients(long long n, const vector<T>& c);
 ```
 
 長さ `K` の漸化式を次の形で渡します。
@@ -26,16 +23,36 @@ a_n = c[0] a_{n-K} + c[1] a_{n-K+1} + ... + c[K-1] a_{n-1}
 
 `initial[i]` は `a_i` です。
 
-`kitamasa_coefficients(n, c)` は `a_n = sum coef[i] * a_i` となる係数列を返します。
+**制約**
 
-## Complexity
+- $0 \leq n$
+- `initial.size() == c.size()`
+- $1 \leq K$
+- `T` は `+`、`*`、`+=`、`0`、`1` を扱える
 
-- Time: `O(K^2 log n)`
-- Memory: `O(K)`
+**計算量**
 
-`T` は `+`、`*`、`+=`、`0`、`1` を扱える型を想定します。modint にも使えます。
+- $O(K^2 \log n)$
 
-## Example
+## kitamasa_coefficients
+
+```cpp
+template<class T>
+vector<T> kitamasa_coefficients(long long n, const vector<T>& c);
+```
+
+`a_n = sum coef[i] * a_i` となる係数列 `coef` を返します。
+
+**制約**
+
+- $0 \leq n$
+- $1 \leq K = c.size()$
+
+**計算量**
+
+- $O(K^2 \log n)$
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -50,13 +67,13 @@ int main() {
 }
 ```
 
-## Typical use
+## 典型的な使い方
 
 - Fibonacci 型の漸化式を `O(log N)` に近い感覚で扱う
 - DP の遷移が固定幅線形で、`N` だけ極端に大きい問題
 - 行列累乗より定数倍を軽くしたい場合
 
-## Notes
+## 注意
 
 - `initial.size() == c.size()` が必要です。
 - `n < K` の場合もそのまま `initial[n]` と同じ値を返します。

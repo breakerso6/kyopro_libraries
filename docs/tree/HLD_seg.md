@@ -12,7 +12,7 @@
 
 AtCoder Library の `atcoder/segtree` が必要です。
 
-## Template Parameters
+## テンプレート引数
 
 ```cpp
 template <class S, auto op, auto e>
@@ -25,7 +25,7 @@ struct HLD_seg;
 - `op(S a, S b)`: 結合的な二項演算
 - `e()`: 単位元
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 HLD_seg<S, op, e> hld(graph, root);
@@ -37,23 +37,30 @@ HLD_seg<S, op, e> hld(graph, initial_values, root);
 - `root`: 根。省略時は `0`
 - `graph` は無向木を想定します。
 
-計算量:
+**制約**
+
+- `graph` は連結な無向木
+- `initial_values` を渡す場合は `initial_values.size() == N`
+- `op` は結合的
+- `e()` は `op` の単位元
+
+**計算量**
 
 - 構築: `O(N log N)`
 - メモリ: `O(N)`
 
-## HLD API
+## HLD関数
 
 `HLD_seg` は `HLD` と同じ補助 API を持ちます。
 
-| function | description | complexity |
+| 関数 | 説明 | 計算量 |
 | --- | --- | --- |
 | `level_ancestor(v, d)` | `v` の祖先で深さ `d` の頂点。存在しない場合は `-1` | `O(log N)` |
 | `lca(u, v)` | `u` と `v` の LCA | `O(log N)` |
 | `distance(u, v)` | `u` と `v` の距離 | `O(log N)` |
 | `jump(s, t, i)` | `s` から `t` へのパス上の `i` 番目の頂点 | `O(log N)` |
 
-## Segment Tree API
+## セグメント木関数
 
 ### set
 
@@ -63,7 +70,9 @@ void set(int v, S x);
 
 頂点 `v` の値を `x` に更新します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### get
 
@@ -73,7 +82,9 @@ S get(int v);
 
 頂点 `v` の現在の値を返します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### prod_path
 
@@ -83,9 +94,11 @@ S prod_path(int s, int t);
 
 `s` から `t` へのパス上の頂点値を、パスの順番で畳み込みます。
 
-計算量: `O(log^2 N)`
+**計算量**
 
-## Example
+- `O(log^2 N)`
+
+## 使用例
 
 ```cpp
 #include "libraries/tree/HLD_seg.hpp"
@@ -120,7 +133,7 @@ int main() {
 }
 ```
 
-## Non-Commutative Example
+## 非可換演算の使用例
 
 ```cpp
 struct S {

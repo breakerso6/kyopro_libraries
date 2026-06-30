@@ -3,10 +3,10 @@
 各ライブラリは、AtCoder Library のドキュメントに近い粒度で次を確認できるようにまとめています。
 
 - `Include`: 提出コードで読み込むパス
-- `Constructor`: 構築方法と前提
-- `Methods`: 主要API、引数、返り値
-- `Complexity`: 計算量とメモリ
-- `Example`: 典型的な使い方
+- `コンストラクタ`: 構築方法と前提
+- `関数`: 主要API、引数、返り値
+- `計算量`: 計算量とメモリ
+- `使用例`: 典型的な使い方
 
 | category | overview |
 | --- | --- |
@@ -19,7 +19,7 @@
 | [tree](tree/README.md) | HLD、全方位木DP、重心分解、Virtual Tree |
 | [utility](utility/README.md) | 乱数などの共通部品 |
 
-## How to read
+## 読み方
 
 - 半開区間は `[l, r)` と書きます。
 - グラフや木の頂点番号は基本的に `0`-indexed です。

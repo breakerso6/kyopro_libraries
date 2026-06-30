@@ -8,7 +8,7 @@
 #include "libraries/data_structure/SegmentTreeBeats.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 SegmentTreeBeats seg(values);
@@ -16,10 +16,15 @@ SegmentTreeBeats seg(values);
 
 `values` は `vector<long long>` です。
 
+**制約**
+
+- $0 \leq N$
+- 和と更新結果が `long long` に収まる
+
 - 構築: `O(N)`
 - メモリ: `O(N)`
 
-## Update API
+## 更新関数
 
 ```cpp
 void range_chmin(int l, int r, long long x);
@@ -35,9 +40,15 @@ void range_add(int l, int r, long long x);
 | `range_chmax` | `a[i] = max(a[i], x)` |
 | `range_add` | `a[i] += x` |
 
-計算量: 償却 `O(log^2 N)`
+**制約**
 
-## Query API
+- $0 \leq l \leq r \leq N$
+
+**計算量**
+
+- ならし `O(log^2 N)`
+
+## クエリ関数
 
 ```cpp
 long long range_sum(int l, int r);
@@ -48,9 +59,16 @@ int size() const;
 
 `range_sum`、`range_min`、`range_max` は `[l,r)` の和、最小値、最大値を返します。`size()` は元の配列長です。
 
-計算量: `O(log N)`
+**制約**
 
-## Example
+- `range_sum`: $0 \leq l \leq r \leq N$
+- `range_min`, `range_max`: $0 \leq l < r \leq N$
+
+**計算量**
+
+- `O(log N)`
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -70,7 +88,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - すべての区間は0-indexed半開区間です。
 - `range_sum` は空区間に対して `0` を返します。空区間への `range_min`、`range_max` は利用しないでください。

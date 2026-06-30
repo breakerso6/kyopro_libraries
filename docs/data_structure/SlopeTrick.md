@@ -8,7 +8,7 @@
 #include "libraries/data_structure/SlopeTrick.hpp"
 ```
 
-## Template Parameter and Initial State
+## テンプレート引数・初期状態
 
 ```cpp
 template<class T = long long>
@@ -19,7 +19,11 @@ SlopeTrick<long long> slope;
 
 初期状態はすべての `x` に対して `f(x)=0` です。`T` は順序比較、加減算、整数との乗算相当の計算でオーバーフローしない型を使います。
 
-## Add Operations
+**制約**
+
+- `T` は比較、加減算、コピーが可能
+
+## 加算操作
 
 ```cpp
 void add_constant(T c);
@@ -37,9 +41,12 @@ void add_abs(T a);
 | `add_x_minus_a(a)` | `max(x-a,0)` |
 | `add_abs(a)` | `abs(x-a)` |
 
-定数加算は `O(1)`、その他は `O(log N)` です。
+**計算量**
 
-## Minimum
+- `add_constant`: $O(1)$
+- その他: $O(\log N)$
+
+## 最小値
 
 ```cpp
 T min_f() const;
@@ -48,9 +55,11 @@ pair<optional<T>, optional<T>> argmin() const;
 
 `min_f()` は関数の最小値です。`argmin()` は最小値を取る区間の左端・右端を返します。片側に非有界なら対応する値は `nullopt` です。
 
-計算量: `O(1)`
+**計算量**
 
-## Transformations
+- `O(1)`
+
+## 変換操作
 
 ```cpp
 void shift(T delta);
@@ -66,7 +75,7 @@ void clear_right();
 
 いずれも `O(1)` です。
 
-## Example
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -87,7 +96,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - 凸性を保つ操作だけを提供します。
 - `argmin()` の `optional` は、初期状態のように最小点集合が全実数の場合は両方とも `nullopt` です。

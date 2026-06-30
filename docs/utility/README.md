@@ -1,6 +1,6 @@
 # Utility
 
-## Random
+## [Random](Random.md)
 
 ```cpp
 #include "libraries/utility/Random.hpp"
@@ -14,7 +14,7 @@
 - `nextDouble`: `[0,1)`
 - `shuffle(vector)`: Fisher-Yates shuffle
 
-## Example
+## 使用例
 
 ```cpp
 #include "libraries/utility/Random.hpp"
@@ -26,3 +26,5 @@ rng.shuffle(values);
 ```
 
 暗号用途には使用しないでください。
+
+詳細は [Random.md](Random.md) を参照してください。

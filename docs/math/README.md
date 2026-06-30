@@ -2,17 +2,17 @@
 
 数論、線形代数、組合せカウント系のライブラリです。
 
-## Quick reference
+## 一覧
 
 | library | purpose |
 | --- | --- |
-| `XorBasis.hpp` | XOR線形基底 |
+| [XorBasis.hpp](XorBasis.md) | XOR線形基底 |
 | [Factorization.hpp](Factorization.md) | 64-bit整数の素数判定・素因数分解 |
 | [Matrix.hpp](Matrix.md) | 行列積、累乗、行列式、逆行列 |
 | [Mobius.hpp](Mobius.md) | Mobius関数、約数/倍数Zeta変換 |
 | [MappingTwelvefold.hpp](MappingTwelvefold.md) | 写像12相の基本カウント |
 
-## XorBasis
+## [XorBasis](XorBasis.md)
 
 ```cpp
 #include "libraries/math/XorBasis.hpp"
@@ -26,6 +26,8 @@
 - `rank`: 基底のrank
 
 各操作は `O(BITS)`、メモリは `O(BITS)` です。
+
+詳細は [XorBasis.md](XorBasis.md) を参照してください。
 
 ## [64-bit factorization](Factorization.md)
 

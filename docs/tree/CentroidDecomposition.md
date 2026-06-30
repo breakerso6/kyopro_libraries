@@ -10,7 +10,7 @@
 #include "libraries/tree/CentroidDecomposition.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 CentroidDecomposition cd(graph);
@@ -18,20 +18,24 @@ CentroidDecomposition cd(graph);
 
 `graph` は `vector<vector<int>>` の無向木です。
 
-## Public members
+**制約**
 
-| member | meaning |
+- `graph` は連結な無向木
+
+## メンバ変数
+
+| メンバ | 意味 |
 | --- | --- |
 | `parent[v]` | 重心分解木での親。根の重心は `-1` |
 | `depth[v]` | 重心分解木での深さ |
 | `subtree[v]` | 構築中に使った部分木サイズ |
 
-## Complexity
+## 計算量
 
-- Construction: `O(N log N)`
-- Memory: `O(N)`
+- 構築: $O(N \log N)$
+- メモリ: $O(N)$
 
-## Example
+## 使用例
 
 ```cpp
 vector<vector<int>> g(n);
@@ -42,7 +46,7 @@ for (int v = 0; v < n; ++v) {
 }
 ```
 
-## Typical use
+## 典型的な使い方
 
 「頂点を赤く塗る更新」と「頂点 `v` から最も近い赤頂点までの距離」を処理する典型では、各頂点から重心分解木の祖先重心への距離を前計算します。
 
@@ -61,7 +65,7 @@ answer = min(best[c] + dist(v, c)) over c in centroid_ancestors[v]
 
 各頂点の重心祖先は `O(log N)` 個なので、更新・クエリは `O(log N)` 個の候補を見るだけになります。距離 `dist` は `HLD` やLCAで求めるか、重心分解構築時に別途保存します。
 
-## Notes
+## 注意
 
 - 入力は連結な無向木を想定します。
 - このクラスは分解木そのものだけを作ります。距離表や問題ごとの集約値は利用側で持ちます。

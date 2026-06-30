@@ -8,7 +8,7 @@
 #include "libraries/string/Manacher.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 Manacher manacher(text);
@@ -16,12 +16,16 @@ Manacher manacher(text);
 
 `text` は `std::string` です。
 
+**制約**
+
+- $0 \leq N$
+
 - 構築: `O(N)`
 - メモリ: `O(N)`
 
 既存インスタンスは `build(text)` で再構築できます。
 
-## Public Members
+## メンバ変数
 
 | member | description |
 | --- | --- |
@@ -40,9 +44,15 @@ bool is_palindrome(int l, int r) const;
 
 半開部分文字列 `text[l,r)` が回文かを返します。空文字列は回文として `true` です。
 
-計算量: `O(1)`
+**制約**
 
-## Example
+- $0 \leq l \leq r \leq N$
+
+**計算量**
+
+- `O(1)`
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -64,7 +74,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - 添字は0-indexed、判定区間は半開区間です。
 - `odd` と `even` の半径の総和は、位置を区別した非空回文部分文字列の総数です。

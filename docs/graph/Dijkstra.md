@@ -8,7 +8,7 @@
 #include "libraries/graph/Dijkstra.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 Dijkstra<T> graph(n);
@@ -16,22 +16,51 @@ Dijkstra<T> graph(n);
 
 頂点は `[0,n)` です。`T` は距離の型です。
 
-## Methods
+**制約**
+
+- $0 \leq n$
+
+**計算量**
+
+- $O(n)$
+
+## add_edge
 
 ```cpp
 void add_edge(int from, int to, T cost, bool directed = true);
+```
+
+辺を追加します。`directed=false` なら無向辺として両方向に追加します。
+
+**制約**
+
+- $0 \leq from < n$
+- $0 \leq to < n$
+- `cost` は非負
+
+**計算量**
+
+- $O(1)$
+
+## shortest_path
+
+```cpp
 vector<T> shortest_path(int source, T infinity) const;
 ```
 
-- `add_edge`: 辺を追加します。`directed=false` なら無向辺として両方向に追加します。
-- `shortest_path`: `source` からの距離配列を返します。到達不能頂点は `infinity` のままです。
+`source` からの距離配列を返します。到達不能頂点は `infinity` のままです。
 
-## Complexity
+**制約**
 
-- Time: `O((V + E) log V)`
-- Memory: `O(V + E)`
+- $0 \leq source < n$
+- 全ての辺重みは非負
+- 最短距離と `d + cost` が `T` の範囲に収まる
 
-## Example
+**計算量**
+
+- $O((V + E) \log V)$
+
+## 使用例
 
 ```cpp
 Dijkstra<long long> g(4);
@@ -44,7 +73,7 @@ auto dist = g.shortest_path(0, (long long)4e18);
 cout << dist[3] << '\n'; // 9
 ```
 
-## Notes
+## 注意
 
 - 負辺がある場合は使えません。
 - `d + cost` がオーバーフローしないように、十分大きい型と `infinity` を選んでください。

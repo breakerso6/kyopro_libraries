@@ -8,20 +8,30 @@
 #include "libraries/math/Mobius.hpp"
 ```
 
-## Functions
+## mobius_sieve
 
 ```cpp
 vector<int> mobius_sieve(int n);
+```
 
+`mu[0..n]` を返します。`mu[1] = 1` です。
+
+**制約**
+
+- $0 \leq n$
+
+**計算量**
+
+- $O(n)$
+
+## divisor_zeta / divisor_mobius
+
+```cpp
 template<class T> vector<T> divisor_zeta(vector<T> f);
 template<class T> vector<T> divisor_mobius(vector<T> f);
-template<class T> vector<T> multiple_zeta(vector<T> f);
-template<class T> vector<T> multiple_mobius(vector<T> f);
 ```
 
 `f` は添字 `1..N` を使います。`f[0]` は未使用です。
-
-## Meaning
 
 `g = divisor_zeta(f)`:
 
@@ -29,20 +39,35 @@ template<class T> vector<T> multiple_mobius(vector<T> f);
 g[n] = sum f[d]  (d | n)
 ```
 
+`divisor_mobius` はこの逆変換です。
+
+**計算量**
+
+- $O(N \log N)$
+
+## multiple_zeta / multiple_mobius
+
+```cpp
+
+template<class T> vector<T> multiple_zeta(vector<T> f);
+template<class T> vector<T> multiple_mobius(vector<T> f);
+```
+
+`f` は添字 `1..N` を使います。`f[0]` は未使用です。
+
 `g = multiple_zeta(f)`:
 
 ```text
 g[d] = sum f[m]  (d | m)
 ```
 
-`divisor_mobius` と `multiple_mobius` はそれぞれ逆変換です。
+`multiple_mobius` はこの逆変換です。
 
-## Complexity
+**計算量**
 
-- `mobius_sieve`: `O(N)`
-- each transform: `O(N log N)`
+- $O(N \log N)$
 
-## Example
+## 使用例
 
 ```cpp
 auto mu = mobius_sieve(10);
@@ -53,7 +78,7 @@ auto g = divisor_zeta(f);
 auto restored = divisor_mobius(g);
 ```
 
-## Typical use
+## 典型的な使い方
 
 - `g[n] = sum_{d|n} f[d]` から `f` を復元する
 - gcd がちょうど `1` の組を、倍数ごとの個数から数える

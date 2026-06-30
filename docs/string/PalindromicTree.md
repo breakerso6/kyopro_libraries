@@ -8,7 +8,7 @@
 #include "libraries/string/PalindromicTree.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 PalindromicTree tree;
@@ -17,7 +17,15 @@ PalindromicTree tree(text);
 
 空文字列から始めるか、`std::string` 全体から構築します。遷移を `std::map<char,int>` で保持するため、構築は `O(N log sigma)`、メモリは `O(N sigma)` ではなく実際に存在する遷移数に対して `O(N)` です。
 
-## Node Layout
+**制約**
+
+- $0 \leq N$
+
+**計算量**
+
+- $O(N \log \sigma)$
+
+## ノードの構造
 
 `nodes[0]` と `nodes[1]` は内部処理用の根です。非空回文に対応するノードは `[2,nodes.size())` にあります。
 
@@ -39,9 +47,15 @@ int node = tree.add(char c);
 
 文字列末尾へ `c` を追加し、新しい文字列の最長回文接尾辞ノードを返します。高々1つの新規ノードが作られます。
 
-計算量: `O(log sigma)` 償却
+**制約**
 
-## Queries
+- `propagate_occurrences()` の呼び出し前である
+
+**計算量**
+
+- ならし `O(log sigma)`
+
+## クエリ
 
 ```cpp
 int distinct_count() const;
@@ -50,7 +64,7 @@ string palindrome(int node) const;
 
 `distinct_count()` は異なる非空回文数です。`palindrome(node)` はノードに対応する文字列を返し、文字列長に比例した時間がかかります。
 
-## Occurrence Counts
+## 出現回数
 
 ```cpp
 void propagate_occurrences();
@@ -60,7 +74,7 @@ void propagate_occurrences();
 
 伝播は複数回呼んでも結果を重複加算しません。ただし、伝播後に `add` を呼ぶと `logic_error` になります。
 
-## Example
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -79,7 +93,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - 同じ文字列を一括構築した場合と、1文字ずつ `add` した場合の結果は同じです。
 - `clear()` で空文字列の状態へ戻せます。

@@ -8,7 +8,7 @@
 #include "libraries/tree/HLD.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 HLD hld(graph, root);
@@ -18,14 +18,19 @@ HLD hld(graph, root);
 - `root`: 根。省略時は `0`
 - `graph` は無向木を想定します。
 
-計算量:
+**制約**
+
+- `graph` は連結な無向木
+- $0 \leq root < N$
+
+**計算量**
 
 - 構築: `O(N)`
 - メモリ: `O(N)`
 
-## Public Members
+## メンバ変数
 
-| member | description |
+| メンバ | 説明 |
 | --- | --- |
 | `vertex[i]` | HLD 順で `i` 番目の頂点 |
 | `id[v]` | 頂点 `v` の HLD 順 index |
@@ -37,7 +42,7 @@ HLD hld(graph, root);
 | `out[v]` | Euler Tour上で部分木区間が終わる位置。部分木は `[id[v], out[v])` |
 | `root` | 構築時に指定した根 |
 
-## API
+## 関数
 
 ### level_ancestor
 
@@ -47,7 +52,14 @@ int level_ancestor(int v, int d);
 
 頂点 `v` の祖先で、深さが `d` の頂点を返します。`depth[v] < d` の場合は `-1` を返します。
 
-計算量: `O(log N)`
+**制約**
+
+- $0 \leq v < N$
+- $0 \leq d$
+
+**計算量**
+
+- `O(log N)`
 
 ### lca
 
@@ -57,7 +69,13 @@ int lca(int u, int v);
 
 頂点 `u` と `v` の Lowest Common Ancestor を返します。
 
-計算量: `O(log N)`
+**制約**
+
+- $0 \leq u, v < N$
+
+**計算量**
+
+- `O(log N)`
 
 ### distance
 
@@ -67,7 +85,13 @@ int distance(int u, int v);
 
 頂点 `u` と `v` の間の辺数を返します。
 
-計算量: `O(log N)`
+**制約**
+
+- $0 \leq u, v < N$
+
+**計算量**
+
+- `O(log N)`
 
 ### in_subtree
 
@@ -77,7 +101,13 @@ bool in_subtree(int ancestor, int v) const;
 
 根付き木で `v` が `ancestor` の部分木に含まれるかを返します。Euler Tour上の区間 `[id[ancestor], out[ancestor])` を使います。
 
-計算量: `O(1)`
+**制約**
+
+- $0 \leq ancestor, v < N$
+
+**計算量**
+
+- `O(1)`
 
 ### path_segments
 
@@ -89,7 +119,13 @@ vector<pair<int, int>> path_segments(int u, int v, bool vertex_query = true);
 
 `vertex_query=false` の場合は LCA に対応する頂点を除くため、辺値を親側の頂点位置に載せるときに使えます。
 
-計算量: `O(log N)` 個の区間を返します。
+**制約**
+
+- $0 \leq u, v < N$
+
+**計算量**
+
+- `O(log N)` 個の区間を返します。
 
 ### jump
 
@@ -101,9 +137,16 @@ int jump(int s, int t, int i);
 
 `i` がパス長を超える場合の返り値は未定義です。
 
-計算量: `O(log N)`
+**制約**
 
-## Example
+- $0 \leq s, t < N$
+- $0 \leq i \leq distance(s, t)$
+
+**計算量**
+
+- `O(log N)`
+
+## 使用例
 
 ```cpp
 #include "libraries/tree/HLD.hpp"

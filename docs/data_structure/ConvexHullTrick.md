@@ -10,7 +10,7 @@
 #include "libraries/data_structure/ConvexHullTrick.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 ConvexHullTrick<T> cht(true);   // minimum
@@ -19,30 +19,47 @@ ConvexHullTrick<T> cht(false);  // maximum
 
 省略時は最小値クエリです。
 
-## Methods
+**計算量**
+
+- $O(1)$
+
+## add_line
 
 ```cpp
 void add_line(T a, T b);
-T query(T x) const;
 ```
 
-- `add_line(a,b)`: 直線 `ax+b` を追加
-- `query(x)`: 現在の直線集合での最小値または最大値
+直線 `ax+b` を追加します。
 
-## Required order
+**制約**
 
 - 最小値クエリ: 傾き `a` を降順に追加
 - 最大値クエリ: 傾き `a` を昇順に追加
 
 同じ傾きの直線は、より良い切片だけが残ります。
 
-## Complexity
+**計算量**
 
-- `add_line`: amortized `O(1)`
-- `query`: `O(log N)`
-- Memory: `O(N)`
+- ならし $O(1)$
 
-## Example
+## query
+
+```cpp
+T query(T x) const;
+```
+
+現在の直線集合での最小値または最大値を返します。
+
+**制約**
+
+- 1本以上の直線が追加されている
+- `a*x+b` が `T` の範囲に収まる
+
+**計算量**
+
+- $O(\log N)$
+
+## 使用例
 
 ```cpp
 ConvexHullTrick<long long> cht;
@@ -53,7 +70,7 @@ cht.add_line(-1, 2);
 cout << cht.query(3) << '\n'; // min(15-20, 6-5, -3+2) = -5
 ```
 
-## Notes
+## 注意
 
 - `query` の `x` は任意順で呼べます。
 - 直線追加順の前提を破ると答えは壊れます。

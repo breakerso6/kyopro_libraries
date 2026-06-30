@@ -12,7 +12,7 @@
 
 AtCoder Library の `atcoder/lazysegtree` が必要です。
 
-## Template Parameters
+## テンプレート引数
 
 ```cpp
 template <
@@ -37,7 +37,7 @@ struct HLD_lseg_edge;
 - `composition(F f, F g)`: `f` と `g` の合成
 - `id_()`: 恒等写像
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 HLD_lseg_edge<S, op, e, F, mapping, composition, id_> hld(n, edges, root);
@@ -49,23 +49,31 @@ HLD_lseg_edge<S, op, e, F, mapping, composition, id_> hld(n, edges, root);
 - `edges[i]` の `from`, `to` は無向木の辺の両端、`weight` は辺 `i` の初期値です。
 - `set(i, x)`、`get(i)` の `i` は `edges` に渡した順番の辺 ID です。
 
-計算量:
+**制約**
+
+- $0 \leq root < n$
+- `edges` は `n` 頂点の連結な無向木
+- `op` は結合的
+- `e()` は `op` の単位元
+- `mapping` と `composition` はACL lazy_segtreeと同じ条件を満たす
+
+**計算量**
 
 - 構築: `O(N log N)`
 - メモリ: `O(N)`
 
-## HLD API
+## HLD関数
 
 `HLD_lseg_edge` は `HLD` と同じ補助 API を持ちます。これらは頂点に対するクエリです。
 
-| function | description | complexity |
+| 関数 | 説明 | 計算量 |
 | --- | --- | --- |
 | `level_ancestor(v, d)` | `v` の祖先で深さ `d` の頂点。存在しない場合は `-1` | `O(log N)` |
 | `lca(u, v)` | `u` と `v` の LCA | `O(log N)` |
 | `distance(u, v)` | `u` と `v` の距離 | `O(log N)` |
 | `jump(s, t, i)` | `s` から `t` へのパス上の `i` 番目の頂点 | `O(log N)` |
 
-## Lazy Segment Tree API
+## 遅延セグメント木関数
 
 ### set
 
@@ -75,7 +83,9 @@ void set(int edge_id, S x);
 
 辺 `edge_id` の値を `x` に更新します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### get
 
@@ -85,7 +95,9 @@ S get(int edge_id);
 
 辺 `edge_id` の現在の値を返します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### prod_path
 
@@ -95,7 +107,9 @@ S prod_path(int s, int t);
 
 `s` から `t` へのパス上の辺値を、パスの順番で畳み込みます。
 
-計算量: `O(log^2 N)`
+**計算量**
+
+- `O(log^2 N)`
 
 ### apply_path
 
@@ -105,9 +119,11 @@ void apply_path(int s, int t, F f);
 
 `s` から `t` へのパス上の全辺に `f` を作用させます。`s == t` の場合は何もしません。
 
-計算量: `O(log^2 N)`
+**計算量**
 
-## Example
+- `O(log^2 N)`
+
+## 使用例
 
 パス加算、パス和クエリの例です。`S` に区間長を持たせると、lazy propagation で区間全体への加算を扱えます。
 
@@ -158,7 +174,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - `apply_path(s, t, f)` は辺に作用します。LCA の頂点自体には対応する辺がないため、パス上の頂点数より 1 個少ない要素が対象です。
 - パス集約は非可換演算に対応していますが、`op` は結合的である必要があります。

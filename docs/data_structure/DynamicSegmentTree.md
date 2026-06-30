@@ -10,7 +10,7 @@
 #include "libraries/data_structure/DynamicSegmentTree.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 DynamicSegmentTree<S, Op> seg(low, high, identity, op);
@@ -24,26 +24,69 @@ DynamicSegmentTree<S, Op> seg(low, high, identity, op);
 | `Op` | `S operator()(S, S)` を持つ結合的な演算 |
 | `identity` | 単位元 |
 
-## Methods
+**制約**
+
+- `low < high`
+- `Op` は結合的
+- `identity` は `Op` の単位元
+
+**計算量**
+
+- $O(1)$
+
+## set
 
 ```cpp
 void set(long long position, const S& value);
+```
+
+`position` の値を `value` に置き換えます。
+
+**制約**
+
+- `low <= position < high`
+
+**計算量**
+
+- $O(\log X)$
+
+## get
+
+```cpp
 S get(long long position) const;
+```
+
+`position` の値を返します。未更新の点は `identity` です。
+
+**制約**
+
+- `low <= position < high`
+
+**計算量**
+
+- $O(\log X)$
+
+## prod
+
+```cpp
 S prod(long long l, long long r) const;
 ```
 
-- `set`: `position` の値を `value` に置き換える
-- `get`: 1点の値を返す
-- `prod`: 半開区間 `[l, r)` の積を返す
+半開区間 `[l, r)` の積を返します。`l = r` のときは `identity` を返します。
 
-## Complexity
+**制約**
+
+- `low <= l <= r <= high`
+
+**計算量**
+
+- $O(\log X)$
 
 `X = high - low` とします。
 
-- `set`, `get`, `prod`: `O(log X)`
-- Memory: 作られたノード数に比例。1回の新規更新で最大 `O(log X)` ノード
+メモリは作られたノード数に比例します。1回の新規更新で最大 $O(\log X)$ ノードを追加します。
 
-## Example
+## 使用例
 
 ```cpp
 struct Sum {
@@ -57,7 +100,7 @@ seg.set(-7, 3);
 cout << seg.prod(-10, 100000000001LL) << '\n'; // 8
 ```
 
-## Notes
+## 注意
 
 - 座標は `long long` です。
 - 区間外の `set/get/prod` は `assert` に失敗します。

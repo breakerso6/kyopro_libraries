@@ -10,23 +10,23 @@
 - 直線最小値: 傾き単調なら `ConvexHullTrick`、任意順なら `LiChaoTree`
 - 値域頻度・k番目: `WaveletMatrix`
 
-| library | main API | complexity |
+| library | 主な関数 | 計算量 |
 | --- | --- | --- |
-| `BinaryTrie.hpp` | `insert`, `erase`, `count`, `min_xor`, `max_xor` | 1操作 `O(BITS)` |
-| `RollbackDSU.hpp` | `merge`, `undo`, `snapshot`, `rollback` | `merge`/`undo`: `O(log N)` |
-| `WeightedDSU.hpp` | `merge(a,b,w)`, `diff`, `same` | 償却 `O(alpha(N))` |
-| `SparseTable.hpp` | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
-| `DisjointSparseTable.hpp` | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
-| `SWAG.hpp` | `push`, `pop`, `prod` | 償却 `O(1)` |
-| `LiChaoTree.hpp` | `add_line(a,b)`, `min(x)` | `O(log X)` |
+| [BinaryTrie.hpp](BinaryTrie.md) | `insert`, `erase`, `count`, `min_xor`, `max_xor` | 1操作 `O(BITS)` |
+| [RollbackDSU.hpp](RollbackDSU.md) | `merge`, `undo`, `snapshot`, `rollback` | `merge`/`undo`: `O(log N)` |
+| [WeightedDSU.hpp](WeightedDSU.md) | `merge(a,b,w)`, `diff`, `same` | 償却 `O(alpha(N))` |
+| [SparseTable.hpp](SparseTable.md) | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
+| [DisjointSparseTable.hpp](DisjointSparseTable.md) | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
+| [SWAG.hpp](SWAG.md) | `push`, `pop`, `prod` | 償却 `O(1)` |
+| [LiChaoTree.hpp](LiChaoTree.md) | `add_line(a,b)`, `min(x)` | `O(log X)` |
 | [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 `O(1)` 償却、取得 `O(log N)` |
-| `IntervalSet.hpp` | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
-| `Indexset.hpp` | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
-| `PersistentSegmentTree.hpp` | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
+| [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
+| [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
+| [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
 | [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 `O(log X)` |
-| `PersistentLazySegmentTree.hpp` | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |
-| `PersistentDSU.hpp` | `build`, `merge`, `same`, `size` | 各操作 `O(log^2 N)` |
-| `PersistentBinaryTrie.hpp` | `insert`, `erase`, `kth_xor` | 1操作 `O(BITS)` |
+| [PersistentLazySegmentTree.hpp](Persistence.md#persistentlazysegmenttree) | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |
+| [PersistentDSU.hpp](Persistence.md#persistentdsu) | `build`, `merge`, `same`, `size` | 各操作 `O(log^2 N)` |
+| [PersistentBinaryTrie.hpp](Persistence.md#persistentbinarytrie) | `insert`, `erase`, `kth_xor` | 1操作 `O(BITS)` |
 | [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | `O(log H log W)` |
 | [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | `O(log H log W)` |
 | [WaveletMatrix.hpp](WaveletMatrix.md) | `kth_smallest`, `range_freq`, `prev_value`, `next_value` | 1クエリ `O(log sigma)` |
@@ -35,7 +35,7 @@
 | [CartesianTree.hpp](CartesianTree.md) | `parent`, `left`, `right`, `root` | 構築 `O(N)` |
 | [SlopeTrick.hpp](SlopeTrick.md) | `add_abs`, `add_x_minus_a`, `shift`, `min_f` | 追加 `O(log N)` |
 
-## Notes
+## 注意
 
 - `SparseTable` の演算は結合的かつ冪等である必要があります。一般の結合的演算には `DisjointSparseTable` を使います。
 - `WeightedDSU::merge(a,b,w)` は `potential(b)-potential(a)=w` を追加します。同一成分で矛盾する場合は `false` です。
@@ -46,9 +46,9 @@
 - IndexSetの詳細は [Indexset.md](Indexset.md) を参照してください。
 - 永続データ構造のversion管理と制約は [Persistence.md](Persistence.md) を参照してください。
 
-## Typical choices
+## 使い分け
 
-### Dynamic coordinates
+### 動的座標
 
 ```cpp
 DynamicSegmentTree<long long, Sum> seg(-INF, INF, 0);
@@ -58,7 +58,7 @@ auto total = seg.prod(l, r);
 
 座標圧縮できるなら普通の配列セグ木の方が軽いです。オンラインで未知座標が来る場合や、範囲が `1e18` 近い場合に使います。
 
-### Rectangle queries
+### 長方形クエリ
 
 ```cpp
 SegmentTree2D<long long, Sum> static_grid(values, 0);

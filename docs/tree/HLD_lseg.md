@@ -12,7 +12,7 @@
 
 AtCoder Library の `atcoder/lazysegtree` が必要です。
 
-## Template Parameters
+## テンプレート引数
 
 ```cpp
 template <
@@ -37,7 +37,7 @@ struct HLD_lseg;
 - `composition(F f, F g)`: `f` と `g` の合成
 - `id_()`: 恒等写像
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, root);
@@ -49,23 +49,31 @@ HLD_lseg<S, op, e, F, mapping, composition, id_> hld(graph, initial_values, root
 - `root`: 根。省略時は `0`
 - `graph` は無向木を想定します。
 
-計算量:
+**制約**
+
+- `graph` は連結な無向木
+- `initial_values` を渡す場合は `initial_values.size() == N`
+- `op` は結合的
+- `e()` は `op` の単位元
+- `mapping` と `composition` はACL lazy_segtreeと同じ条件を満たす
+
+**計算量**
 
 - 構築: `O(N log N)`
 - メモリ: `O(N)`
 
-## HLD API
+## HLD関数
 
 `HLD_lseg` は `HLD` と同じ補助 API を持ちます。
 
-| function | description | complexity |
+| 関数 | 説明 | 計算量 |
 | --- | --- | --- |
 | `level_ancestor(v, d)` | `v` の祖先で深さ `d` の頂点。存在しない場合は `-1` | `O(log N)` |
 | `lca(u, v)` | `u` と `v` の LCA | `O(log N)` |
 | `distance(u, v)` | `u` と `v` の距離 | `O(log N)` |
 | `jump(s, t, i)` | `s` から `t` へのパス上の `i` 番目の頂点 | `O(log N)` |
 
-## Lazy Segment Tree API
+## 遅延セグメント木関数
 
 ### set
 
@@ -75,7 +83,9 @@ void set(int v, S x);
 
 頂点 `v` の値を `x` に更新します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### get
 
@@ -85,7 +95,9 @@ S get(int v);
 
 頂点 `v` の現在の値を返します。
 
-計算量: `O(log N)`
+**計算量**
+
+- `O(log N)`
 
 ### prod_path
 
@@ -95,7 +107,9 @@ S prod_path(int s, int t);
 
 `s` から `t` へのパス上の頂点値を、パスの順番で畳み込みます。
 
-計算量: `O(log^2 N)`
+**計算量**
+
+- `O(log^2 N)`
 
 ### apply_path
 
@@ -105,9 +119,11 @@ void apply_path(int s, int t, F f);
 
 `s` から `t` へのパス上の全頂点に `f` を作用させます。
 
-計算量: `O(log^2 N)`
+**計算量**
 
-## Example
+- `O(log^2 N)`
+
+## 使用例
 
 パス加算、パス和クエリの例です。`S` に区間長を持たせると、lazy propagation で区間全体への加算を扱えます。
 
@@ -163,7 +179,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - `apply_path(s, t, f)` は頂点に作用します。辺に値を持たせたい場合は、子側の頂点に辺の値を載せるなどの変換が必要です。
 - パス集約は非可換演算に対応していますが、`op` は結合的である必要があります。

@@ -23,14 +23,21 @@ VirtualTree tree = VirtualTree::build(selected_vertices, hld);
 
 異なる指定頂点数を `K` とすると、Virtual Treeの頂点数は高々 `2K-1` です。
 
-- 構築: `O(K log K)`
-- メモリ: `O(K)`
+**制約**
+
+- `selected_vertices` の各要素は元の木の頂点
+- `hld` は同じ木から構築済み
+
+**計算量**
+
+- 構築: $O(K \log K)$
+- メモリ: $O(K)$
 
 空の頂点集合を渡した場合は、すべての配列が空のVirtual Treeを返します。
 
-## Public Members
+## メンバ変数
 
-| member | description |
+| メンバ | 説明 |
 | --- | --- |
 | `vertices[i]` | Virtual Tree上の添字 `i` に対応する元の頂点番号 |
 | `parent[i]` | Virtual Tree上の親添字。根は `-1` |
@@ -39,7 +46,7 @@ VirtualTree tree = VirtualTree::build(selected_vertices, hld);
 
 `vertices` はHLDのDFS順に並び、根は添字 `0` です。`parent[i] < i` なので、添字の逆順で子から親へのDPを行えます。
 
-## Example
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -71,7 +78,7 @@ int main() {
 
 この例では指定頂点 `3,4,6` に加え、必要なLCA `1,0` が自動的に追加されます。
 
-## Tree DP Pattern
+## 木DPでの使い方
 
 ```cpp
 vector<long long> dp(tree.vertices.size(), 0);
@@ -84,7 +91,7 @@ for (int i = (int)tree.vertices.size() - 1; i > 0; --i) {
 
 元の頂点番号が必要な処理では常に `tree.vertices[i]` を参照します。`parent` や `graph` 内の番号は元の頂点番号ではなく、Virtual Tree上の添字です。
 
-## Notes
+## 注意
 
 - 入力は `hld` の構築に使った連結な無向木上の頂点である必要があります。
 - 辺重みは扱わず、距離は元の木の辺数です。重み付き距離が必要なら、根からの累積距離を別途用意して `vertices` 間の差を計算してください。

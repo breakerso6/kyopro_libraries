@@ -8,7 +8,7 @@
 #include "libraries/algorithm/ZAlgorithm.hpp"
 ```
 
-## Function
+## 関数
 
 ```cpp
 template<class Container>
@@ -22,12 +22,15 @@ vector<int> z_algorithm(const Container& s);
 - `z[0] = s.size()`
 - `z[i] = lcp(s, s.substr(i))`
 
-## Complexity
+**制約**
 
-- Time: `O(N)`
-- Memory: `O(N)`
+- `s.size()` と `s[i]` が定義されている
 
-## Example
+**計算量**
+
+- $O(N)$
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -41,7 +44,7 @@ int main() {
 }
 ```
 
-## Pattern matching
+## パターン検索
 
 文字列 `text` に `pattern` が出る位置を探す典型例です。
 

@@ -8,7 +8,7 @@
 #include "libraries/graph/MST.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 KruskalMST<T> mst(n);
@@ -16,14 +16,38 @@ KruskalMST<T> mst(n);
 
 頂点は `[0,n)` です。`T` は辺重みの型です。
 
-## Methods
+**制約**
+
+- $0 \leq n$
+
+**計算量**
+
+- $O(n)$
+
+## add_edge
 
 ```cpp
 int add_edge(int u, int v, T cost);
+```
+
+無向辺を追加し、追加した辺IDを返します。
+
+**制約**
+
+- $0 \leq u < n$
+- $0 \leq v < n$
+
+**計算量**
+
+- $O(1)$
+
+## build
+
+```cpp
 pair<T, vector<Edge>> build() const;
 ```
 
-`add_edge` は追加した辺IDを返します。`build` は `{total_cost, used_edges}` を返します。
+`{total_cost, used_edges}` を返します。非連結グラフでは最小全域森になります。
 
 `Edge` は次のメンバを持ちます。
 
@@ -35,12 +59,11 @@ struct Edge {
 };
 ```
 
-## Complexity
+**計算量**
 
-- Time: `O(E log E)`
-- Memory: `O(V + E)`
+- $O(E \log E)$
 
-## Example
+## 使用例
 
 ```cpp
 KruskalMST<long long> mst(4);
@@ -53,7 +76,7 @@ auto [cost, edges] = mst.build();
 cout << cost << '\n'; // 7
 ```
 
-## Notes
+## 注意
 
 - 無向グラフとして扱います。
 - グラフが非連結なら、各連結成分のMSTを合わせた最小全域森になります。

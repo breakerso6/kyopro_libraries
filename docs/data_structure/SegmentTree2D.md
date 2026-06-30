@@ -8,7 +8,7 @@
 #include "libraries/data_structure/SegmentTree2D.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 SegmentTree2D<S, Op> seg(height, width, identity, op);
@@ -17,23 +17,52 @@ SegmentTree2D<S, Op> seg(values, identity, op);
 
 `values` は `vector<vector<S>>` です。すべての行の長さが同じである必要があります。
 
-## Methods
+**制約**
+
+- $0 \leq height$
+- $0 \leq width$
+- `Op` は結合的
+- `identity` は `Op` の単位元
+
+**計算量**
+
+- $O(HW)$
+
+## set
 
 ```cpp
 void set(int row, int column, const S& value);
+```
+
+1マスを `value` に代入します。
+
+**制約**
+
+- $0 \leq row < H$
+- $0 \leq column < W$
+
+**計算量**
+
+- $O(\log H \log W)$
+
+## prod
+
+```cpp
 S prod(int row_l, int row_r, int column_l, int column_r) const;
 ```
 
-- `set`: 1マスを代入
-- `prod`: 長方形 `[row_l,row_r) x [column_l,column_r)` の積
+長方形 `[row_l,row_r) x [column_l,column_r)` の積を返します。
 
-## Complexity
+**制約**
 
-- Construction: `O(HW)`
-- `set`, `prod`: `O(log H log W)`
-- Memory: `O(HW)`
+- $0 \leq row_l \leq row_r \leq H$
+- $0 \leq column_l \leq column_r \leq W$
 
-## Example
+**計算量**
+
+- $O(\log H \log W)$
+
+## 使用例
 
 ```cpp
 struct Sum {
@@ -51,7 +80,7 @@ seg.set(1, 1, 10);
 cout << seg.prod(1, 2, 0, 3) << '\n'; // 4 + 10 + 6 = 20
 ```
 
-## Notes
+## 注意
 
 - すべての区間は半開区間です。
 - 演算は結合的である必要があります。

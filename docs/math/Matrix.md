@@ -8,7 +8,7 @@
 #include "libraries/math/Matrix.hpp"
 ```
 
-## Types
+## 型
 
 ```cpp
 template<class T>
@@ -20,7 +20,7 @@ struct Rational;
 
 `Rational<Int>` は整数行列の逆行列を有理数として返すための簡易分数型です。
 
-## Functions
+## 関数
 
 ```cpp
 Matrix<T> matrix_identity<T>(int n);
@@ -32,7 +32,15 @@ Int determinant_bareiss(Matrix<Int> a);
 optional<Matrix<Rational<Int>>> inverse_matrix_rational(const Matrix<Int>& a);
 ```
 
-## Complexity
+**制約**
+
+- 行列積では `a[0].size() == b.size()`
+- `matrix_pow`、`determinant`、`inverse_matrix` は正方行列
+- `matrix_pow` は $0 \leq e$
+- `determinant` と `inverse_matrix` は割り算できる型を使う
+- `determinant_bareiss` と `inverse_matrix_rational` は整数型を使う
+
+**計算量**
 
 `N x N` 行列について:
 
@@ -42,7 +50,7 @@ optional<Matrix<Rational<Int>>> inverse_matrix_rational(const Matrix<Int>& a);
 - `inverse_matrix`: `O(N^3)`
 - `determinant_bareiss`: `O(N^3)`
 
-## Example: matrix power over F_p
+## 使用例: $F_p$ 上の行列累乗
 
 ```cpp
 using mint = atcoder::modint998244353;
@@ -55,7 +63,7 @@ auto b = matrix_pow(a, 10);
 cout << b[0][1].val() << '\n'; // Fibonacci(10)
 ```
 
-## Example: integer determinant and inverse
+## 使用例: 整数行列の行列式と逆行列
 
 ```cpp
 Matrix<long long> a = {
@@ -70,7 +78,7 @@ auto inv = inverse_matrix_rational(a);
 // inv[1][0] = 3/2, inv[1][1] = -1/2
 ```
 
-## Notes
+## 注意
 
 - `determinant` と `inverse_matrix` は割り算できる体上の型向けです。
 - 整数の行列式には `determinant_bareiss` を使うと、途中の分数を避けられます。

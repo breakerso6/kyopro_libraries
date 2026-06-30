@@ -2,18 +2,18 @@
 
 文字列検索、ハッシュ、回文構造をまとめています。
 
-| library | purpose | complexity |
+| library | purpose | 計算量 |
 | --- | --- | --- |
-| `AhoCorasick.hpp` | 複数パターンの同時検索 | 構築 `O(総文字数 * alphabet)`、検索 `O(|text| + 出力)` |
-| `RollingHash.hpp` | 部分文字列比較、連結ハッシュ | 構築 `O(N)`、取得 `O(1)` |
+| [AhoCorasick.hpp](AhoCorasick.md) | 複数パターンの同時検索 | 構築 `O(総文字数 * alphabet)`、検索 `O(|text| + 出力)` |
+| [RollingHash.hpp](RollingHash.md) | 部分文字列比較、連結ハッシュ | 構築 `O(N)`、取得 `O(1)` |
 | [Manacher.hpp](Manacher.md) | 各中心の回文半径、回文判定 | `O(N)` |
 | [PalindromicTree.hpp](PalindromicTree.md) | 異なる回文の列挙と出現回数 | `O(N log sigma)` |
 
-## Typical choices
+## 使い分け
 
 - 1個のパターン検索: Z-algorithm や KMP 相当
-- 多数のパターン検索: `AhoCorasick`
-- 部分文字列同士の高速比較: `RollingHash`
+- 多数のパターン検索: [AhoCorasick](AhoCorasick.md)
+- 部分文字列同士の高速比較: [RollingHash](RollingHash.md)
 - 全区間の回文判定: `Manacher`
 - 異なる回文そのものを列挙したい: `PalindromicTree`
 

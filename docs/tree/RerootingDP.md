@@ -16,7 +16,7 @@
 #include "libraries/tree/RerootingDP.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 auto rerooting = make_rerooting_dp<DP, EdgeData>(
@@ -26,8 +26,6 @@ auto rerooting = make_rerooting_dp<DP, EdgeData>(
     add_vertex,
     add_edge_dp
 );
-rerooting.add_edge(u, v, uv_data, vu_data);
-vector<DP> answer = rerooting.build();
 ```
 
 | name | meaning |
@@ -39,7 +37,17 @@ vector<DP> answer = rerooting.build();
 | `add_vertex` | 集まった寄与に頂点自身の情報を足し、DP値にする関数 |
 | `add_edge_dp` | 隣接頂点のDP値を辺越しの寄与へ変換する関数 |
 
-## Functions passed to the constructor
+**制約**
+
+- $0 \leq n$
+- `merge` は結合的
+- `identity` は `merge` の単位元
+
+**計算量**
+
+- $O(n)$
+
+## コンストラクタへ渡す関数
 
 - `merge(a,b)`: 同じ頂点へ入る寄与を隣接リスト順に結合する。結合則と単位元が必要
 - `add_vertex(value,v)`: 子方向の寄与をまとめた後、頂点 `v` の情報を加える
@@ -49,9 +57,44 @@ vector<DP> answer = rerooting.build();
 
 `add_edge(u,v,data)` は両方向に同じデータを設定します。方向別のデータが必要なら `add_edge(u,v,uv_data,vu_data)` を使います。`uv_data` は頂点 `u` で `v` 側のDPを取り込む際に渡され、逆方向では `vu_data` が使われます。
 
-入力は連結な無向木を想定します。構築時間・メモリは `O(N)` です。
+## add_edge
 
-## Example: sum of distances from each vertex
+```cpp
+(1) void rerooting.add_edge(int u, int v, const EdgeData& data = EdgeData());
+(2) void rerooting.add_edge(int u, int v, const EdgeData& uv, const EdgeData& vu);
+```
+
+- (1): 両方向に同じ辺データを設定します。
+- (2): `u` から `v` 側を見るときは `uv`、`v` から `u` 側を見るときは `vu` を使います。
+
+**制約**
+
+- $0 \leq u < n$
+- $0 \leq v < n$
+- 最終的に追加する辺は木をなす
+
+**計算量**
+
+- $O(1)$
+
+## build
+
+```cpp
+vector<DP> answer = rerooting.build(int root = 0);
+```
+
+全頂点をそれぞれ根にしたときのDP値を返します。`answer[v]` が頂点 `v` を根とした答えです。
+
+**制約**
+
+- $0 \leq root < n$
+- 入力グラフは連結な無向木
+
+**計算量**
+
+- $O(n)$
+
+## 使用例: sum of distances from each vertex
 
 `DP{size, dist}` を「その成分に含まれる頂点数」と「根からその成分内の頂点への距離和」として持ちます。子側のDPを親へ渡すとき、全頂点の距離が辺重み `w` だけ増えるので `dist += size * w` します。
 
@@ -97,7 +140,7 @@ int main() {
 
 この例では `ans[v].dist` が頂点 `v` から全頂点への距離和です。
 
-## Notes
+## 注意
 
 - `merge` は結合的である必要があります。可換でなくても構いません。
 - 非可換な `merge` でも、prefix/suffix を使って隣接リスト順を保ちます。

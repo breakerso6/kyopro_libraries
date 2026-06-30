@@ -2,18 +2,18 @@
 
 | library | purpose | documentation |
 | --- | --- | --- |
-| `HLD.hpp` | LCA、距離、祖先、パス上の頂点 | [HLD.md](HLD.md) |
-| `HLD_seg.hpp` | 頂点値の一点更新・パス積 | [HLD_seg.md](HLD_seg.md) |
-| `HLD_lseg.hpp` | 頂点値のパス作用・パス積 | [HLD_lseg.md](HLD_lseg.md) |
-| `HLD_seg_edge.hpp` | 辺値の一点更新・パス積 | [HLD_seg_edge.md](HLD_seg_edge.md) |
-| `HLD_lseg_edge.hpp` | 辺値のパス作用・パス積 | [HLD_lseg_edge.md](HLD_lseg_edge.md) |
-| `CentroidDecomposition.hpp` | 重心分解木の構築 | [CentroidDecomposition.md](CentroidDecomposition.md) |
-| `RerootingDP.hpp` | 全方位木DP | [RerootingDP.md](RerootingDP.md) |
-| `VirtualTree.hpp` | 指定頂点とLCAから圧縮木を構築 | [VirtualTree.md](VirtualTree.md) |
+| [HLD.hpp](HLD.md) | LCA、距離、祖先、パス上の頂点 | [HLD.md](HLD.md) |
+| [HLD_seg.hpp](HLD_seg.md) | 頂点値の一点更新・パス積 | [HLD_seg.md](HLD_seg.md) |
+| [HLD_lseg.hpp](HLD_lseg.md) | 頂点値のパス作用・パス積 | [HLD_lseg.md](HLD_lseg.md) |
+| [HLD_seg_edge.hpp](HLD_seg_edge.md) | 辺値の一点更新・パス積 | [HLD_seg_edge.md](HLD_seg_edge.md) |
+| [HLD_lseg_edge.hpp](HLD_lseg_edge.md) | 辺値のパス作用・パス積 | [HLD_lseg_edge.md](HLD_lseg_edge.md) |
+| [CentroidDecomposition.hpp](CentroidDecomposition.md) | 重心分解木の構築 | [CentroidDecomposition.md](CentroidDecomposition.md) |
+| [RerootingDP.hpp](RerootingDP.md) | 全方位木DP | [RerootingDP.md](RerootingDP.md) |
+| [VirtualTree.hpp](VirtualTree.md) | 指定頂点とLCAから圧縮木を構築 | [VirtualTree.md](VirtualTree.md) |
 
 HLDの構築は `O(N)`、パスクエリはセグメント木の操作を除いて `O(log N)` 区間に分解されます。`HLD` は `lca`、`distance`、`jump` に加え、Euler Tour上の `id/out`、`in_subtree`、`path_segments` を持ちます。`HLD_*seg*` はAtCoder Libraryが必要です。
 
-## Centroid decomposition
+## 重心分解
 
 ```cpp
 #include "libraries/tree/CentroidDecomposition.hpp"

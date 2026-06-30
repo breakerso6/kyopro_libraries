@@ -8,7 +8,7 @@
 #include "libraries/data_structure/OfflineDynamicConnectivity.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 OfflineDynamicConnectivity dc(n);
@@ -16,7 +16,11 @@ OfflineDynamicConnectivity dc(n);
 
 頂点は `[0,n)` です。構築直後のグラフに辺はありません。
 
-## Edge Operations
+**制約**
+
+- $0 \leq n$
+
+## 辺操作
 
 ```cpp
 void add_edge(int u, int v);
@@ -27,7 +31,12 @@ void remove_edge(int u, int v);
 
 存在しない辺を削除すると `invalid_argument` を送出します。
 
-## Query Registration
+**制約**
+
+- $0 \leq u,v < n$
+- `remove_edge` は未削除の同じ辺が存在する時だけ呼ぶ
+
+## クエリ登録
 
 ```cpp
 int same_query(int u, int v);
@@ -45,6 +54,11 @@ int components_query();
 
 クエリ登録も時刻を1進めます。
 
+**制約**
+
+- `same_query`: $0 \leq u,v < n$
+- `size_query`: $0 \leq v < n$
+
 ## run
 
 ```cpp
@@ -55,7 +69,11 @@ vector<long long> answer = dc.run();
 
 操作数を `Q` とすると、計算量は `O(Q log Q log N)`、メモリは `O(Q log Q + N)` です。
 
-## Example
+**計算量**
+
+- $O(Q \log Q \log N)$
+
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -78,7 +96,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - 無向グラフ専用です。自己ループは登録できますが連結性には影響しません。
 - 結果は `run()` を呼ぶまで得られません。

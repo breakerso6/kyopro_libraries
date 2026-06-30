@@ -10,7 +10,7 @@
 #include "libraries/math/MappingTwelvefold.hpp"
 ```
 
-## Constructor
+## コンストラクタ
 
 ```cpp
 MappingTwelvefold<T> mt(max_n);
@@ -20,11 +20,19 @@ MappingTwelvefold<T> mt(max_n);
 
 `T` は `+`、`*`、`+=`、`0`、`1` を扱える型です。modint にも使えます。
 
-## Methods
+**制約**
 
-名前は `balls_to_boxes_condition` です。
+- $0 \leq max_n$
 
-| method | balls | boxes | condition |
+**計算量**
+
+- $O(max\_n^3)$
+
+## 関数
+
+関数名は `balls_to_boxes_condition` です。
+
+| 関数 | 玉 | 箱 | 条件 |
 | --- | --- | --- | --- |
 | `distinct_to_distinct_any(n,k)` | 区別あり | 区別あり | 制約なし |
 | `distinct_to_distinct_injective(n,k)` | 区別あり | 区別あり | 高々1個 |
@@ -39,13 +47,18 @@ MappingTwelvefold<T> mt(max_n);
 | `identical_to_identical_injective(n,k)` | 区別なし | 区別なし | 高々1個 |
 | `identical_to_identical_surjective(n,k)` | 区別なし | 区別なし | 空箱なし |
 
-## Complexity
+**制約**
 
-- Construction: `O(max_n^3)` for partition table
-- Query: `O(1)` except small loops in `any` cases over identical boxes
-- Memory: `O(max_n^2)`
+- $0 \leq n$
+- $0 \leq k$
+- 必要な前計算範囲が `max_n` に収まる
 
-## Example
+**計算量**
+
+- ほとんどの関数は $O(1)$
+- 一部の `any` は $O(\min(n,k))$
+
+## 使用例
 
 ```cpp
 MappingTwelvefold<long long> mt(20);
@@ -56,7 +69,7 @@ cout << mt.identical_to_distinct_any(4, 3) << '\n';       // C(6,2) = 15
 cout << mt.identical_to_identical_surjective(5, 2) << '\n'; // 2: 1+4, 2+3
 ```
 
-## Notes
+## 注意
 
 - `n` は玉の数、`k` は箱の数です。
 - `max_n` より大きい入力は一部メソッドで `0` になります。必要な上限で構築してください。

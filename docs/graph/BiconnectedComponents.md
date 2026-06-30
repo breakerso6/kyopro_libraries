@@ -2,6 +2,11 @@
 
 `libraries/graph/BiconnectedComponents.hpp` は無向グラフの二重辺連結成分と二重頂点連結成分を構築します。橋木とBlock-Cut Forestも同時に得られます。
 
+**制約**
+
+- 頂点番号は `0`-indexed
+- 自己ループは対象外
+
 ## Include
 
 ```cpp
@@ -14,7 +19,7 @@
 
 橋を取り除いても互いに到達できる頂点を1成分にまとめます。
 
-### Constructor and Edge Registration
+### コンストラクタ・辺追加
 
 ```cpp
 TwoEdgeConnectedComponents graph(n);
@@ -24,9 +29,13 @@ graph.build();
 
 `add_edge` は0から追加順に辺IDを返します。`build()` の計算量は `O(V+E)`、メモリも `O(V+E)` です。
 
-### Public Members
+**制約**
 
-| member | description |
+- $0 \leq u,v < n$
+
+### メンバ変数
+
+| メンバ | 説明 |
 | --- | --- |
 | `edges[id]` | 辺IDに対応する端点 `{u,v}` |
 | `component[v]` | 頂点 `v` の二重辺連結成分ID |
@@ -40,7 +49,7 @@ graph.build();
 
 関節点で分離されない極大な頂点集合をBlockに分解し、Blockと関節点からなる二部森を構築します。
 
-### Constructor and Edge Registration
+### コンストラクタ・辺追加
 
 ```cpp
 VertexBiconnectedComponents graph(n);
@@ -50,7 +59,7 @@ graph.build();
 
 `build()` の計算量・メモリは `O(V+E)` です。
 
-### Public Members
+### メンバ変数
 
 | member | description |
 | --- | --- |
@@ -66,7 +75,7 @@ Block-Cut Forestのノード番号は次の規約です。
 
 非関節点はただ1つのBlockに属するため、`vertex_node[v]` はそのBlockノードです。関節点は複数Blockに属するため、専用の関節点ノードを指します。孤立点は、その頂点だけを含むBlockになります。
 
-## Example
+## 使用例
 
 ```cpp
 #include <bits/stdc++.h>
@@ -97,7 +106,7 @@ int main() {
 }
 ```
 
-## Notes
+## 注意
 
 - 無向グラフ専用です。
 - 非連結グラフ、孤立点、多重辺に対応します。平行辺2本は橋になりません。
