@@ -22,9 +22,14 @@ private:
         bool mid_better = line.eval(m) < nodes[v].line.eval(m);
         if (mid_better) std::swap(line, nodes[v].line);
         if (r - l == 1) return;
-        int& child = left_better != mid_better ? nodes[v].left : nodes[v].right;
+        bool go_left = left_better != mid_better;
+        int child = go_left ? nodes[v].left : nodes[v].right;
         T nl = left_better != mid_better ? l : m, nr = left_better != mid_better ? m : r;
-        if (child == -1) { child = (int)nodes.size(); nodes.push_back({line, -1, -1}); }
+        if (child == -1) {
+            child = (int)nodes.size(); nodes.push_back({line, -1, -1});
+            if (go_left) nodes[v].left = child;
+            else nodes[v].right = child;
+        }
         else add_line(line, child, nl, nr);
     }
     T query(T x, int v, T l, T r) const {

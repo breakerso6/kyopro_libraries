@@ -8,11 +8,11 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
 | category | contents | documentation |
 | --- | --- | --- |
-| `algorithm` | Mo's algorithm、SMAWK | [docs/algorithm](docs/algorithm/README.md) |
-| `data_structure` | DSU、区間積、Wavelet Matrix、永続データ構造 | [docs/data_structure](docs/data_structure/README.md) |
+| `algorithm` | Mo's algorithm、SMAWK、Kitamasa、Z-algorithm | [docs/algorithm](docs/algorithm/README.md) |
+| `data_structure` | DSU、区間積、Wavelet Matrix、永続・動的データ構造、CHT | [docs/data_structure](docs/data_structure/README.md) |
 | `geometry` | 整数・実数幾何、最近点対、KD-tree、長方形和集合 | [docs/geometry](docs/geometry/README.md) |
-| `graph` | LowLink、二重連結成分、Euler路、二部マッチング | [docs/graph](docs/graph/README.md) |
-| `math` | XOR線形基底、64-bit素因数分解 | [docs/math](docs/math/README.md) |
+| `graph` | LowLink、二重連結成分、Euler路、二部マッチング、最短路、MST | [docs/graph](docs/graph/README.md) |
+| `math` | XOR線形基底、64-bit素因数分解、行列、Mobius、写像12相 | [docs/math](docs/math/README.md) |
 | `string` | Aho-Corasick、Rolling Hash、回文 | [docs/string](docs/string/README.md) |
 | `tree` | HLD、Virtual Tree、重心分解、全方位木DP | [docs/tree](docs/tree/README.md) |
 | `utility` | 乱数生成器 | [docs/utility](docs/utility/README.md) |

@@ -1,8 +1,14 @@
-# Geometry libraries
+# Geometry
+
+整数幾何は誤差を避けるため `__int128_t` を多用し、実数幾何は `long double` と `EPS` による判定を使います。まず整数で表せる問題なら `GeometryInt.hpp` を優先します。
 
 ## Integer geometry
 
 `libraries/geometry/GeometryInt.hpp` は `geometry_int` 名前空間で提供されます。
+
+```cpp
+#include "libraries/geometry/GeometryInt.hpp"
+```
 
 - `Point<T>`: 座標、加減算、辞書順比較
 - `dot`, `cross`, `distance2`: 戻り値は `__int128_t`
@@ -21,6 +27,10 @@
 
 `libraries/geometry/GeometryReal.hpp` は `geometry_real` 名前空間で提供され、座標型は `long double` です。
 
+```cpp
+#include "libraries/geometry/GeometryReal.hpp"
+```
+
 - 射影、反射、点と直線・線分の距離
 - 線分交差と線分間距離
 - 直線同士、円と直線、円同士の交点
@@ -31,3 +41,23 @@
 
 - `rectangle_union_area`: 長方形を `[x1,x2) x [y1,y2)` として扱い、面積を `__int128_t` で返す
 - `KDTree`: 最近傍は `{距離の2乗, 元の点ID}`、範囲検索は半開矩形
+
+## Examples
+
+### Convex hull
+
+```cpp
+using geometry_int::Point;
+
+vector<Point<long long>> points = {{0, 0}, {2, 0}, {1, 1}, {0, 2}};
+auto hull = geometry_int::convex_hull(points);
+```
+
+`convex_hull` は重複点と辺上の共線点を除いた凸包を、反時計回りに返します。
+
+### Point in polygon
+
+```cpp
+int state = geometry_int::point_in_polygon(hull, {1, 1});
+// outside: -1, boundary: 0, inside: 1
+```

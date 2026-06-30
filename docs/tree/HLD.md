@@ -34,6 +34,7 @@ HLD hld(graph, root);
 | `depth[v]` | 根からの深さ |
 | `subsize[v]` | 部分木サイズ |
 | `heavy_child[v]` | heavy child。存在しない場合は `-1` |
+| `out[v]` | Euler Tour上で部分木区間が終わる位置。部分木は `[id[v], out[v])` |
 | `root` | 構築時に指定した根 |
 
 ## API
@@ -67,6 +68,28 @@ int distance(int u, int v);
 頂点 `u` と `v` の間の辺数を返します。
 
 計算量: `O(log N)`
+
+### in_subtree
+
+```cpp
+bool in_subtree(int ancestor, int v) const;
+```
+
+根付き木で `v` が `ancestor` の部分木に含まれるかを返します。Euler Tour上の区間 `[id[ancestor], out[ancestor])` を使います。
+
+計算量: `O(1)`
+
+### path_segments
+
+```cpp
+vector<pair<int, int>> path_segments(int u, int v, bool vertex_query = true);
+```
+
+`u` から `v` へのパスを、HLD順の半開区間 `[l,r)` の列に分解します。各区間は `vertex` 配列上の連続区間です。
+
+`vertex_query=false` の場合は LCA に対応する頂点を除くため、辺値を親側の頂点位置に載せるときに使えます。
+
+計算量: `O(log N)` 個の区間を返します。
 
 ### jump
 

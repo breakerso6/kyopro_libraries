@@ -1,5 +1,15 @@
 # Data structures
 
+区間クエリ、集合管理、永続化、オフライン処理をまとめています。迷ったら次の基準で選びます。
+
+- 静的RMQ: `SparseTable`
+- 静的一般モノイド区間積: `DisjointSparseTable`
+- 一点更新 + 区間積: 通常のセグ木が必要。広い疎座標なら `DynamicSegmentTree`
+- 区間 `chmin/chmax/add` + min/max/sum: `SegmentTreeBeats`
+- 過去versionを参照する: `Persistent*`
+- 直線最小値: 傾き単調なら `ConvexHullTrick`、任意順なら `LiChaoTree`
+- 値域頻度・k番目: `WaveletMatrix`
+
 | library | main API | complexity |
 | --- | --- | --- |
 | `BinaryTrie.hpp` | `insert`, `erase`, `count`, `min_xor`, `max_xor` | 1操作 `O(BITS)` |
@@ -9,12 +19,16 @@
 | `DisjointSparseTable.hpp` | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
 | `SWAG.hpp` | `push`, `pop`, `prod` | 償却 `O(1)` |
 | `LiChaoTree.hpp` | `add_line(a,b)`, `min(x)` | `O(log X)` |
+| [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 `O(1)` 償却、取得 `O(log N)` |
 | `IntervalSet.hpp` | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
 | `Indexset.hpp` | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
 | `PersistentSegmentTree.hpp` | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
+| [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 `O(log X)` |
 | `PersistentLazySegmentTree.hpp` | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |
 | `PersistentDSU.hpp` | `build`, `merge`, `same`, `size` | 各操作 `O(log^2 N)` |
 | `PersistentBinaryTrie.hpp` | `insert`, `erase`, `kth_xor` | 1操作 `O(BITS)` |
+| [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | `O(log H log W)` |
+| [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | `O(log H log W)` |
 | [WaveletMatrix.hpp](WaveletMatrix.md) | `kth_smallest`, `range_freq`, `prev_value`, `next_value` | 1クエリ `O(log sigma)` |
 | [SegmentTreeBeats.hpp](SegmentTreeBeats.md) | `range_chmin`, `range_chmax`, `range_add`, 区間集約 | 償却 `O(log^2 N)` |
 | [OfflineDynamicConnectivity.hpp](OfflineDynamicConnectivity.md) | 辺追加・削除、`same_query`, `size_query` | 全体 `O((Q log Q) log N)` |
@@ -27,8 +41,31 @@
 - `WeightedDSU::merge(a,b,w)` は `potential(b)-potential(a)=w` を追加します。同一成分で矛盾する場合は `false` です。
 - `IntervalSet` はすべて半開区間 `[l,r)` です。
 - `LiChaoTree` の座標範囲はコンストラクタで `[low,high)` として固定します。
+- `ConvexHullTrick` は最小値なら傾き降順、最大値なら傾き昇順で直線を追加します。任意順追加には `LiChaoTree` を使います。
+- `LazySegmentTree2D.hpp` は長方形加算・長方形和に特化した `RangeAddRangeSum2D` です。
 - IndexSetの詳細は [Indexset.md](Indexset.md) を参照してください。
 - 永続データ構造のversion管理と制約は [Persistence.md](Persistence.md) を参照してください。
+
+## Typical choices
+
+### Dynamic coordinates
+
+```cpp
+DynamicSegmentTree<long long, Sum> seg(-INF, INF, 0);
+seg.set(x, value);
+auto total = seg.prod(l, r);
+```
+
+座標圧縮できるなら普通の配列セグ木の方が軽いです。オンラインで未知座標が来る場合や、範囲が `1e18` 近い場合に使います。
+
+### Rectangle queries
+
+```cpp
+SegmentTree2D<long long, Sum> static_grid(values, 0);
+RangeAddRangeSum2D<long long> add_sum(h, w);
+```
+
+`SegmentTree2D` は一点更新・長方形積、`RangeAddRangeSum2D` は長方形加算・長方形和に使います。
 
 ## Wavelet Matrix
 

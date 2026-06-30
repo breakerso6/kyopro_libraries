@@ -14,6 +14,12 @@
 using factorization::u64;
 ```
 
+Python版は `libraries/math/factorization.py` にあります。
+
+```python
+from factorization import is_prime, factorize, divisors
+```
+
 ## is_prime
 
 ```cpp

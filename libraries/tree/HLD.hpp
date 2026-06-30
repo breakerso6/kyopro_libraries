@@ -12,6 +12,7 @@ struct HLD {
     vecll depth;
     vecll subsize;
     vecll heavy_child;
+    vecll out;
     int root;
 
     HLD(const vector<vector<ll>>& graph, int root_ = 0) {
@@ -24,6 +25,7 @@ struct HLD {
         depth.resize(n);
         subsize.resize(n);
         heavy_child.resize(n);
+        out.resize(n);
         {
             function<void(int,int,int)> dfs = [&](int v, int p, int d) {
                 parent[v] = p;
@@ -57,6 +59,7 @@ struct HLD {
                     if (to == parent[v] || to == heavy_child[v]) continue;
                     dfs(to, to);
                 }
+                out[v] = idx;
             };
             dfs(root, root);
         }
@@ -87,6 +90,29 @@ struct HLD {
     int distance(int u, int v) {
         int l = lca(u, v);
         return depth[u] + depth[v] - 2 * depth[l];
+    }
+
+    bool in_subtree(int ancestor, int v) const {
+        return id[ancestor] <= id[v] && id[v] < out[ancestor];
+    }
+
+    vector<pair<int,int>> path_segments(int u, int v, bool vertex_query = true) {
+        vector<pair<int,int>> left, right;
+        while (head[u] != head[v]) {
+            if (depth[head[u]] > depth[head[v]]) {
+                left.push_back({(int)id[head[u]], (int)id[u] + 1});
+                u = parent[head[u]];
+            } else {
+                right.push_back({(int)id[head[v]], (int)id[v] + 1});
+                v = parent[head[v]];
+            }
+        }
+        int l = min(id[u], id[v]) + (vertex_query ? 0 : 1);
+        int r = max(id[u], id[v]) + 1;
+        if (l < r) left.push_back({l, r});
+        reverse(right.begin(), right.end());
+        left.insert(left.end(), right.begin(), right.end());
+        return left;
     }
 
     // s->tのパス上i番目の頂点を返す

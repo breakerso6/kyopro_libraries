@@ -14,4 +14,15 @@
 - `nextDouble`: `[0,1)`
 - `shuffle(vector)`: Fisher-Yates shuffle
 
+## Example
+
+```cpp
+#include "libraries/utility/Random.hpp"
+
+Random rng(12345);
+int x = rng.get(10);          // [0, 10)
+long long y = rng.range(5, 9); // [5, 9)
+rng.shuffle(values);
+```
+
 暗号用途には使用しないでください。
