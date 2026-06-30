@@ -15,7 +15,7 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 | `math` | XOR線形基底、64-bit素因数分解、行列、Mobius、写像12相 | [docs/math](docs/math/README.md) |
 | `string` | Aho-Corasick、Rolling Hash、回文 | [docs/string](docs/string/README.md) |
 | `tree` | HLD、Virtual Tree、重心分解、全方位木DP | [docs/tree](docs/tree/README.md) |
-| `utility` | 乱数生成器 | [docs/utility](docs/utility/README.md) |
+| `utility` | 乱数生成器、時間計測 | [docs/utility](docs/utility/README.md) |
 
 ライブラリはリポジトリルートからのパスでincludeします。
 

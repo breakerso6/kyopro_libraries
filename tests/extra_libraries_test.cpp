@@ -15,6 +15,7 @@ using namespace std;
 #include "libraries/string/AhoCorasick.hpp"
 #include "libraries/algorithm/Mo.hpp"
 #include "libraries/data_structure/LiChaoTree.hpp"
+#include "libraries/utility/Timer.hpp"
 
 struct Minimum { int operator()(int a, int b) const { return min(a, b); } };
 struct Sum { long long operator()(long long a, long long b) const { return a + b; } };
@@ -177,8 +178,38 @@ static void test_offline_and_lines() {
     }
 }
 
+static void test_timer() {
+    Timer timer;
+    assert(timer.elapsed_ns() >= 0);
+    assert(timer.elapsed_us() >= 0);
+    assert(timer.elapsed_ms() >= 0);
+    assert(timer.elapsed() >= 0.0);
+    assert(timer.elapsed_sec() >= 0.0);
+    assert(timer.expired(-1.0));
+    assert(!timer.expired(1e9));
+    assert(timer.remaining(-1.0) == 0.0);
+    assert(timer.time_limit() == 0.0);
+    assert(timer.progress() == 0.0);
+    assert(timer.progress_clamped() == 0.0);
+    timer.set_time_limit(1e9);
+    assert(timer.time_limit() == 1e9);
+    assert(!timer.expired());
+    assert(timer.remaining() > 0.0);
+    assert(0.0 <= timer.progress() && timer.progress() < 1.0);
+    assert(0.0 <= timer.progress_clamped() && timer.progress_clamped() <= 1.0);
+    Timer limited(-1.0);
+    assert(limited.expired());
+    assert(limited.remaining() == 0.0);
+    assert(limited.progress() == 0.0);
+    double before = timer.elapsed();
+    for (volatile int i = 0; i < 1000; ++i) {}
+    assert(timer.elapsed() >= before);
+    timer.reset();
+    assert(timer.elapsed() >= 0.0);
+}
+
 int main() {
     test_dsu(); test_range_structures(); test_bit_structures(); test_graphs();
-    test_strings(); test_offline_and_lines();
+    test_strings(); test_offline_and_lines(); test_timer();
     cout << "extra library tests passed\n";
 }

@@ -17,7 +17,7 @@
 | [math](math/README.md) | 素因数分解、線形代数、Mobius、写像12相 |
 | [string](string/README.md) | Aho-Corasick、Rolling Hash、回文 |
 | [tree](tree/README.md) | HLD、全方位木DP、重心分解、Virtual Tree |
-| [utility](utility/README.md) | 乱数などの共通部品 |
+| [utility](utility/README.md) | 乱数、時間計測などの共通部品 |
 
 ## 読み方
 

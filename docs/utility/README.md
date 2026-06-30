@@ -1,5 +1,15 @@
 # Utility
 
+## [Timer](Timer.md)
+
+```cpp
+#include "libraries/utility/Timer.hpp"
+```
+
+経過時間を測るためのタイマーです。`elapsed_ms()`、`elapsed()`、`expired()`、`remaining()`、`progress()` を提供します。
+
+詳細は [Timer.md](Timer.md) を参照してください。
+
 ## [Random](Random.md)
 
 ```cpp
