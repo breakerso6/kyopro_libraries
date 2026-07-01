@@ -77,4 +77,88 @@ inline std::vector<u64> divisors(u64 n) {
     }
     std::sort(result.begin(), result.end()); return result;
 }
+
+inline u64 divisor_count_from_factorization(const std::vector<std::pair<u64, int>>& factors) {
+    u64 result = 1;
+    for (auto [p, exponent] : factors) {
+        (void)p;
+        result *= u64(exponent + 1);
+    }
+    return result;
+}
+
+inline u64 divisor_count(u64 n) {
+    assert(n >= 1);
+    return divisor_count_from_factorization(factorize(n));
+}
+
+template<class T = u64>
+T divisor_sum_from_factorization(const std::vector<std::pair<u64, int>>& factors) {
+    T result = 1;
+    for (auto [p, exponent] : factors) {
+        T term = 1, power = 1;
+        for (int i = 0; i < exponent; ++i) {
+            power *= T(p);
+            term += power;
+        }
+        result *= term;
+    }
+    return result;
+}
+
+template<class T = u64>
+T divisor_sum(u64 n) {
+    assert(n >= 1);
+    return divisor_sum_from_factorization<T>(factorize(n));
+}
+
+inline u64 euler_phi_from_factorization(u64 n, const std::vector<std::pair<u64, int>>& factors) {
+    u64 result = n;
+    for (auto [p, exponent] : factors) {
+        (void)exponent;
+        result = result / p * (p - 1);
+    }
+    return result;
+}
+
+inline u64 euler_phi(u64 n) {
+    assert(n >= 1);
+    return euler_phi_from_factorization(n, factorize(n));
+}
+
+inline int mobius_from_factorization(const std::vector<std::pair<u64, int>>& factors) {
+    for (auto [p, exponent] : factors) {
+        (void)p;
+        if (exponent >= 2) return 0;
+    }
+    return (int)factors.size() % 2 == 0 ? 1 : -1;
+}
+
+inline int mobius(u64 n) {
+    assert(n >= 1);
+    return mobius_from_factorization(factorize(n));
+}
+
+inline bool is_square_free_from_factorization(const std::vector<std::pair<u64, int>>& factors) {
+    return mobius_from_factorization(factors) != 0;
+}
+
+inline bool is_square_free(u64 n) {
+    assert(n >= 1);
+    return is_square_free_from_factorization(factorize(n));
+}
+
+inline u64 radical_from_factorization(const std::vector<std::pair<u64, int>>& factors) {
+    u64 result = 1;
+    for (auto [p, exponent] : factors) {
+        (void)exponent;
+        result *= p;
+    }
+    return result;
+}
+
+inline u64 radical(u64 n) {
+    assert(n >= 1);
+    return radical_from_factorization(factorize(n));
+}
 } // namespace factorization

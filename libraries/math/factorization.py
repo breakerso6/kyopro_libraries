@@ -71,3 +71,71 @@ def divisors(n: int) -> list[int]:
             q *= p
             result += [x * q for x in current]
     return sorted(result)
+
+
+def divisor_count_from_factorization(factors: list[tuple[int, int]]) -> int:
+    result = 1
+    for _, e in factors:
+        result *= e + 1
+    return result
+
+
+def divisor_count(n: int) -> int:
+    return divisor_count_from_factorization(factorize(n))
+
+
+def divisor_sum_from_factorization(factors: list[tuple[int, int]]) -> int:
+    result = 1
+    for p, e in factors:
+        term = 1
+        q = 1
+        for _ in range(e):
+            q *= p
+            term += q
+        result *= term
+    return result
+
+
+def divisor_sum(n: int) -> int:
+    return divisor_sum_from_factorization(factorize(n))
+
+
+def euler_phi_from_factorization(n: int, factors: list[tuple[int, int]]) -> int:
+    result = n
+    for p, _ in factors:
+        result = result // p * (p - 1)
+    return result
+
+
+def euler_phi(n: int) -> int:
+    return euler_phi_from_factorization(n, factorize(n))
+
+
+def mobius_from_factorization(factors: list[tuple[int, int]]) -> int:
+    for _, e in factors:
+        if e >= 2:
+            return 0
+    return 1 if len(factors) % 2 == 0 else -1
+
+
+def mobius(n: int) -> int:
+    return mobius_from_factorization(factorize(n))
+
+
+def is_square_free_from_factorization(factors: list[tuple[int, int]]) -> bool:
+    return mobius_from_factorization(factors) != 0
+
+
+def is_square_free(n: int) -> bool:
+    return is_square_free_from_factorization(factorize(n))
+
+
+def radical_from_factorization(factors: list[tuple[int, int]]) -> int:
+    result = 1
+    for p, _ in factors:
+        result *= p
+    return result
+
+
+def radical(n: int) -> int:
+    return radical_from_factorization(factorize(n))

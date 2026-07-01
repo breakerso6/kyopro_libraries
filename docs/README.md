@@ -14,7 +14,7 @@
 | [data_structure](data_structure/README.md) | Union-Find、区間クエリ、永続、Wavelet Matrix、CHT |
 | [geometry](geometry/README.md) | 整数・実数幾何、凸包、最近点対、KD-tree |
 | [graph](graph/README.md) | 最短路、MST、LowLink、Euler路、二部マッチング |
-| [math](math/README.md) | 素因数分解、線形代数、Mobius、写像12相 |
+| [math](math/README.md) | 整数演算、modint組合せ、素因数分解、線形代数、Mobius、写像12相 |
 | [string](string/README.md) | Aho-Corasick、Rolling Hash、回文 |
 | [tree](tree/README.md) | HLD、全方位木DP、重心分解、Virtual Tree |
 | [utility](utility/README.md) | 乱数、時間計測などの共通部品 |

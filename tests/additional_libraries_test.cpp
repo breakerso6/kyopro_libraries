@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <atcoder/modint>
 using namespace std;
 
 #include "libraries/algorithm/SMAWK.hpp"
@@ -69,6 +70,17 @@ static void test_number_theory() {
     assert((prime_factors(n) == vector<u64>{1000000007ULL, 1000000009ULL}));
     assert((factorize(360) == vector<pair<u64, int>>{{2, 3}, {3, 2}, {5, 1}}));
     assert((divisors(12) == vector<u64>{1, 2, 3, 4, 6, 12}));
+    assert(divisor_count(360) == 24);
+    assert(divisor_sum(360) == 1170);
+    assert(euler_phi(360) == 96);
+    assert(mobius(1) == 1);
+    assert(mobius(30) == -1);
+    assert(mobius(12) == 0);
+    assert(is_square_free(30));
+    assert(!is_square_free(12));
+    assert(radical(360) == 30);
+    using mint = atcoder::modint998244353;
+    assert(divisor_sum<mint>(360).val() == 1170);
 }
 
 static void test_palindromes() {
