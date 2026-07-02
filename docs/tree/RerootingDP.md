@@ -1,14 +1,8 @@
 # RerootingDP
 
-`libraries/tree/RerootingDP.hpp` は、すべての頂点を根にした木DPをまとめて計算するための汎用全方位木DPです。
+`libraries/tree/RerootingDP.hpp` は、すべての頂点を根にした木DPをまとめて計算するための全方位木DPです。
 
-典型例は次のような問題です。
-
-- 各頂点を根にしたときの木の高さ
-- 各頂点から全頂点への距離和
-- 各頂点を根にしたときの部分木情報を、辺重み込みで集約する問題
-
-「子から親へ渡るDP値」と「辺を越えたときの変換」と「頂点での仕上げ」を関数として渡します。
+子方向・親方向から来る寄与の型 `E`、頂点で確定したDP値の型 `V`、それらを結合・変換する関数をテンプレート引数として渡します。頂点ごとの初期値を持たせることもできます。
 
 ## Include
 
@@ -16,62 +10,78 @@
 #include "libraries/tree/RerootingDP.hpp"
 ```
 
-## コンストラクタ
+## テンプレート引数
 
 ```cpp
-auto rerooting = make_rerooting_dp<DP, EdgeData>(
-    n,
-    identity,
-    merge,
-    add_vertex,
-    add_edge_dp
-);
+RerootingDP<E, V, merge, e, put_edge, put_vertex> dp(n);
 ```
 
-| name | meaning |
-| --- | --- |
-| `DP` | ある向きの根付き木が親へ渡す値 |
-| `EdgeData` | 辺に持たせる値。重みなしなら `int` や空の構造体でよい |
-| `identity` | `merge` の単位元 |
-| `merge` | 同じ頂点に集まる複数の寄与を結合する演算 |
-| `add_vertex` | 集まった寄与に頂点自身の情報を足し、DP値にする関数 |
-| `add_edge_dp` | 隣接頂点のDP値を辺越しの寄与へ変換する関数 |
+| 引数 | 入力 | 返り値 | 説明 |
+| --- | --- | --- | --- |
+| `E` | - | - | 隣接部分木から頂点へ渡される寄与の型 |
+| `V` | - | - | 頂点で確定したDP値、または最終的な答えの型 |
+| `merge` | `E a, E b` | `E` | 複数の `E` の寄与を1つの `E` に結合する関数 |
+| `e` | なし | `E` | `merge` の単位元を返す関数 |
+| `put_edge` | `V value, int edge_id` | `E` | 隣接頂点の `V` を、辺越しに渡す `E` へ変換する関数 |
+| `put_vertex` | `E value, int vertex_id` | `V` | 集約済みの `E` を、頂点 `vertex_id` の `V` へ変換する関数 |
+
+関数シグネチャは次の形です。
+
+```cpp
+E merge(E a, E b);
+E e();
+E put_edge(V value, int edge_id);
+V put_vertex(E value, int vertex_id);
+```
+
+`edge_id` は `add_edge` で渡した向きごとのIDです。辺重みなどを使う場合は、外部配列を `edge_id` で参照します。
 
 **制約**
 
-- $0 \leq n$
 - `merge` は結合的
-- `identity` は `merge` の単位元
+- `e()` は `merge` の単位元
+- 現実的には `merge` は可換であることを想定
+
+## コンストラクタ
+
+```cpp
+RerootingDP<E, V, merge, e, put_edge, put_vertex> dp(int n);
+RerootingDP<E, V, merge, e, put_edge, put_vertex> dp(int n, vector<E> initial_values);
+```
+
+- `n`: 頂点数
+- `initial_values[v]`: 頂点 `v` で寄与を集約し始める初期値
+
+`initial_values` を省略した場合、各頂点の初期値は `e()` です。頂点重みや「自分自身を候補に含める」情報をDPへ直接入れたい場合に `initial_values` を指定します。
+
+**制約**
+
+- $1 \leq n$
+- `initial_values` を指定する場合、`initial_values.size() == n`
 
 **計算量**
 
-- $O(n)$
-
-## コンストラクタへ渡す関数
-
-- `merge(a,b)`: 同じ頂点へ入る寄与を隣接リスト順に結合する。結合則と単位元が必要
-- `add_vertex(value,v)`: 子方向の寄与をまとめた後、頂点 `v` の情報を加える
-- `add_edge_dp(value,data,from,to)`: `from` 側のDPを辺越しに `to` への寄与へ変換する
-
-`merge` は可換でなくても構いません。prefix/suffix積により、入力した隣接リスト順を維持します。
-
-`add_edge(u,v,data)` は両方向に同じデータを設定します。方向別のデータが必要なら `add_edge(u,v,uv_data,vu_data)` を使います。`uv_data` は頂点 `u` で `v` 側のDPを取り込む際に渡され、逆方向では `vu_data` が使われます。
+- 初期化: $O(n)$
+- メモリ: $O(n)$
 
 ## add_edge
 
 ```cpp
-(1) void rerooting.add_edge(int u, int v, const EdgeData& data = EdgeData());
-(2) void rerooting.add_edge(int u, int v, const EdgeData& uv, const EdgeData& vu);
+void dp.add_edge(int u, int v, int idx, int xdi);
 ```
 
-- (1): 両方向に同じ辺データを設定します。
-- (2): `u` から `v` 側を見るときは `uv`、`v` から `u` 側を見るときは `vu` を使います。
+無向木の辺 `u-v` を追加します。
+
+- `idx`: `v` 側のDP値を `u` 側へ取り込むときに `put_edge` へ渡すID
+- `xdi`: `u` 側のDP値を `v` 側へ取り込むときに `put_edge` へ渡すID
+
+無向辺で同じ重みを使う場合は、同じIDを両方に渡せます。向きごとに違う値を使う場合は、別々のIDを渡します。
 
 **制約**
 
-- $0 \leq u < n$
-- $0 \leq v < n$
-- 最終的に追加する辺は木をなす
+- $0 \leq u,v < n$
+- 最終的に追加する辺数は `n-1`
+- 追加する辺は連結な無向木をなす
 
 **計算量**
 
@@ -80,69 +90,111 @@ auto rerooting = make_rerooting_dp<DP, EdgeData>(
 ## build
 
 ```cpp
-vector<DP> answer = rerooting.build(int root = 0);
+vector<V> subdp = dp.build(int root = 0);
 ```
 
-全頂点をそれぞれ根にしたときのDP値を返します。`answer[v]` が頂点 `v` を根とした答えです。
+`root` を根として子方向DPを計算します。返り値は `vector<V>` です。`subdp[v]` は、この根付き木における頂点 `v` の部分木DPです。
+
+`reroot()` を呼ぶ前に必ず一度 `build()` を呼びます。
 
 **制約**
 
 - $0 \leq root < n$
-- 入力グラフは連結な無向木
+- `add_edge` が `n-1` 回呼ばれている
 
 **計算量**
 
 - $O(n)$
 
-## 使用例: sum of distances from each vertex
+## reroot
 
-`DP{size, dist}` を「その成分に含まれる頂点数」と「根からその成分内の頂点への距離和」として持ちます。子側のDPを親へ渡すとき、全頂点の距離が辺重み `w` だけ増えるので `dist += size * w` します。
+```cpp
+vector<V> answer = dp.reroot();
+```
+
+全方位DPを行い、`vector<V>` を返します。`answer[v]` が頂点 `v` を根としたときの答えです。
+
+**制約**
+
+- 先に `build(root)` を呼んでいる
+
+**計算量**
+
+- $O(n)$
+
+## 使用例: 各頂点から全頂点への距離和
+
+`E = V = pair<long long, long long>` とし、`{頂点数, 距離和}` を持ちます。辺を越えると、その成分内の各頂点までの距離が辺重み `w` だけ増えるので、`dist += size * w` します。
 
 ```cpp
 #include <bits/stdc++.h>
 #include "libraries/tree/RerootingDP.hpp"
 using namespace std;
 
-struct DP {
-    long long size;
-    long long dist;
-};
+using DP = pair<long long, long long>;
+vector<long long> weight;
+
+DP merge(DP a, DP b) {
+    return {a.first + b.first, a.second + b.second};
+}
+DP e() {
+    return {0, 0};
+}
+DP put_edge(DP value, int edge_id) {
+    long long w = weight[edge_id];
+    value.second += value.first * w;
+    return value;
+}
+DP put_vertex(DP value, int) {
+    ++value.first;
+    return value;
+}
 
 int main() {
     int n = 4;
-    vector<tuple<int, int, long long>> edges = {
-        {0, 1, 2},
-        {1, 2, 3},
-        {1, 3, 4},
+    RerootingDP<DP, DP, merge, e, put_edge, put_vertex> dp(n);
+
+    auto add_weighted_edge = [&](int u, int v, long long w) {
+        int id = (int)weight.size();
+        weight.push_back(w);
+        dp.add_edge(u, v, id, id);
     };
 
-    auto merge = [](DP a, DP b) {
-        return DP{a.size + b.size, a.dist + b.dist};
-    };
-    auto add_vertex = [](DP x, int) {
-        return DP{x.size + 1, x.dist};
-    };
-    auto add_edge = [](DP x, long long w, int, int) {
-        return DP{x.size, x.dist + x.size * w};
-    };
+    add_weighted_edge(0, 1, 2);
+    add_weighted_edge(1, 2, 3);
+    add_weighted_edge(1, 3, 4);
 
-    auto rerooting = make_rerooting_dp<DP, long long>(
-        n, DP{0, 0}, merge, add_vertex, add_edge
-    );
-    for (auto [u, v, w] : edges) rerooting.add_edge(u, v, w);
-
-    vector<DP> ans = rerooting.build();
+    dp.build(0);
+    vector<DP> ans = dp.reroot();
     for (int v = 0; v < n; ++v) {
-        cout << ans[v].dist << '\n';
+        cout << ans[v].second << '\n';
     }
 }
 ```
 
-この例では `ans[v].dist` が頂点 `v` から全頂点への距離和です。
+## 使用例: 頂点ごとの初期値
+
+各頂点から最も遠い頂点を、距離が同じなら頂点番号が大きいものとして求めます。`initial_values[v] = {0, v}` として、自分自身への距離を最初から候補に入れます。
+
+```cpp
+using DP = pair<int, int>; // {distance, vertex}
+
+DP merge(DP a, DP b) { return max(a, b); }
+DP e() { return {-1, -1}; }
+DP put_edge(DP value, int) {
+    ++value.first;
+    return value;
+}
+DP put_vertex(DP value, int) { return value; }
+
+vector<DP> initial_values(n);
+for (int v = 0; v < n; ++v) initial_values[v] = {0, v};
+
+RerootingDP<DP, DP, merge, e, put_edge, put_vertex> dp(n, initial_values);
+```
 
 ## 注意
 
-- `merge` は結合的である必要があります。可換でなくても構いません。
-- 非可換な `merge` でも、prefix/suffix を使って隣接リスト順を保ちます。
-- `build(root)` の `root` は計算の開始点で、答えは全頂点について得られます。
-- 入力が連結でない場合は `assert` に失敗します。
+- `build(root)` の `root` は計算開始用の根です。`reroot()` の返り値は全頂点分得られます。
+- `put_edge` に渡される `edge_id` は向きごとのIDです。同じ無向辺でも、`idx` と `xdi` に違うIDを渡せます。
+- 非可換な `merge` で隣接リスト順を厳密に使う用途には向きません。

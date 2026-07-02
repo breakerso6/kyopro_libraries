@@ -10,23 +10,53 @@ using namespace std;
 long long op_sum(long long a, long long b) { return a + b; }
 long long e_sum() { return 0; }
 
+using DistanceDP = pair<long long, long long>; // {vertex count, sum of distances}
+static vector<long long> rerooting_edge_weight;
+
+DistanceDP distance_merge(DistanceDP a, DistanceDP b) {
+    return {a.first + b.first, a.second + b.second};
+}
+DistanceDP distance_e() { return {0, 0}; }
+DistanceDP distance_put_edge(DistanceDP value, int edge_index) {
+    long long weight = rerooting_edge_weight[edge_index];
+    value.second += value.first * weight;
+    return value;
+}
+DistanceDP distance_put_vertex(DistanceDP value, int) {
+    ++value.first;
+    return value;
+}
+
+using FarthestDP = pair<int, int>; // {distance, vertex}
+
+FarthestDP farthest_merge(FarthestDP a, FarthestDP b) {
+    return max(a, b);
+}
+FarthestDP farthest_e() { return {-1, -1}; }
+FarthestDP farthest_put_edge(FarthestDP value, int) {
+    ++value.first;
+    return value;
+}
+FarthestDP farthest_put_vertex(FarthestDP value, int) {
+    return value;
+}
+
 static void test_rerooting() {
-    using DP = pair<long long, long long>; // {vertex count, sum of distances}
-    auto merge = [](DP a, DP b) { return DP{a.first + b.first, a.second + b.second}; };
-    auto add_vertex = [](DP value, int) { ++value.first; return value; };
-    auto add_edge = [](DP value, long long weight, int, int) {
-        value.second += value.first * weight; return value;
-    };
     mt19937 rng(20260623);
     for (int n = 1; n <= 100; ++n) for (int trial = 0; trial < 10; ++trial) {
-        auto rerooting = make_rerooting_dp<DP, long long>(n, DP{0, 0}, merge, add_vertex, add_edge);
+        rerooting_edge_weight.clear();
+        RerootingDP<DistanceDP, DistanceDP, distance_merge, distance_e,
+                    distance_put_edge, distance_put_vertex> rerooting(n);
         vector<vector<pair<int, int>>> graph(n);
         for (int v = 1; v < n; ++v) {
             int p = rng() % v, w = 1 + rng() % 20;
-            rerooting.add_edge(p, v, w);
+            int edge_index = (int)rerooting_edge_weight.size();
+            rerooting_edge_weight.push_back(w);
+            rerooting.add_edge(p, v, edge_index, edge_index);
             graph[p].push_back({v, w}); graph[v].push_back({p, w});
         }
-        auto answer = rerooting.build(rng() % n);
+        rerooting.build(rng() % n);
+        auto answer = rerooting.reroot();
         for (int root = 0; root < n; ++root) {
             vector<long long> distance(n, -1); distance[root] = 0;
             vector<int> stack{root};
@@ -36,30 +66,47 @@ static void test_rerooting() {
                     distance[to] = distance[v] + w; stack.push_back(to);
                 }
             }
-            assert(answer[root] == DP(n, accumulate(distance.begin(), distance.end(), 0LL)));
+            assert(answer[root] == DistanceDP(n, accumulate(distance.begin(), distance.end(), 0LL)));
         }
     }
 
     // Directional edge data: importing across 0->1 and 1->0 has different cost.
-    auto directional = make_rerooting_dp<DP, long long>(2, DP{0, 0}, merge, add_vertex, add_edge);
-    directional.add_edge(0, 1, 7LL, 11LL);
-    auto answer = directional.build();
+    rerooting_edge_weight = {7, 11};
+    RerootingDP<DistanceDP, DistanceDP, distance_merge, distance_e,
+                distance_put_edge, distance_put_vertex> directional(2);
+    directional.add_edge(0, 1, 0, 1);
+    directional.build();
+    auto answer = directional.reroot();
     assert(answer[0].second == 7 && answer[1].second == 11);
 
-    auto concatenate = [](string a, const string& b) { return a + b; };
-    auto wrap_vertex = [](string value, int v) { return "(" + to_string(v) + value + ")"; };
-    auto label_edge = [](string value, char label, int, int) { return string(1, label) + value; };
-    auto ordered = make_rerooting_dp<string, char>(5, "", concatenate, wrap_vertex, label_edge);
-    ordered.add_edge(0, 1, 'a', 'A'); ordered.add_edge(0, 2, 'b', 'B');
-    ordered.add_edge(1, 3, 'c', 'C'); ordered.add_edge(1, 4, 'd', 'D');
-    auto ordered_answer = ordered.build(3);
-    function<string(int, int)> brute = [&](int v, int parent) {
-        string children;
-        for (const auto& edge : ordered.graph[v]) if (edge.to != parent)
-            children += label_edge(brute(edge.to, v), edge.data, edge.to, v);
-        return wrap_vertex(children, v);
+    vector<FarthestDP> initial_values(5);
+    for (int i = 0; i < 5; ++i) initial_values[i] = {0, i};
+    RerootingDP<FarthestDP, FarthestDP, farthest_merge, farthest_e,
+                farthest_put_edge, farthest_put_vertex> farthest(5, initial_values);
+    vector<vector<int>> unweighted_graph(5);
+    auto add_unweighted_edge = [&](int u, int v, int index) {
+        farthest.add_edge(u, v, index, index);
+        unweighted_graph[u].push_back(v);
+        unweighted_graph[v].push_back(u);
     };
-    for (int root = 0; root < 5; ++root) assert(ordered_answer[root] == brute(root, -1));
+    add_unweighted_edge(0, 1, 0); add_unweighted_edge(0, 2, 1);
+    add_unweighted_edge(1, 3, 2); add_unweighted_edge(1, 4, 3);
+    farthest.build(3);
+    auto farthest_answer = farthest.reroot();
+    for (int root = 0; root < 5; ++root) {
+        vector<int> distance(5, -1); distance[root] = 0;
+        vector<int> stack{root};
+        for (int i = 0; i < (int)stack.size(); ++i) {
+            int v = stack[i];
+            for (int to : unweighted_graph[v]) if (distance[to] == -1) {
+                distance[to] = distance[v] + 1;
+                stack.push_back(to);
+            }
+        }
+        FarthestDP expected = {0, root};
+        for (int v = 0; v < 5; ++v) expected = max(expected, FarthestDP{distance[v], v});
+        assert(farthest_answer[root] == expected);
+    }
 }
 
 static void test_persistent_segment_tree() {
