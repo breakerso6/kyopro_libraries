@@ -7,7 +7,8 @@ using namespace std;
 #include "libraries/data_structure/PersistentDSU.hpp"
 #include "libraries/data_structure/PersistentBinaryTrie.hpp"
 
-struct SumOp { long long operator()(long long a, long long b) const { return a + b; } };
+long long op_sum(long long a, long long b) { return a + b; }
+long long e_sum() { return 0; }
 
 static void test_rerooting() {
     using DP = pair<long long, long long>; // {vertex count, sum of distances}
@@ -65,7 +66,7 @@ static void test_persistent_segment_tree() {
     mt19937 rng(1234); const int n = 60;
     vector<long long> initial(n);
     for (auto& x : initial) x = (int)(rng() % 201) - 100;
-    PersistentSegmentTree<long long, SumOp> tree(n, 0LL);
+    PersistentSegmentTree<long long, op_sum, e_sum> tree(n);
     vector<int> roots{tree.build(initial)};
     vector<vector<long long>> versions{initial};
     for (int trial = 0; trial < 3000; ++trial) {

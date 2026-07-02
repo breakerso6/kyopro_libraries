@@ -1,22 +1,19 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, class Op>
+template<class S, S (*op)(S, S), S (*e)()>
 struct SegmentTree2D {
     int height = 0, width = 0, h_size = 1, w_size = 1;
-    S identity;
-    Op op;
     std::vector<std::vector<S>> data;
 
     SegmentTree2D() = default;
-    SegmentTree2D(int height_, int width_, S identity_, Op op_ = Op())
-        : height(height_), width(width_), identity(identity_), op(op_) {
+    SegmentTree2D(int height_, int width_) : height(height_), width(width_) {
         while (h_size < std::max(1, height)) h_size <<= 1;
         while (w_size < std::max(1, width)) w_size <<= 1;
-        data.assign(2 * h_size, std::vector<S>(2 * w_size, identity));
+        data.assign(2 * h_size, std::vector<S>(2 * w_size, e()));
     }
-    explicit SegmentTree2D(const std::vector<std::vector<S>>& a, S identity_, Op op_ = Op())
-        : SegmentTree2D((int)a.size(), a.empty() ? 0 : (int)a[0].size(), identity_, op_) {
+    explicit SegmentTree2D(const std::vector<std::vector<S>>& a)
+        : SegmentTree2D((int)a.size(), a.empty() ? 0 : (int)a[0].size()) {
         for (int i = 0; i < height; ++i) {
             assert((int)a[i].size() == width);
             for (int j = 0; j < width; ++j) data[i + h_size][j + w_size] = a[i][j];
@@ -38,7 +35,7 @@ struct SegmentTree2D {
     S prod(int row_l, int row_r, int column_l, int column_r) const {
         assert(0 <= row_l && row_l <= row_r && row_r <= height);
         assert(0 <= column_l && column_l <= column_r && column_r <= width);
-        S left_result = identity, right_result = identity;
+        S left_result = e(), right_result = e();
         for (int l = row_l + h_size, r = row_r + h_size; l < r; l >>= 1, r >>= 1) {
             if (l & 1) left_result = op(left_result, prod_y(l++, column_l, column_r));
             if (r & 1) right_result = op(prod_y(--r, column_l, column_r), right_result);
@@ -48,7 +45,7 @@ struct SegmentTree2D {
 
 private:
     S prod_y(int x, int column_l, int column_r) const {
-        S left_result = identity, right_result = identity;
+        S left_result = e(), right_result = e();
         for (int l = column_l + w_size, r = column_r + w_size; l < r; l >>= 1, r >>= 1) {
             if (l & 1) left_result = op(left_result, data[x][l++]);
             if (r & 1) right_result = op(data[x][--r], right_result);

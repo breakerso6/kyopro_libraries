@@ -1,15 +1,14 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, class Op>
+template<class S, S (*op)(S, S)>
 struct DisjointSparseTable {
     int n = 0;
-    Op op;
     std::vector<S> base;
     std::vector<std::vector<S>> table;
 
     DisjointSparseTable() = default;
-    DisjointSparseTable(const std::vector<S>& a, Op op_ = Op()) : n((int)a.size()), op(op_), base(a) {
+    explicit DisjointSparseTable(const std::vector<S>& a) : n((int)a.size()), base(a) {
         int levels = 0;
         while ((1 << levels) < std::max(1, n)) ++levels;
         table.assign(levels, a);

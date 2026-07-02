@@ -11,12 +11,12 @@
 ## コンストラクタ
 
 ```cpp
-DisjointSparseTable<S, Op> table(values, op);
+DisjointSparseTable<S, op> table(values);
 ```
 
 **制約**
 
-- `Op` は結合的
+- `S op(S a, S b)` は結合的
 
 **計算量**
 

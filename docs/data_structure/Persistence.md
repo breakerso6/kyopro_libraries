@@ -29,14 +29,14 @@
 ### コンストラクタ
 
 ```cpp
-PersistentSegmentTree<S, Op> seg(int n, S identity, Op op = Op());
+PersistentSegmentTree<S, op, e> seg(int n);
 ```
 
 **制約**
 
 - $1 \leq n$
-- `Op` は結合的
-- `identity` は `Op` の単位元
+- `S op(S a, S b)` は結合的
+- `S e()` は `op` の単位元
 
 **計算量**
 
@@ -49,7 +49,7 @@ int root = seg.build();
 int root = seg.build(values);
 ```
 
-初期versionを作って、その `root` を返します。`values` を省略した場合は全要素が `identity` です。
+初期versionを作って、その `root` を返します。`values` を省略した場合は全要素が `e()` です。
 
 **制約**
 
@@ -83,7 +83,7 @@ S x = seg.get(root, position);
 S x = seg.prod(root, l, r);
 ```
 
-`get` は1点の値、`prod` は `op(a[l], ..., a[r-1])` を返します。`l = r` のときは `identity` を返します。
+`get` は1点の値、`prod` は `op(a[l], ..., a[r-1])` を返します。`l = r` のときは `e()` を返します。
 
 **制約**
 
@@ -98,11 +98,15 @@ S x = seg.prod(root, l, r);
 ### 使用例
 
 ```cpp
-struct Sum {
-    long long operator()(long long a, long long b) const { return a + b; }
-};
+long long op(long long a, long long b) {
+    return a + b;
+}
 
-PersistentSegmentTree<long long, Sum> seg(5, 0);
+long long e() {
+    return 0;
+}
+
+PersistentSegmentTree<long long, op, e> seg(5);
 int root0 = seg.build(vector<long long>{1, 2, 3, 4, 5});
 int root1 = seg.set(root0, 2, 10);
 

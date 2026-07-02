@@ -11,12 +11,12 @@
 ## コンストラクタ
 
 ```cpp
-SparseTable<S, Op> table(values, op);
+SparseTable<S, op> table(values);
 ```
 
 **制約**
 
-- `Op` は結合的かつ冪等
+- `S op(S a, S b)` は結合的かつ冪等
 
 **計算量**
 
@@ -41,10 +41,10 @@ S table.prod(int l, int r) const;
 ## 使用例
 
 ```cpp
-struct Min {
-    int operator()(int a, int b) const { return min(a, b); }
-};
+int op(int a, int b) {
+    return min(a, b);
+}
 
-SparseTable<int, Min> st(a);
+SparseTable<int, op> st(a);
 cout << st.prod(l, r) << '\n';
 ```

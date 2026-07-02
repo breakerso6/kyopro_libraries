@@ -13,7 +13,7 @@
 ## コンストラクタ
 
 ```cpp
-DynamicSegmentTree<S, Op> seg(low, high, identity, op);
+DynamicSegmentTree<S, op, e> seg(low, high);
 ```
 
 区間 `[low, high)` を管理します。
@@ -21,14 +21,14 @@ DynamicSegmentTree<S, Op> seg(low, high, identity, op);
 | parameter | meaning |
 | --- | --- |
 | `S` | モノイドの値型 |
-| `Op` | `S operator()(S, S)` を持つ結合的な演算 |
-| `identity` | 単位元 |
+| `op` | `S op(S, S)` 形式の結合的な演算 |
+| `e` | 単位元を返す `S e()` |
 
 **制約**
 
 - `low < high`
-- `Op` は結合的
-- `identity` は `Op` の単位元
+- `op` は結合的
+- `e()` は `op` の単位元
 
 **計算量**
 
@@ -56,7 +56,7 @@ void set(long long position, const S& value);
 S get(long long position) const;
 ```
 
-`position` の値を返します。未更新の点は `identity` です。
+`position` の値を返します。未更新の点は `e()` です。
 
 **制約**
 
@@ -72,7 +72,7 @@ S get(long long position) const;
 S prod(long long l, long long r) const;
 ```
 
-半開区間 `[l, r)` の積を返します。`l = r` のときは `identity` を返します。
+半開区間 `[l, r)` の積を返します。`l = r` のときは `e()` を返します。
 
 **制約**
 
@@ -89,11 +89,15 @@ S prod(long long l, long long r) const;
 ## 使用例
 
 ```cpp
-struct Sum {
-    long long operator()(long long a, long long b) const { return a + b; }
-};
+long long op(long long a, long long b) {
+    return a + b;
+}
 
-DynamicSegmentTree<long long, Sum> seg(-1000000000000LL, 1000000000000LL, 0);
+long long e() {
+    return 0;
+}
+
+DynamicSegmentTree<long long, op, e> seg(-1000000000000LL, 1000000000000LL);
 seg.set(100000000000LL, 5);
 seg.set(-7, 3);
 

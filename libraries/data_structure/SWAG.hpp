@@ -1,13 +1,11 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, class Op>
+template<class S, S (*op)(S, S), S (*e)()>
 struct SWAG {
-    Op op;
-    S identity;
     std::vector<std::pair<S, S>> front, back;
 
-    SWAG(S identity_, Op op_ = Op()) : op(op_), identity(identity_) {}
+    SWAG() = default;
     int size() const { return (int)front.size() + (int)back.size(); }
     bool empty() const { return size() == 0; }
     void push(const S& x) {
@@ -26,7 +24,7 @@ struct SWAG {
         front.pop_back();
     }
     S prod() const {
-        if (front.empty() && back.empty()) return identity;
+        if (front.empty() && back.empty()) return e();
         if (front.empty()) return back.back().second;
         if (back.empty()) return front.back().second;
         return op(front.back().second, back.back().second);

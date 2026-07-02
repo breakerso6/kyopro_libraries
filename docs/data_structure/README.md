@@ -51,7 +51,7 @@
 ### 動的座標
 
 ```cpp
-DynamicSegmentTree<long long, Sum> seg(-INF, INF, 0);
+DynamicSegmentTree<long long, op, e> seg(-INF, INF);
 seg.set(x, value);
 auto total = seg.prod(l, r);
 ```
@@ -61,7 +61,7 @@ auto total = seg.prod(l, r);
 ### 長方形クエリ
 
 ```cpp
-SegmentTree2D<long long, Sum> static_grid(values, 0);
+SegmentTree2D<long long, op, e> static_grid(values);
 RangeAddRangeSum2D<long long> add_sum(h, w);
 ```
 

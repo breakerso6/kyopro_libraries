@@ -17,9 +17,10 @@ using namespace std;
 #include "libraries/data_structure/LiChaoTree.hpp"
 #include "libraries/utility/Timer.hpp"
 
-struct Minimum { int operator()(int a, int b) const { return min(a, b); } };
-struct Sum { long long operator()(long long a, long long b) const { return a + b; } };
-struct Concat { string operator()(const string& a, const string& b) const { return a + b; } };
+int op_min(int a, int b) { return min(a, b); }
+long long op_sum(long long a, long long b) { return a + b; }
+string op_concat(string a, string b) { return a + b; }
+string e_concat() { return ""; }
 
 static void test_dsu() {
     RollbackDSU d(5);
@@ -42,13 +43,13 @@ static void test_range_structures() {
     mt19937 rng(123456);
     vector<int> a(100);
     for (int& x : a) x = (int)rng() % 1000;
-    SparseTable<int, Minimum> st(a);
-    DisjointSparseTable<long long, Sum> dst(vector<long long>(a.begin(), a.end()));
+    SparseTable<int, op_min> st(a);
+    DisjointSparseTable<long long, op_sum> dst(vector<long long>(a.begin(), a.end()));
     for (int l = 0; l < 100; ++l) for (int r = l + 1; r <= 100; ++r) {
         assert(st.prod(l, r) == *min_element(a.begin() + l, a.begin() + r));
         assert(dst.prod(l, r) == accumulate(a.begin() + l, a.begin() + r, 0LL));
     }
-    SWAG<string, Concat> swag(""), empty("");
+    SWAG<string, op_concat, e_concat> swag, empty;
     deque<string> q;
     for (int t = 0; t < 500; ++t) {
         if (q.empty() || rng() % 3) { string x(1, 'a' + rng() % 26); q.push_back(x); swag.push(x); }

@@ -1,15 +1,14 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, class Op>
+template<class S, S (*op)(S, S)>
 struct SparseTable {
     int n = 0;
-    Op op;
     std::vector<int> lg;
     std::vector<std::vector<S>> table;
 
     SparseTable() = default;
-    SparseTable(const std::vector<S>& a, Op op_ = Op()) : n((int)a.size()), op(op_) {
+    explicit SparseTable(const std::vector<S>& a) : n((int)a.size()) {
         lg.assign(n + 1, 0);
         for (int i = 2; i <= n; ++i) lg[i] = lg[i / 2] + 1;
         if (!n) return;

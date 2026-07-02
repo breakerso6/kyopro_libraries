@@ -11,13 +11,13 @@
 ## コンストラクタ
 
 ```cpp
-SWAG<S, Op> swag(identity, op);
+SWAG<S, op, e> swag;
 ```
 
 **制約**
 
-- `Op` は結合的
-- `identity` は `Op` の単位元
+- `S op(S a, S b)` は結合的
+- `S e()` は `op` の単位元
 
 ## push / pop
 
@@ -53,7 +53,15 @@ bool swag.empty() const;
 ## 使用例
 
 ```cpp
-SWAG<long long, Sum> swag(0);
+long long op(long long a, long long b) {
+    return a + b;
+}
+
+long long e() {
+    return 0;
+}
+
+SWAG<long long, op, e> swag;
 swag.push(1);
 swag.push(2);
 cout << swag.prod() << '\n'; // 3

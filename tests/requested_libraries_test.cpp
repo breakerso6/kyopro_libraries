@@ -13,9 +13,8 @@ using namespace std;
 #include "libraries/math/Matrix.hpp"
 #include "libraries/math/Mobius.hpp"
 
-struct Sum {
-    long long operator()(long long a, long long b) const { return a + b; }
-};
+long long op_sum(long long a, long long b) { return a + b; }
+long long e_sum() { return 0; }
 
 struct Mint {
     static constexpr long long MOD = 998244353;
@@ -35,7 +34,7 @@ struct Mint {
 };
 
 static void test_dynamic_segment_tree() {
-    DynamicSegmentTree<long long, Sum> seg(-1000000000000LL, 1000000000000LL, 0);
+    DynamicSegmentTree<long long, op_sum, e_sum> seg(-1000000000000LL, 1000000000000LL);
     map<long long, long long> mp;
     vector<long long> xs{-10, 0, 5, 999999999999LL, -999999999999LL};
     for (int i = 0; i < (int)xs.size(); ++i) seg.set(xs[i], i + 1), mp[xs[i]] = i + 1;
@@ -50,7 +49,7 @@ static void test_2d_structures() {
     mt19937 rng(1);
     vector<vector<long long>> a(8, vector<long long>(7));
     for (auto& row : a) for (auto& x : row) x = (int)rng() % 20 - 10;
-    SegmentTree2D<long long, Sum> seg(a, 0);
+    SegmentTree2D<long long, op_sum, e_sum> seg(a);
     for (int x1 = 0; x1 <= 8; ++x1) for (int x2 = x1; x2 <= 8; ++x2)
         for (int y1 = 0; y1 <= 7; ++y1) for (int y2 = y1; y2 <= 7; ++y2) {
             long long expected = 0;

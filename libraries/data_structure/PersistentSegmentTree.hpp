@@ -1,16 +1,13 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, class Op>
+template<class S, S (*op)(S, S), S (*e)()>
 struct PersistentSegmentTree {
     struct Node { S value; int left = -1, right = -1; };
     int n;
-    S identity;
-    Op op;
     std::vector<Node> nodes;
 
-    PersistentSegmentTree(int n_, S identity_, Op op_ = Op())
-        : n(n_), identity(identity_), op(op_) { assert(n > 0); }
+    explicit PersistentSegmentTree(int n_) : n(n_) { assert(n > 0); }
     int build(const std::vector<S>& values = {}) {
         assert(values.empty() || (int)values.size() == n);
         return build(0, n, values);
@@ -30,7 +27,7 @@ private:
         nodes.push_back({std::move(value), left, right}); return (int)nodes.size() - 1;
     }
     int build(int l, int r, const std::vector<S>& values) {
-        if (r - l == 1) return make_node(values.empty() ? identity : values[l]);
+        if (r - l == 1) return make_node(values.empty() ? e() : values[l]);
         int m = (l + r) / 2, left = build(l, m, values), right = build(m, r, values);
         return make_node(op(nodes[left].value, nodes[right].value), left, right);
     }
@@ -42,7 +39,7 @@ private:
         return make_node(op(nodes[left].value, nodes[right].value), left, right);
     }
     S prod(int v, int ql, int qr, int l, int r) const {
-        if (qr <= l || r <= ql) return identity;
+        if (qr <= l || r <= ql) return e();
         if (ql <= l && r <= qr) return nodes[v].value;
         int m = (l + r) / 2;
         return op(prod(nodes[v].left, ql, qr, l, m), prod(nodes[v].right, ql, qr, m, r));
