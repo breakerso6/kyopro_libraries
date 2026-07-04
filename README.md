@@ -50,6 +50,7 @@
 `ac-library/` は Git 管理対象外です。`tools/expand_includes.py` を使う前に、このリポジトリ直下へ AtCoder Library を配置してください。
 
 標準ライブラリの include、例えば `#include <bits/stdc++.h>` はそのまま残します。
+ACL include はデフォルトで展開します。ACL を展開せず、`#include <atcoder/all>` などをそのまま残したい場合は `--no-expand-acl` を指定してください。
 
 ### Basic Usage
 
@@ -73,6 +74,12 @@ tools/expand_includes.py main.cpp --stdout
 
 ```bash
 tools/expand_includes.py main.cpp -I other_libs -o combined.cpp
+```
+
+ACL include を展開しない場合:
+
+```bash
+tools/expand_includes.py main.cpp --no-expand-acl -o combined.cpp
 ```
 
 ### Compile Example
