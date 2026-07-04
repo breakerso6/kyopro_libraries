@@ -72,5 +72,5 @@ i128 lattice_points_on_boundary(const vector<Point<T>>& polygon);
 
 ## 注意
 
-- `__int128_t` の出力は必要に応じて自前で文字列化してください。
+- `__int128_t` の出力には [Int128IO](../utility/Int128IO.md) が使えます。
 - `convex_hull` は全点が同一直線上の場合、端点だけを返します。

@@ -23,7 +23,7 @@
 
 `libraries/geometry/ClosestPair.hpp` の `closest_pair_distance2` も同じ名前空間にあり、点が2個未満なら `-1` を返します。詳細: [ClosestPair.md](ClosestPair.md)
 
-整数幾何の積や距離は `__int128_t` です。出力時は必要に応じて文字列へ変換してください。
+整数幾何の積や距離は `__int128_t` です。出力時は [Int128IO](../utility/Int128IO.md) が使えます。
 
 ## 実数幾何
 

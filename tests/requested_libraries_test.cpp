@@ -4,6 +4,7 @@ using namespace std;
 #include "libraries/algorithm/Kitamasa.hpp"
 #include "libraries/algorithm/ZAlgorithm.hpp"
 #include "libraries/data_structure/ConvexHullTrick.hpp"
+#include "libraries/data_structure/CumulativeSumND.hpp"
 #include "libraries/data_structure/DynamicSegmentTree.hpp"
 #include "libraries/data_structure/LazySegmentTree2D.hpp"
 #include "libraries/data_structure/SegmentTree2D.hpp"
@@ -73,6 +74,48 @@ static void test_2d_structures() {
     }
 }
 
+static void test_cumulative_sum_nd() {
+    mt19937 rng(2);
+    vector<int> shape{4, 3, 5};
+    vector<long long> flat(4 * 3 * 5);
+    for (long long& x : flat) x = (int)rng() % 21 - 10;
+    CumulativeSumND<long long> cs(shape, flat);
+    auto at = [&](int x, int y, int z) {
+        return flat[(x * shape[1] + y) * shape[2] + z];
+    };
+    for (int x1 = 0; x1 <= shape[0]; ++x1) for (int x2 = x1; x2 <= shape[0]; ++x2)
+        for (int y1 = 0; y1 <= shape[1]; ++y1) for (int y2 = y1; y2 <= shape[1]; ++y2)
+            for (int z1 = 0; z1 <= shape[2]; ++z1) for (int z2 = z1; z2 <= shape[2]; ++z2) {
+                long long expected = 0;
+                for (int x = x1; x < x2; ++x) for (int y = y1; y < y2; ++y)
+                    for (int z = z1; z < z2; ++z) expected += at(x, y, z);
+                assert(cs.sum({x1, y1, z1}, {x2, y2, z2}) == expected);
+            }
+
+    CumulativeSumND<long long> sparse({6, 5, 4, 3});
+    vector<tuple<int, int, int, int, long long>> points;
+    for (int t = 0; t < 40; ++t) {
+        int a = rng() % 6, b = rng() % 5, c = rng() % 4, d = rng() % 3;
+        long long v = (int)rng() % 11 - 5;
+        sparse.add({a, b, c, d}, v);
+        points.push_back({a, b, c, d, v});
+    }
+    sparse.build();
+    for (int t = 0; t < 300; ++t) {
+        vector<int> l(4), r(4);
+        for (int axis = 0; axis < 4; ++axis) {
+            l[axis] = rng() % (sparse.shape[axis] + 1);
+            r[axis] = rng() % (sparse.shape[axis] + 1);
+            if (l[axis] > r[axis]) swap(l[axis], r[axis]);
+        }
+        long long expected = 0;
+        for (auto [a, b, c, d, v] : points)
+            if (l[0] <= a && a < r[0] && l[1] <= b && b < r[1] &&
+                l[2] <= c && c < r[2] && l[3] <= d && d < r[3]) expected += v;
+        assert(sparse.sum(l, r) == expected);
+    }
+}
+
 static void test_optimization_and_strings() {
     ConvexHullTrick<long long> cht;
     vector<pair<long long, long long>> lines{{5, -20}, {2, -5}, {-1, 2}, {-3, 4}};
@@ -124,7 +167,7 @@ static void test_math() {
 }
 
 int main() {
-    test_dynamic_segment_tree(); test_2d_structures(); test_optimization_and_strings();
+    test_dynamic_segment_tree(); test_2d_structures(); test_cumulative_sum_nd(); test_optimization_and_strings();
     test_graphs(); test_math();
     cout << "requested library tests passed\n";
 }

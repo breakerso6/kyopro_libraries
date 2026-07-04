@@ -38,3 +38,17 @@ rng.shuffle(values);
 暗号用途には使用しないでください。
 
 詳細は [Random.md](Random.md) を参照してください。
+
+## [Int128IO](Int128IO.md)
+
+```cpp
+#include "libraries/utility/Int128IO.hpp"
+```
+
+`__int128_t` と `unsigned __int128` の10進入出力を追加します。
+
+```cpp
+__int128_t x;
+cin >> x;
+cout << x << '\n';
+```

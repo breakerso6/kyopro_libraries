@@ -27,6 +27,7 @@
 | [PersistentLazySegmentTree.hpp](Persistence.md#persistentlazysegmenttree) | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |
 | [PersistentDSU.hpp](Persistence.md#persistentdsu) | `build`, `merge`, `same`, `size` | 各操作 `O(log^2 N)` |
 | [PersistentBinaryTrie.hpp](Persistence.md#persistentbinarytrie) | `insert`, `erase`, `kth_xor` | 1操作 `O(BITS)` |
+| [CumulativeSumND.hpp](CumulativeSumND.md) | `add`, `build`, `sum` | 構築 `O(D prod(shape_i+1))`、取得 `O(D 2^D)` |
 | [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | `O(log H log W)` |
 | [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | `O(log H log W)` |
 | [WaveletMatrix.hpp](WaveletMatrix.md) | `kth_smallest`, `range_freq`, `prev_value`, `next_value` | 1クエリ `O(log sigma)` |
@@ -61,11 +62,13 @@ auto total = seg.prod(l, r);
 ### 長方形クエリ
 
 ```cpp
+CumulativeSumND<long long> cs({h, w}, flat_values);
+auto rect = cs.sum({r1, c1}, {r2, c2});
 SegmentTree2D<long long, op, e> static_grid(values);
 RangeAddRangeSum2D<long long> add_sum(h, w);
 ```
 
-`SegmentTree2D` は一点更新・長方形積、`RangeAddRangeSum2D` は長方形加算・長方形和に使います。
+`CumulativeSumND` は静的な n 次元直方体和、`SegmentTree2D` は一点更新・長方形積、`RangeAddRangeSum2D` は長方形加算・長方形和に使います。
 
 ## Wavelet Matrix
 

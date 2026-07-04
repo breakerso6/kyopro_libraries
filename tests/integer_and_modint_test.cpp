@@ -2,6 +2,7 @@
 #include <atcoder/modint>
 #include "libraries/math/IntegerMath.hpp"
 #include "libraries/math/ModCombinatorics.hpp"
+#include "libraries/utility/Int128IO.hpp"
 
 using namespace std;
 using namespace integer_math;
@@ -85,8 +86,40 @@ void test_mod_combinatorics() {
     assert(dmc.derangement(5).val() == 44);
 }
 
+void test_int128_io() {
+    __int128_t big = ((__int128_t)1 << 100) + 12345;
+    __int128_t small = -(((__int128_t)1 << 100) + 67890);
+    unsigned __int128 ubig = ((unsigned __int128)1 << 127) + 42;
+
+    ostringstream oss;
+    oss << big << ' ' << small << ' ' << ubig;
+    assert(oss.str() == "1267650600228229401496703217721 -1267650600228229401496703273266 170141183460469231731687303715884105770");
+
+    istringstream iss(oss.str());
+    __int128_t a = 0, b = 0;
+    unsigned __int128 c = 0;
+    assert(iss >> a >> b >> c);
+    assert(a == big && b == small && c == ubig);
+
+    __int128_t min_value;
+    istringstream min_stream("-170141183460469231731687303715884105728");
+    min_stream >> min_value;
+    assert(min_value == -((__int128_t)(((unsigned __int128)1 << 127) - 1)) - 1);
+
+    __int128_t overflow_signed;
+    istringstream overflow_stream("170141183460469231731687303715884105728");
+    overflow_stream >> overflow_signed;
+    assert(overflow_stream.fail());
+
+    unsigned __int128 overflow_unsigned;
+    istringstream invalid_stream("-1");
+    invalid_stream >> overflow_unsigned;
+    assert(invalid_stream.fail());
+}
+
 int main() {
     test_integer_math();
     test_mod_combinatorics();
+    test_int128_io();
     return 0;
 }
