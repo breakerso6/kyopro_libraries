@@ -49,7 +49,21 @@ struct ImplicitTreap {
         root = -1;
         nodes.clear();
         nodes.reserve(values.size());
-        for (const S& value : values) root = merge(root, make_node(value));
+        std::vector<int> stack;
+        stack.reserve(values.size());
+        for (const S& value : values) {
+            int v = make_node(value);
+            int last = -1;
+            while (!stack.empty() && nodes[v].priority < nodes[stack.back()].priority) {
+                last = stack.back();
+                stack.pop_back();
+            }
+            if (!stack.empty()) nodes[stack.back()].right = v;
+            nodes[v].left = last;
+            stack.push_back(v);
+        }
+        root = stack.empty() ? -1 : stack.front();
+        rebuild(root);
     }
 
     void insert(int position, const S& value) {
@@ -138,6 +152,23 @@ private:
         nodes[v].size = 1 + node_size(nodes[v].left) + node_size(nodes[v].right);
         nodes[v].prod = op(op(node_prod(nodes[v].left), nodes[v].value), node_prod(nodes[v].right));
         nodes[v].rprod = op(op(node_rprod(nodes[v].right), nodes[v].value), node_rprod(nodes[v].left));
+    }
+
+    void rebuild(int v) {
+        if (v == -1) return;
+        std::vector<std::pair<int, bool>> stack{{v, false}};
+        while (!stack.empty()) {
+            auto [u, visited] = stack.back();
+            stack.pop_back();
+            if (u == -1) continue;
+            if (visited) {
+                pull(u);
+            } else {
+                stack.push_back({u, true});
+                stack.push_back({nodes[u].right, false});
+                stack.push_back({nodes[u].left, false});
+            }
+        }
     }
 
     void apply_reverse(int v) {

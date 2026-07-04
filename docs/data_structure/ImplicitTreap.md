@@ -53,7 +53,7 @@ ImplicitTreap<S, op, e> treap(values);
 **計算量**
 
 - 空構築: `O(1)`
-- `values` から構築: 期待 `O(N log N)`
+- `values` から構築: `O(N)`
 
 ## 関数
 

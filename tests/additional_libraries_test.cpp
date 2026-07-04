@@ -206,6 +206,12 @@ static void test_implicit_treap() {
 
 static void test_implicit_treap_beats() {
     mt19937 rng(97531);
+    ImplicitTreapBeats built(vector<long long>{5, 1, 8, 6});
+    assert((built.to_vector() == vector<long long>{5, 1, 8, 6}));
+    assert(built.range_sum(0, 4) == 20);
+    assert(built.range_min(0, 4) == 1);
+    assert(built.range_max(0, 4) == 8);
+
     vector<long long> a;
     ImplicitTreapBeats treap;
     for (int step = 0; step < 5000; ++step) {

@@ -29,7 +29,21 @@ struct ImplicitTreapBeats {
         root = -1;
         nodes.clear();
         nodes.reserve(values.size());
-        for (i64 value : values) root = merge(root, make_node(value));
+        std::vector<int> stack;
+        stack.reserve(values.size());
+        for (i64 value : values) {
+            int v = make_node(value);
+            int last = -1;
+            while (!stack.empty() && nodes[v].priority < nodes[stack.back()].priority) {
+                last = stack.back();
+                stack.pop_back();
+            }
+            if (!stack.empty()) nodes[stack.back()].right = v;
+            nodes[v].left = last;
+            stack.push_back(v);
+        }
+        root = stack.empty() ? -1 : stack.front();
+        rebuild(root);
     }
 
     void insert(int position, i64 value) {
@@ -221,6 +235,23 @@ private:
         nodes[v].right = right;
         nodes[v].priority = priority;
         nodes[v].rev = rev;
+    }
+
+    void rebuild(int v) {
+        if (v == -1) return;
+        std::vector<std::pair<int, bool>> stack{{v, false}};
+        while (!stack.empty()) {
+            auto [u, visited] = stack.back();
+            stack.pop_back();
+            if (u == -1) continue;
+            if (visited) {
+                pull(u);
+            } else {
+                stack.push_back({u, true});
+                stack.push_back({nodes[u].right, false});
+                stack.push_back({nodes[u].left, false});
+            }
+        }
     }
 
     void apply_reverse(int v) {
