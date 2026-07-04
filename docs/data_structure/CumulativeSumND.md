@@ -59,6 +59,7 @@ T sum(vector<int> lower, vector<int> upper) const;
 ```
 
 n 次元直方体 `prod_i [lower_i, upper_i)` の和を返します。
+いずれかの次元で `lower_i > upper_i` の場合は空区間として `T()` を返します。
 
 **計算量**
 

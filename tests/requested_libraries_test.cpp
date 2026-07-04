@@ -91,6 +91,8 @@ static void test_cumulative_sum_nd() {
                     for (int z = z1; z < z2; ++z) expected += at(x, y, z);
                 assert(cs.sum({x1, y1, z1}, {x2, y2, z2}) == expected);
             }
+    assert(cs.sum({3, 0, 0}, {2, 3, 5}) == 0);
+    assert(cs.sum({0, 2, 4}, {4, 1, 5}) == 0);
 
     CumulativeSumND<long long> sparse({6, 5, 4, 3});
     vector<tuple<int, int, int, int, long long>> points;

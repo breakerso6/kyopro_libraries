@@ -68,7 +68,9 @@ struct CumulativeSumND {
         assert(built);
         assert((int)lower.size() == dimension && (int)upper.size() == dimension);
         for (int axis = 0; axis < dimension; ++axis) {
-            assert(0 <= lower[axis] && lower[axis] <= upper[axis] && upper[axis] <= shape[axis]);
+            assert(0 <= lower[axis] && lower[axis] <= shape[axis]);
+            assert(0 <= upper[axis] && upper[axis] <= shape[axis]);
+            if (lower[axis] > upper[axis]) return T();
         }
         T result = T();
         assert(dimension < 62);
