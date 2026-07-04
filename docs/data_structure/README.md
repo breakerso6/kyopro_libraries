@@ -22,6 +22,7 @@
 | [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 `O(1)` 償却、取得 `O(log N)` |
 | [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
 | [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
+| [Compress.hpp](Compress.md) | `index`, `contains`, `compressed` | 構築 `O(N log N)`、変換 `O(log N)` |
 | [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `prod` | 期待 `O(log N)` |
 | [SplayTreeSequence.hpp](SplayTreeSequence.md) | `insert`, `erase`, `reverse`, `prod` | ならし `O(log N)` |
 | [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
@@ -45,6 +46,7 @@
 - `IntervalSet` はすべて半開区間 `[l,r)` です。
 - `LiChaoTree` の座標範囲はコンストラクタで `[low,high)` として固定します。
 - `ConvexHullTrick` は最小値なら傾き降順、最大値なら傾き昇順で直線を追加します。任意順追加には `LiChaoTree` を使います。
+- `Compress` は値を追加して `build()` するか、`vector` から直接構築します。
 - `LazySegmentTree2D.hpp` は長方形加算・長方形和に特化した `RangeAddRangeSum2D` です。
 - IndexSetの詳細は [Indexset.md](Indexset.md) を参照してください。
 - 永続データ構造のversion管理と制約は [Persistence.md](Persistence.md) を参照してください。

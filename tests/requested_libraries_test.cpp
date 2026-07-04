@@ -4,6 +4,7 @@ using namespace std;
 #include "libraries/algorithm/Kitamasa.hpp"
 #include "libraries/algorithm/ZAlgorithm.hpp"
 #include "libraries/data_structure/ConvexHullTrick.hpp"
+#include "libraries/data_structure/Compress.hpp"
 #include "libraries/data_structure/CumulativeSumND.hpp"
 #include "libraries/data_structure/DynamicSegmentTree.hpp"
 #include "libraries/data_structure/LazySegmentTree2D.hpp"
@@ -44,6 +45,27 @@ static void test_dynamic_segment_tree() {
         for (auto [x, v] : mp) if (l <= x && x < r) expected += v;
         assert(seg.prod(l, r) == expected);
     }
+}
+
+static void test_compress() {
+    vector<long long> x{100, -5, 100, 7, -5};
+    Compress<long long> comp(x);
+    assert(comp.size() == 3);
+    assert(!comp.empty());
+    assert(comp[0] == -5 && comp[1] == 7 && comp[2] == 100);
+    assert(comp.index(-5) == 0);
+    assert(comp(7) == 1);
+    assert(comp.contains(100));
+    assert(!comp.contains(8));
+    assert(comp.lower_bound(8) == 2);
+    assert(comp.upper_bound(7) == 2);
+    assert((comp.compressed(x) == vector<int>{2, 0, 2, 1, 0}));
+
+    Compress<int> incremental;
+    incremental.add(3);
+    incremental.add(vector<int>{1, 3, 2});
+    incremental.build();
+    assert((incremental.values == vector<int>{1, 2, 3}));
 }
 
 static void test_2d_structures() {
@@ -169,6 +191,7 @@ static void test_math() {
 }
 
 int main() {
+    test_compress();
     test_dynamic_segment_tree(); test_2d_structures(); test_cumulative_sum_nd(); test_optimization_and_strings();
     test_graphs(); test_math();
     cout << "requested library tests passed\n";
