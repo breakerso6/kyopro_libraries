@@ -22,6 +22,8 @@
 | [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 `O(1)` 償却、取得 `O(log N)` |
 | [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
 | [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
+| [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `prod` | 期待 `O(log N)` |
+| [SplayTreeSequence.hpp](SplayTreeSequence.md) | `insert`, `erase`, `reverse`, `prod` | ならし `O(log N)` |
 | [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
 | [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 `O(log X)` |
 | [PersistentLazySegmentTree.hpp](Persistence.md#persistentlazysegmenttree) | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |

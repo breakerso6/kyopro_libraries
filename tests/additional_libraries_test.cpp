@@ -4,9 +4,11 @@ using namespace std;
 
 #include "libraries/algorithm/SMAWK.hpp"
 #include "libraries/data_structure/CartesianTree.hpp"
+#include "libraries/data_structure/ImplicitTreap.hpp"
 #include "libraries/data_structure/OfflineDynamicConnectivity.hpp"
 #include "libraries/data_structure/SegmentTreeBeats.hpp"
 #include "libraries/data_structure/SlopeTrick.hpp"
+#include "libraries/data_structure/SplayTreeSequence.hpp"
 #include "libraries/data_structure/WaveletMatrix.hpp"
 #include "libraries/graph/BiconnectedComponents.hpp"
 #include "libraries/math/Factorization.hpp"
@@ -60,6 +62,96 @@ static void test_offline_connectivity() {
     auto answer = dc.run();
     assert(answer[q0] == 0 && answer[q1] == 1 && answer[q2] == 3);
     assert(answer[q3] == 1 && answer[q4] == 0 && answer[q5] == 4);
+}
+
+string op_string(string a, string b) { return a + b; }
+string e_string() { return ""; }
+
+static void test_implicit_treap() {
+    mt19937 rng(13579);
+    vector<string> a;
+    ImplicitTreap<string, op_string, e_string> treap;
+    for (int step = 0; step < 2000; ++step) {
+        int type = rng() % 7;
+        if (type == 0 || a.empty()) {
+            int pos = rng() % (a.size() + 1);
+            string value(1, char('a' + rng() % 26));
+            a.insert(a.begin() + pos, value);
+            treap.insert(pos, value);
+        } else if (type == 1) {
+            int pos = rng() % a.size();
+            a.erase(a.begin() + pos);
+            treap.erase(pos);
+        } else if (type == 2) {
+            int pos = rng() % a.size();
+            string value(1, char('a' + rng() % 26));
+            a[pos] = value;
+            treap.set(pos, value);
+        } else {
+            int l = rng() % (a.size() + 1), r = rng() % (a.size() + 1);
+            if (l > r) swap(l, r);
+            if (type == 3) {
+                reverse(a.begin() + l, a.begin() + r);
+                treap.reverse(l, r);
+            } else {
+                string expected;
+                for (int i = l; i < r; ++i) expected += a[i];
+                assert(treap.prod(l, r) == expected);
+            }
+        }
+        assert(treap.size() == (int)a.size());
+        assert(treap.to_vector() == a);
+        for (int i = 0; i < (int)a.size(); ++i) assert(treap.get(i) == a[i]);
+    }
+    ImplicitTreap<string, op_string, e_string> built(vector<string>{"a", "b", "c", "d"});
+    built.reverse(0, 4);
+    assert(built.prod(0, 4) == "dcba");
+}
+
+template<class Sequence>
+static void random_sequence_test() {
+    mt19937 rng(24680);
+    vector<string> a;
+    Sequence sequence;
+    for (int step = 0; step < 2000; ++step) {
+        int type = rng() % 7;
+        if (type == 0 || a.empty()) {
+            int pos = rng() % (a.size() + 1);
+            string value(1, char('a' + rng() % 26));
+            a.insert(a.begin() + pos, value);
+            sequence.insert(pos, value);
+        } else if (type == 1) {
+            int pos = rng() % a.size();
+            a.erase(a.begin() + pos);
+            sequence.erase(pos);
+        } else if (type == 2) {
+            int pos = rng() % a.size();
+            string value(1, char('a' + rng() % 26));
+            a[pos] = value;
+            sequence.set(pos, value);
+        } else {
+            int l = rng() % (a.size() + 1), r = rng() % (a.size() + 1);
+            if (l > r) swap(l, r);
+            if (type == 3) {
+                reverse(a.begin() + l, a.begin() + r);
+                sequence.reverse(l, r);
+            } else {
+                string expected;
+                for (int i = l; i < r; ++i) expected += a[i];
+                assert(sequence.prod(l, r) == expected);
+            }
+        }
+        assert(sequence.size() == (int)a.size());
+        assert(sequence.to_vector() == a);
+        for (int i = 0; i < (int)a.size(); ++i) assert(sequence.get(i) == a[i]);
+    }
+}
+
+static void test_splay_tree_sequence() {
+    random_sequence_test<SplayTreeSequence<string, op_string, e_string>>();
+    SplayTreeSequence<string, op_string, e_string> built(vector<string>{"a", "b", "c", "d"});
+    built.reverse(0, 4);
+    assert(built.prod(0, 4) == "dcba");
 }
 
 static void test_number_theory() {
@@ -152,6 +244,6 @@ static void test_tree_and_optimization() {
 
 int main() {
     test_wavelet_matrix(); test_segment_tree_beats(); test_offline_connectivity();
-    test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
+    test_implicit_treap(); test_splay_tree_sequence(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
     cout << "additional library tests passed\n";
 }
