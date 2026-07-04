@@ -4,6 +4,7 @@ using namespace std;
 
 #include "libraries/algorithm/SMAWK.hpp"
 #include "libraries/data_structure/CartesianTree.hpp"
+#include "libraries/data_structure/ImplicitTreapBeats.hpp"
 #include "libraries/data_structure/ImplicitTreap.hpp"
 #include "libraries/data_structure/OfflineDynamicConnectivity.hpp"
 #include "libraries/data_structure/SegmentTreeBeats.hpp"
@@ -67,6 +68,34 @@ static void test_offline_connectivity() {
 string op_string(string a, string b) { return a + b; }
 string e_string() { return ""; }
 
+struct TreapSum {
+    long long sum;
+    int size;
+    bool operator==(const TreapSum& other) const {
+        return sum == other.sum && size == other.size;
+    }
+};
+
+TreapSum op_treap_sum(TreapSum a, TreapSum b) {
+    return {a.sum + b.sum, a.size + b.size};
+}
+
+TreapSum e_treap_sum() {
+    return {0, 0};
+}
+
+TreapSum mapping_treap_add(long long f, TreapSum x) {
+    return {x.sum + f * x.size, x.size};
+}
+
+long long composition_treap_add(long long f, long long g) {
+    return f + g;
+}
+
+long long id_treap_add() {
+    return 0;
+}
+
 static void test_implicit_treap() {
     mt19937 rng(13579);
     vector<string> a;
@@ -106,6 +135,107 @@ static void test_implicit_treap() {
     ImplicitTreap<string, op_string, e_string> built(vector<string>{"a", "b", "c", "d"});
     built.reverse(0, 4);
     assert(built.prod(0, 4) == "dcba");
+
+    vector<long long> b;
+    ImplicitTreap<TreapSum, op_treap_sum, e_treap_sum, long long,
+                  mapping_treap_add, composition_treap_add, id_treap_add> lazy_treap;
+    for (int step = 0; step < 3000; ++step) {
+        int type = rng() % 8;
+        if (type == 0 || b.empty()) {
+            int pos = rng() % (b.size() + 1);
+            long long value = (int)(rng() % 41) - 20;
+            b.insert(b.begin() + pos, value);
+            lazy_treap.insert(pos, {value, 1});
+        } else if (type == 1) {
+            int pos = rng() % b.size();
+            b.erase(b.begin() + pos);
+            lazy_treap.erase(pos);
+        } else if (type == 2) {
+            int pos = rng() % b.size();
+            long long value = (int)(rng() % 41) - 20;
+            b[pos] = value;
+            lazy_treap.set(pos, {value, 1});
+        } else {
+            int l = rng() % (b.size() + 1), r = rng() % (b.size() + 1);
+            if (l > r) swap(l, r);
+            if (type == 3) {
+                reverse(b.begin() + l, b.begin() + r);
+                lazy_treap.reverse(l, r);
+            } else if (type == 4) {
+                long long add = (int)(rng() % 41) - 20;
+                for (int i = l; i < r; ++i) b[i] += add;
+                lazy_treap.apply(l, r, add);
+            } else {
+                long long expected = accumulate(b.begin() + l, b.begin() + r, 0LL);
+                assert(lazy_treap.prod(l, r).sum == expected);
+            }
+        }
+        assert(lazy_treap.size() == (int)b.size());
+        auto values = lazy_treap.to_vector();
+        assert(values.size() == b.size());
+        for (int i = 0; i < (int)b.size(); ++i) {
+            assert(values[i] == (TreapSum{b[i], 1}));
+            assert(lazy_treap.get(i) == (TreapSum{b[i], 1}));
+        }
+    }
+}
+
+static void test_implicit_treap_beats() {
+    mt19937 rng(97531);
+    vector<long long> a;
+    ImplicitTreapBeats treap;
+    for (int step = 0; step < 5000; ++step) {
+        int type = rng() % 11;
+        if (type == 0 || a.empty()) {
+            int pos = rng() % (a.size() + 1);
+            long long value = (int)(rng() % 101) - 50;
+            a.insert(a.begin() + pos, value);
+            treap.insert(pos, value);
+        } else if (type == 1) {
+            int pos = rng() % a.size();
+            a.erase(a.begin() + pos);
+            treap.erase(pos);
+        } else if (type == 2) {
+            int pos = rng() % a.size();
+            long long value = (int)(rng() % 101) - 50;
+            a[pos] = value;
+            treap.set(pos, value);
+        } else {
+            int l = rng() % (a.size() + 1), r = rng() % (a.size() + 1);
+            if (l > r) swap(l, r);
+            if (type == 3) {
+                reverse(a.begin() + l, a.begin() + r);
+                treap.reverse(l, r);
+            } else if (type == 4) {
+                long long x = (int)(rng() % 101) - 50;
+                for (int i = l; i < r; ++i) a[i] = min(a[i], x);
+                treap.range_chmin(l, r, x);
+            } else if (type == 5) {
+                long long x = (int)(rng() % 101) - 50;
+                for (int i = l; i < r; ++i) a[i] = max(a[i], x);
+                treap.range_chmax(l, r, x);
+            } else if (type == 6) {
+                long long x = (int)(rng() % 41) - 20;
+                for (int i = l; i < r; ++i) a[i] += x;
+                treap.range_add(l, r, x);
+            } else {
+                long long expected_sum = accumulate(a.begin() + l, a.begin() + r, 0LL);
+                assert(treap.range_sum(l, r) == expected_sum);
+                if (l < r) {
+                    assert(treap.range_min(l, r) == *min_element(a.begin() + l, a.begin() + r));
+                    assert(treap.range_max(l, r) == *max_element(a.begin() + l, a.begin() + r));
+                }
+            }
+        }
+        assert(treap.size() == (int)a.size());
+        assert(treap.to_vector() == a);
+        for (int i = 0; i < (int)a.size(); ++i) assert(treap.get(i) == a[i]);
+        if (!a.empty()) {
+            assert(treap.range_sum(0, a.size()) == accumulate(a.begin(), a.end(), 0LL));
+            assert(treap.range_min(0, a.size()) == *min_element(a.begin(), a.end()));
+            assert(treap.range_max(0, a.size()) == *max_element(a.begin(), a.end()));
+        }
+    }
 }
 
 template<class Sequence>
@@ -244,6 +374,6 @@ static void test_tree_and_optimization() {
 
 int main() {
     test_wavelet_matrix(); test_segment_tree_beats(); test_offline_connectivity();
-    test_implicit_treap(); test_splay_tree_sequence(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
+    test_implicit_treap(); test_implicit_treap_beats(); test_splay_tree_sequence(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
     cout << "additional library tests passed\n";
 }

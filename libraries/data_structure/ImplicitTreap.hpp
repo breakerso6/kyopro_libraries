@@ -1,13 +1,38 @@
 #pragma once
 #include <bits/stdc++.h>
 
-template<class S, S (*op)(S, S), S (*e)()>
+namespace implicit_treap_detail {
+struct NoLazy {};
+
+template<class S>
+S default_mapping(NoLazy, S x) {
+    return x;
+}
+
+inline NoLazy default_composition(NoLazy, NoLazy) {
+    return {};
+}
+
+inline NoLazy default_id() {
+    return {};
+}
+}
+
+template<class S,
+         S (*op)(S, S),
+         S (*e)(),
+         class F = implicit_treap_detail::NoLazy,
+         S (*mapping)(F, S) = implicit_treap_detail::default_mapping<S>,
+         F (*composition)(F, F) = implicit_treap_detail::default_composition,
+         F (*id_)() = implicit_treap_detail::default_id>
 struct ImplicitTreap {
     struct Node {
         S value, prod, rprod;
+        F lazy = id_();
         int left = -1, right = -1, size = 1;
         uint32_t priority = 0;
         bool rev = false;
+        bool has_lazy = false;
     };
 
     int root = -1;
@@ -46,6 +71,8 @@ struct ImplicitTreap {
         auto [a, bc] = split(root, position);
         auto [b, c] = split(bc, 1);
         nodes[b].value = value;
+        nodes[b].lazy = id_();
+        nodes[b].has_lazy = false;
         pull(b);
         root = merge(a, merge(b, c));
     }
@@ -74,6 +101,15 @@ struct ImplicitTreap {
         root = merge(a, merge(b, c));
     }
 
+    void apply(int l, int r, F f) {
+        assert(0 <= l && l <= r && r <= size());
+        if (l == r) return;
+        auto [a, bc] = split(root, l);
+        auto [b, c] = split(bc, r - l);
+        apply_lazy(b, f);
+        root = merge(a, merge(b, c));
+    }
+
     std::vector<S> to_vector() {
         std::vector<S> result;
         result.reserve(size());
@@ -93,7 +129,7 @@ private:
     }
 
     int make_node(const S& value) {
-        nodes.push_back({value, value, value, -1, -1, 1, rng(), false});
+        nodes.push_back({value, value, value, id_(), -1, -1, 1, rng(), false, false});
         return (int)nodes.size() - 1;
     }
 
@@ -111,11 +147,28 @@ private:
         nodes[v].rev = !nodes[v].rev;
     }
 
+    void apply_lazy(int v, F f) {
+        if (v == -1) return;
+        nodes[v].value = mapping(f, nodes[v].value);
+        nodes[v].prod = mapping(f, nodes[v].prod);
+        nodes[v].rprod = mapping(f, nodes[v].rprod);
+        nodes[v].lazy = nodes[v].has_lazy ? composition(f, nodes[v].lazy) : f;
+        nodes[v].has_lazy = true;
+    }
+
     void push(int v) {
-        if (v == -1 || !nodes[v].rev) return;
-        apply_reverse(nodes[v].left);
-        apply_reverse(nodes[v].right);
-        nodes[v].rev = false;
+        if (v == -1) return;
+        if (nodes[v].rev) {
+            apply_reverse(nodes[v].left);
+            apply_reverse(nodes[v].right);
+            nodes[v].rev = false;
+        }
+        if (nodes[v].has_lazy) {
+            apply_lazy(nodes[v].left, nodes[v].lazy);
+            apply_lazy(nodes[v].right, nodes[v].lazy);
+            nodes[v].lazy = id_();
+            nodes[v].has_lazy = false;
+        }
     }
 
     int merge(int a, int b) {
