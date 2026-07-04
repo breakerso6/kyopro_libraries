@@ -16,6 +16,7 @@ using namespace std;
 #include "libraries/string/Manacher.hpp"
 #include "libraries/string/PalindromicTree.hpp"
 #include "libraries/tree/HLD.hpp"
+#include "libraries/tree/LinkCutTree.hpp"
 #include "libraries/tree/VirtualTree.hpp"
 
 static void test_wavelet_matrix() {
@@ -67,6 +68,29 @@ static void test_offline_connectivity() {
 
 string op_string(string a, string b) { return a + b; }
 string e_string() { return ""; }
+
+static vector<int> bfs_path(int s, int t, const vector<set<int>>& graph) {
+    vector<int> parent(graph.size(), -1);
+    queue<int> que;
+    parent[s] = s;
+    que.push(s);
+    while (!que.empty()) {
+        int v = que.front();
+        que.pop();
+        if (v == t) break;
+        for (int to : graph[v]) {
+            if (parent[to] != -1) continue;
+            parent[to] = v;
+            que.push(to);
+        }
+    }
+    if (parent[t] == -1) return {};
+    vector<int> path;
+    for (int v = t; v != s; v = parent[v]) path.push_back(v);
+    path.push_back(s);
+    reverse(path.begin(), path.end());
+    return path;
+}
 
 struct TreapSum {
     long long sum;
@@ -238,6 +262,173 @@ static void test_implicit_treap_beats() {
     }
 }
 
+static void test_link_cut_tree() {
+    {
+        const int n = 8;
+        LinkCutTree<string, op_string, e_string> lct(vector<string>{"0", "1", "2", "3", "4", "5", "6", "7"});
+        vector<set<int>> graph(n);
+        auto add_edge = [&](int u, int v) {
+            assert(lct.link(u, v));
+            graph[u].insert(v);
+            graph[v].insert(u);
+        };
+        add_edge(0, 1);
+        add_edge(1, 2);
+        add_edge(1, 3);
+        add_edge(3, 4);
+        add_edge(3, 5);
+        add_edge(0, 6);
+        add_edge(6, 7);
+        for (int root = 0; root < n; ++root) {
+            lct.evert(root);
+            vector<int> parent(n, -1), depth(n, 0);
+            queue<int> que;
+            parent[root] = root;
+            que.push(root);
+            while (!que.empty()) {
+                int v = que.front();
+                que.pop();
+                for (int to : graph[v]) {
+                    if (parent[to] != -1) continue;
+                    parent[to] = v;
+                    depth[to] = depth[v] + 1;
+                    que.push(to);
+                }
+            }
+            auto naive_lca = [&](int u, int v) {
+                while (depth[u] > depth[v]) u = parent[u];
+                while (depth[v] > depth[u]) v = parent[v];
+                while (u != v) {
+                    u = parent[u];
+                    v = parent[v];
+                }
+                return u;
+            };
+            for (int u = 0; u < n; ++u) for (int v = 0; v < n; ++v) {
+                assert(lct.lca(u, v) == naive_lca(u, v));
+            }
+        }
+    }
+
+    mt19937 rng(86420);
+    const int n = 45;
+    vector<string> value(n);
+    for (int i = 0; i < n; ++i) value[i] = string(1, char('a' + i % 26));
+    LinkCutTree<string, op_string, e_string> lct(value);
+    vector<set<int>> graph(n);
+
+    for (int step = 0; step < 4000; ++step) {
+        int type = rng() % 8;
+        if (type == 0) {
+            int u = rng() % n, v = rng() % n;
+            if (u == v) continue;
+            bool expected = bfs_path(u, v, graph).empty();
+            bool actual = lct.link(u, v);
+            assert(actual == expected);
+            if (actual) {
+                graph[u].insert(v);
+                graph[v].insert(u);
+            }
+        } else if (type == 1) {
+            int u = rng() % n, v = rng() % n;
+            bool expected = graph[u].count(v);
+            bool actual = lct.cut(u, v);
+            assert(actual == expected);
+            if (actual) {
+                graph[u].erase(v);
+                graph[v].erase(u);
+            }
+        } else if (type == 2) {
+            int v = rng() % n;
+            value[v] = string(1, char('A' + rng() % 26));
+            lct.set(v, value[v]);
+        } else {
+            int u = rng() % n, v = rng() % n;
+            auto path = bfs_path(u, v, graph);
+            bool expected_connected = !path.empty();
+            assert(lct.connected(u, v) == expected_connected);
+            if (type == 3) {
+                if (expected_connected) {
+                    string expected;
+                    for (int x : path) expected += value[x];
+                    assert(lct.prod(u, v) == expected);
+                }
+            } else if (type == 4) {
+                if (expected_connected) lct.evert(u);
+            } else if (type == 5) {
+                assert(lct.get(u) == value[u]);
+            } else if (type == 6) {
+                int actual = lct.root(u);
+                assert(!bfs_path(u, actual, graph).empty());
+                for (int x = 0; x < n; ++x) {
+                    assert((!bfs_path(u, x, graph).empty()) == (!bfs_path(actual, x, graph).empty()));
+                }
+            } else {
+                int w = lct.lca(u, v);
+                assert((w != -1) == expected_connected);
+                if (w != -1) assert(!bfs_path(u, w, graph).empty() && !bfs_path(v, w, graph).empty());
+            }
+        }
+    }
+
+    vector<long long> number(n);
+    vector<TreapSum> initial(n);
+    for (int i = 0; i < n; ++i) {
+        number[i] = (int)(rng() % 101) - 50;
+        initial[i] = {number[i], 1};
+    }
+    LinkCutTree<TreapSum, op_treap_sum, e_treap_sum, long long,
+                mapping_treap_add, composition_treap_add, id_treap_add> lazy_lct(initial);
+    vector<set<int>> graph2(n);
+    for (int step = 0; step < 4000; ++step) {
+        int type = rng() % 7;
+        if (type == 0) {
+            int u = rng() % n, v = rng() % n;
+            if (u == v) continue;
+            bool expected = bfs_path(u, v, graph2).empty();
+            bool actual = lazy_lct.link(u, v);
+            assert(actual == expected);
+            if (actual) {
+                graph2[u].insert(v);
+                graph2[v].insert(u);
+            }
+        } else if (type == 1) {
+            int u = rng() % n, v = rng() % n;
+            bool expected = graph2[u].count(v);
+            bool actual = lazy_lct.cut(u, v);
+            assert(actual == expected);
+            if (actual) {
+                graph2[u].erase(v);
+                graph2[v].erase(u);
+            }
+        } else if (type == 2) {
+            int v = rng() % n;
+            number[v] = (int)(rng() % 101) - 50;
+            lazy_lct.set(v, {number[v], 1});
+        } else {
+            int u = rng() % n, v = rng() % n;
+            auto path = bfs_path(u, v, graph2);
+            bool expected_connected = !path.empty();
+            assert(lazy_lct.connected(u, v) == expected_connected);
+            if (!expected_connected) continue;
+            if (type == 3) {
+                long long add = (int)(rng() % 41) - 20;
+                for (int x : path) number[x] += add;
+                lazy_lct.apply(u, v, add);
+            } else if (type == 4) {
+                long long expected = 0;
+                for (int x : path) expected += number[x];
+                assert(lazy_lct.prod(u, v).sum == expected);
+            } else if (type == 5) {
+                lazy_lct.evert(u);
+            } else {
+                int x = rng() % n;
+                assert(lazy_lct.get(x) == (TreapSum{number[x], 1}));
+            }
+        }
+    }
+}
+
 template<class Sequence>
 static void random_sequence_test() {
     mt19937 rng(24680);
@@ -374,6 +565,6 @@ static void test_tree_and_optimization() {
 
 int main() {
     test_wavelet_matrix(); test_segment_tree_beats(); test_offline_connectivity();
-    test_implicit_treap(); test_implicit_treap_beats(); test_splay_tree_sequence(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
+    test_implicit_treap(); test_implicit_treap_beats(); test_splay_tree_sequence(); test_link_cut_tree(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
     cout << "additional library tests passed\n";
 }

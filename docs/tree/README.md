@@ -7,11 +7,18 @@
 | [HLD_lseg.hpp](HLD_lseg.md) | 頂点値のパス作用・パス積 | [HLD_lseg.md](HLD_lseg.md) |
 | [HLD_seg_edge.hpp](HLD_seg_edge.md) | 辺値の一点更新・パス積 | [HLD_seg_edge.md](HLD_seg_edge.md) |
 | [HLD_lseg_edge.hpp](HLD_lseg_edge.md) | 辺値のパス作用・パス積 | [HLD_lseg_edge.md](HLD_lseg_edge.md) |
+| [LinkCutTree.hpp](LinkCutTree.md) | 動的森の link/cut・パス作用・パス積 | [LinkCutTree.md](LinkCutTree.md) |
 | [CentroidDecomposition.hpp](CentroidDecomposition.md) | 重心分解木の構築 | [CentroidDecomposition.md](CentroidDecomposition.md) |
 | [RerootingDP.hpp](RerootingDP.md) | 全方位木DP | [RerootingDP.md](RerootingDP.md) |
 | [VirtualTree.hpp](VirtualTree.md) | 指定頂点とLCAから圧縮木を構築 | [VirtualTree.md](VirtualTree.md) |
 
 HLDの構築は `O(N)`、パスクエリはセグメント木の操作を除いて `O(log N)` 区間に分解されます。`HLD` は `lca`、`distance`、`jump` に加え、Euler Tour上の `id/out`、`in_subtree`、`path_segments` を持ちます。`HLD_*seg*` はAtCoder Libraryが必要です。
+
+## Link-Cut Tree
+
+詳細: [LinkCutTree.md](LinkCutTree.md)
+
+`LinkCutTree` は動的森に対し、`link`、`cut`、`connected`、`evert`、`lca`、頂点値の `set/get`、パス上の `apply/prod` をならし `O(log N)` で処理します。非可換なモノイドにも対応し、`prod(u,v)` は `u` から `v` の順序で積を返します。
 
 ## 重心分解
 
