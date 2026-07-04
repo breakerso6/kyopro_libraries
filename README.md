@@ -38,12 +38,38 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
 ## Include Expander
 
-`tools/expand_includes.py` はローカルライブラリとACLの再帰includeを展開し、提出用の単一ファイルを生成します。標準ライブラリのincludeはそのまま残します。
+`tools/expand_includes.py` は、提出用に C++ ソースを 1 ファイルへまとめるためのスクリプトです。
+
+展開対象:
+
+- `#include "libraries/HLD.hpp"` のようなローカル include
+- `#include <atcoder/segtree>` のような ACL include
+- ACL 内部の再帰 include
+
+`ac-library/` は Git 管理対象外です。`tools/expand_includes.py` を使う前に、このリポジトリ直下へ AtCoder Library を配置してください。
+
+標準ライブラリの include、例えば `#include <bits/stdc++.h>` はそのまま残します。
+ACL include はデフォルトで展開します。ACL を展開せず、`#include <atcoder/all>` などをそのまま残したい場合は `--no-expand-acl` を指定してください。
+
+### Basic Usage
 
 ```bash
 tools/expand_includes.py main.cpp -o combined.cpp
 tools/expand_includes.py main.cpp --stdout
 tools/expand_includes.py main.cpp -I other_libs -o combined.cpp
+```
+
+ACL include を展開しない場合:
+
+```bash
+tools/expand_includes.py main.cpp --no-expand-acl -o combined.cpp
+```
+
+### Compile Example
+
+```bash
+tools/expand_includes.py main.cpp -o combined.cpp
+g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 ```
 
 ## Tests

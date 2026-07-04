@@ -17,8 +17,9 @@ DEFAULT_OUTPUT = "combined.cpp"
 
 
 class Expander:
-    def __init__(self, include_dirs):
+    def __init__(self, include_dirs, expand_acl=True):
         self.include_dirs = [Path(p).resolve() for p in include_dirs]
+        self.expand_acl = expand_acl
         self.included = set()
 
     def resolve(self, name, delimiter, current_dir):
@@ -26,6 +27,8 @@ class Expander:
         if delimiter == '"':
             candidates.append(current_dir / name)
         if name.startswith("atcoder/"):
+            if not self.expand_acl:
+                return None
             candidates.extend(directory / name for directory in self.include_dirs)
             candidates.extend(directory / "ac-library" / name for directory in self.include_dirs)
         elif delimiter == '"':
@@ -124,11 +127,24 @@ def main():
         action="store_true",
         help="print expanded source instead of writing a file",
     )
+    parser.add_argument(
+        "--expand-acl",
+        dest="expand_acl",
+        action="store_true",
+        default=True,
+        help="expand AtCoder Library includes (default)",
+    )
+    parser.add_argument(
+        "--no-expand-acl",
+        dest="expand_acl",
+        action="store_false",
+        help="leave AtCoder Library includes as #include lines",
+    )
     args = parser.parse_args()
 
     source = Path(args.source)
     include_dirs = default_include_dirs(source.resolve()) + [Path(p).resolve() for p in args.include]
-    expander = Expander(include_dirs)
+    expander = Expander(include_dirs, expand_acl=args.expand_acl)
     expanded = expander.expand(source)
 
     if args.stdout:
