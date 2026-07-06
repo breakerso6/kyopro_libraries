@@ -17,6 +17,8 @@ using vec2di = std::vector<vecint>;
 using vec2dd = std::vector<vecdou>;
 using vec2db = std::vector<vecbool>;
 using pl = pair<long long,long long>;
+template<class T> using vec = vector<T>;
+template<class T> using pq_rev = priority_queue<T, vector<T>, greater<T>>;
 // using mint998 = modint998244353;
 // using mint107 = modint1000000007;
 // using mint = modint;
@@ -33,7 +35,7 @@ using pl = pair<long long,long long>;
 #define rrep1(i,n) for (ll i = (ll)(n); i > 0; i--)
 #define RREP(i,l,r) for (ll i = (ll)(r)-1; i >= (ll)(l); i--)
 #define all(a) (a).begin(), (a).end()
-#define INF ((1LL<<62)-(1LL<<31))
+const ll INF = (1LL<<62)-(1LL<<31);
 #define inr(a,x,b) ((a) <= (x) && (x) < (b))
 template <typename T>
 bool chmax(T &a, const T &b) {
@@ -51,6 +53,32 @@ bool chmin(T &a, const T &b) {
     }
     return false;
 }
+int popcnt(int x) { return __builtin_popcount(x); }
+int popcnt(ll x) { return __builtin_popcountll(x); }
+// https://trap.jp/post/1224/
+template<class... T>
+constexpr auto min(T... a){
+    return min(initializer_list<common_type_t<T...>>{a...});
+}
+template<class... T>
+constexpr auto max(T... a){
+    return max(initializer_list<common_type_t<T...>>{a...});
+}
+template<class... T>
+void input(T&... a){
+    (cin >> ... >> a);
+}
+void print(){
+    cout << '\n';
+}
+template<class T, class... Ts>
+void print(const T& a, const Ts&... b){
+    cout << a;
+    (cout << ... << (cout << ' ', b));
+    cout << '\n';
+}
+#define INT(...) int __VA_ARGS__; input(__VA_ARGS__)
+#define LL(...) ll __VA_ARGS__; input(__VA_ARGS__)
 
 void ynout(bool x,string Tru="Yes",string Wro="No"){
     if(x){

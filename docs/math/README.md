@@ -9,6 +9,7 @@
 | [XorBasis.hpp](XorBasis.md) | XOR線形基底 |
 | [IntegerMath.hpp](IntegerMath.md) | 整数除算、拡張GCD、CRT、floor_sum |
 | [ModCombinatorics.hpp](ModCombinatorics.md) | ACL modint対応の階乗・二項係数・多項係数 |
+| [FormalPowerSeries.hpp](FormalPowerSeries.md) | 形式的冪級数の基本演算、逆元、log、exp、pow |
 | [Factorization.hpp](Factorization.md) | 64-bit整数の素数判定・素因数分解・約数関数 |
 | [Matrix.hpp](Matrix.md) | 行列積、累乗、行列式、逆行列 |
 | [Mobius.hpp](Mobius.md) | Mobius関数、約数/倍数Zeta変換 |
@@ -50,6 +51,16 @@
 ACLの `atcoder::modint` 系でも使える階乗・逆階乗・逆元テーブルです。順列、二項係数、多項係数、Catalan数、錯置数を計算できます。
 
 詳細は [ModCombinatorics.md](ModCombinatorics.md) を参照してください。
+
+## [FormalPowerSeries](FormalPowerSeries.md)
+
+```cpp
+#include "libraries/math/FormalPowerSeries.hpp"
+```
+
+形式的冪級数を `FormalPowerSeries<Mint>` で扱います。加減乗除、微分、積分、評価、`inv`、`log`、`exp`、`pow` を提供します。標準では ACL の `atcoder::convolution` を使い、`FormalPowerSeries<Mint, false>` で素朴畳み込みにできます。
+
+詳細は [FormalPowerSeries.md](FormalPowerSeries.md) を参照してください。
 
 ## [64-bit factorization](Factorization.md)
 
