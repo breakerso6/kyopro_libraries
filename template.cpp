@@ -35,7 +35,7 @@ template<class T> using pq_rev = priority_queue<T, vector<T>, greater<T>>;
 #define rrep1(i,n) for (ll i = (ll)(n); i > 0; i--)
 #define RREP(i,l,r) for (ll i = (ll)(r)-1; i >= (ll)(l); i--)
 #define all(a) (a).begin(), (a).end()
-const ll INF = (1LL<<62)-(1LL<<31);
+constexpr ll INF = (1LL<<62)-(1LL<<31);
 #define inr(a,x,b) ((a) <= (x) && (x) < (b))
 template <typename T>
 bool chmax(T &a, const T &b) {
@@ -64,9 +64,26 @@ template<class... T>
 constexpr auto max(T... a){
     return max(initializer_list<common_type_t<T...>>{a...});
 }
-template<class... T>
-void input(T&... a){
-    (cin >> ... >> a);
+template<class T>
+void input(T& a) {
+    cin >> a;
+}
+
+template<class T, class U>
+void input(pair<T, U>& p) {
+    input(p.first);
+    input(p.second);
+}
+
+template<class T>
+void input(vector<T>& v) {
+    for (auto& x : v) input(x);
+}
+
+template<class T, class... Ts>
+void input(T& a, Ts&... rest) {
+    input(a);
+    input(rest...);
 }
 void print(){
     cout << '\n';
@@ -79,6 +96,12 @@ void print(const T& a, const Ts&... b){
 }
 #define INT(...) int __VA_ARGS__; input(__VA_ARGS__)
 #define LL(...) ll __VA_ARGS__; input(__VA_ARGS__)
+#define PL(...) pair<ll,ll> __VA_ARGS__; input(__VA_ARGS__)
+#define STR(...) string __VA_ARGS__; input(__VA_ARGS__)
+#define VEC(type,name,size) vector<type> name(size); input(name)
+#define VEC2(type,name,h,w) vector<vector<type>> name(h,vector<type>(w)); input(name)
+#define VECLL(name,size) vecll name(size); input(name)
+#define VEC2D(name,h,w) vec2d name(h,vecll(w)); input(name)
 
 void ynout(bool x,string Tru="Yes",string Wro="No"){
     if(x){
@@ -127,15 +150,12 @@ void print(const std::vector<T>& v) {
 template <typename T>
 void print2d(const std::vector<std::vector<T>>& v) {
     for (const auto& row : v) {
-        for (const auto& elem : row) {
-            cout << elem << " ";
-        }
-        cout << '\n';
+        print(row);
     }
 }
 vecll vecinp(ll n){
     vecll v(n);
-    rep(i,n) cin >> v[i];
+    rep(i,n)input(v[i]);
     return v;
 }
 

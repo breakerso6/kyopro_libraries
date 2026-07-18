@@ -8,6 +8,7 @@
 | --- | --- |
 | [XorBasis.hpp](XorBasis.md) | XOR線形基底 |
 | [IntegerMath.hpp](IntegerMath.md) | 整数除算、拡張GCD、CRT、floor_sum |
+| [Rational.hpp](Rational.md) | 既約分数、有理数の四則演算・比較・丸め |
 | [ModCombinatorics.hpp](ModCombinatorics.md) | ACL modint対応の階乗・二項係数・多項係数 |
 | [FormalPowerSeries.hpp](FormalPowerSeries.md) | 形式的冪級数の基本演算、逆元、log、exp、pow |
 | [Factorization.hpp](Factorization.md) | 64-bit整数の素数判定・素因数分解・約数関数 |
@@ -41,6 +42,16 @@
 `safe_mod`、`floor_div`、`ceil_div`、`ext_gcd`、`pow_mod`、`inv_mod`、`crt`、`floor_sum` を提供します。
 
 詳細は [IntegerMath.md](IntegerMath.md) を参照してください。
+
+## [Rational](Rational.md)
+
+```cpp
+#include "libraries/math/Rational.hpp"
+```
+
+`Rational<Int>` は符号付き整数型 `Int` を分子・分母に持つ既約分数型です。四則演算、比較、`floor`、`ceil`、`to_long_double` を提供し、行列や幾何に依存せず利用できます。
+
+詳細は [Rational.md](Rational.md) を参照してください。
 
 ## [ModCombinatorics](ModCombinatorics.md)
 

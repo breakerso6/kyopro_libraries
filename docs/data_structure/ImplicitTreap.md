@@ -1,6 +1,6 @@
 # ImplicitTreap
 
-`libraries/data_structure/ImplicitTreap.hpp` は列を平衡二分木として管理し、位置指定の挿入・削除・区間反転・区間作用・区間積を行うデータ構造です。
+`libraries/data_structure/ImplicitTreap.hpp` は列を平衡二分木として管理し、位置指定の挿入・削除・区間反転・区間作用・区間積を行うデータ構造です。要素には安定したノードハンドルを付けられ、ハンドルから現在位置を取得したり、同じハンドルを保ったまま要素を移動したりできます。
 
 ## Include
 
@@ -55,6 +55,20 @@ ImplicitTreap<S, op, e> treap(values);
 - 空構築: `O(1)`
 - `values` から構築: `O(N)`
 
+## ノードハンドル
+
+```cpp
+using Handle = int;
+```
+
+`Handle` はTreap内の1要素を識別する安定したIDです。挿入・削除・区間反転・区間作用によって他要素の位置が変わっても、アクティブな要素のハンドルは変わりません。
+
+- `insert` が新しい要素のハンドルを返す
+- 初期構築した要素のハンドルは `handle_at` または `to_handles` で取得する
+- `extract` で取り出したハンドルは `reinsert` で同じ要素として再挿入できる
+- `build` を再度呼ぶと、それ以前のすべてのハンドルは無効になる
+- `erase` した要素、および `extract` 後でまだ再挿入していない要素に対して `index_of` を呼んではならない
+
 ## 関数
 
 ### size / empty
@@ -73,16 +87,56 @@ bool empty() const;
 ### insert / erase
 
 ```cpp
-void insert(int position, const S& value);
+Handle insert(int position, const S& value);
 void erase(int position);
 ```
 
-`insert` は `position` 番目の直前へ `value` を挿入します。`erase` は `position` 番目の要素を削除します。
+`insert` は `position` 番目の直前へ `value` を挿入し、新しい要素のハンドルを返します。戻り値が不要なら従来どおり無視できます。`erase` は `position` 番目の要素を削除します。
 
 **制約**
 
 - `insert`: $0 \leq position \leq N$
 - `erase`: $0 \leq position < N$
+
+**計算量**
+
+- 期待 `O(log N)`
+
+### handle_at / index_of
+
+```cpp
+Handle handle_at(int position);
+int index_of(Handle handle);
+```
+
+`handle_at` は現在 `position` 番目にある要素のハンドルを返します。`index_of` はアクティブな `handle` が現在何番目にあるかを返します。区間反転が遅延中でも論理的な現在位置を返します。
+
+**制約**
+
+- `handle_at`: $0 \leq position < N$
+- `index_of`: `handle` は現在のTreapに含まれるアクティブなハンドル
+
+**計算量**
+
+- 期待 `O(log N)`
+
+### extract / reinsert
+
+```cpp
+Handle extract(int position);
+void reinsert(int position, Handle handle);
+void reinsert(int position, Handle handle, const S& value);
+```
+
+`extract` は `position` 番目の要素を列から取り出し、そのハンドルを返します。値とハンドルは保持されるため、2引数の `reinsert` で同じ値のまま再挿入できます。3引数版は値を `value` に置き換えてから再挿入します。
+
+`extract` と `reinsert` を使うと、外部に保存したハンドルを変更せずに要素を別の位置へ移動できます。
+
+**制約**
+
+- `extract`: $0 \leq position < N$
+- `reinsert`: $0 \leq position \leq N$
+- `reinsert` の `handle` は、このTreapから `extract` され、まだ再挿入されていないハンドル
 
 **計算量**
 
@@ -153,13 +207,14 @@ void apply(int l, int r, F f);
 
 - 期待 `O(log N)`
 
-### to_vector
+### to_vector / to_handles
 
 ```cpp
 vector<S> to_vector();
+vector<Handle> to_handles();
 ```
 
-現在の列を `vector` として返します。
+現在の値の列、または現在の並び順に対応するハンドルの列を返します。
 
 **計算量**
 
@@ -183,12 +238,20 @@ long long e() {
 int main() {
     ImplicitTreap<long long, op, e> treap({1, 2, 3, 4, 5});
 
+    // 初期要素に対応する安定ハンドル
+    auto handles = treap.to_handles();
+
     treap.reverse(1, 4);              // {1,4,3,2,5}
     cout << treap.prod(0, 3) << '\n'; // 8
+    cout << treap.index_of(handles[1]) << '\n'; // 元の値2は現在 index 3
 
-    treap.insert(2, 10);              // {1,4,10,3,2,5}
+    auto h10 = treap.insert(2, 10);    // {1,4,10,3,2,5}
     treap.erase(3);                   // {1,4,10,2,5}
     treap.set(0, 7);                  // {7,4,10,2,5}
+
+    int old_position = treap.index_of(h10);
+    auto moved = treap.extract(old_position);
+    treap.reinsert(0, moved);         // {10,7,4,2,5}
 }
 ```
 
@@ -242,3 +305,5 @@ int main() {
 - 乱択平衡二分木なので、各操作の計算量は期待値です。
 - 非可換な `op` にも対応するため、反転後の `prod` は反転された順序で計算されます。
 - `apply` と `reverse` を併用する場合、`mapping` は反転前後のどちらの区間積にも正しく作用する必要があります。
+- ハンドルは同じTreapオブジェクト内でのみ有効です。`build` による再構築後や別のTreapへ持ち越してはいけません。
+- `extract` した要素は `reinsert` するまで列に含まれず、その間は `index_of` の対象にできません。

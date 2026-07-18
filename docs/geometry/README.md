@@ -1,6 +1,6 @@
 # Geometry
 
-整数幾何は誤差を避けるため `__int128_t` を多用し、実数幾何は `long double` と `EPS` による判定を使います。まず整数で表せる問題なら [GeometryInt.hpp](GeometryInt.md) を優先します。
+整数幾何は誤差を避けるため `__int128_t` と既約分数 `Rational` を使い、実数幾何は `long double` と `EPS` による判定を使います。まず入力が整数・有理数で表せる問題なら [GeometryInt.hpp](GeometryInt.md) を優先します。
 
 ## 整数幾何
 
@@ -10,9 +10,13 @@
 #include "libraries/geometry/GeometryInt.hpp"
 ```
 
-- `Point<T>`: 座標、加減算、辞書順比較
-- `dot`, `cross`, `distance2`: 戻り値は `__int128_t`
-- `ccw`, `on_segment`, `segments_intersect`
+- `Point<T>`, `Line<T>`, `Segment<T>`, `Circle<T>`: 点・無限直線・閉線分・円周
+- `Rational128`, `RationalPoint`: [math/Rational.hpp](../math/Rational.md) の `Rational<__int128_t>` による正確な有理数・有理点
+- `dot`, `cross`, `distance2`: 整数座標では `__int128_t`、有理座標では `Rational`
+- `is_parallel`, `is_perpendicular`, `line_relation`, `segment_relation`, `circle_relation`
+- 型を組み合わせた `intersects`、`on_line`, `on_segment`, `on_circle`
+- 中点、直線・線分交点、射影、反射、平行線、垂線、垂直二等分線
+- 三角形の重心・外心・垂心
 - `convex_hull`: 重複点と辺の途中にある共線点を除いた反時計回りの凸包
 - `polygon_area2`: 符号なし面積の2倍
 - `point_in_polygon`: 外部 `-1`、境界 `0`、内部 `1`
@@ -33,11 +37,12 @@
 #include "libraries/geometry/GeometryReal.hpp"
 ```
 
+- `Point`, `Line`, `Segment`, `Circle` の明示型
+- 平行・垂直、直線・線分・円周の関係分類と交差判定
 - 射影、反射、点と直線・線分の距離
-- 線分交差と線分間距離
-- 直線同士、円と直線、円同士の交点
+- 直線同士、円と直線・線分、円同士の交点
 
-平行または一致する直線の `line_intersection` は `nullopt`、交点が無限個になる同心円の `circle_intersections` は空配列を返します。退化した直線、つまり両端点が同じ入力は対象外です。
+`Line` は無限直線、`Segment` は閉線分、`Circle` は円周を表します。平行または一致する直線の `line_intersection` は `nullopt`、交点が無限個になる同心円の `circle_intersections` は空配列を返します。退化した直線、つまり両端点が同じ入力は対象外です。
 
 詳細: [GeometryReal.md](GeometryReal.md)
 

@@ -13,12 +13,9 @@
 ```cpp
 template<class T>
 using Matrix = vector<vector<T>>;
-
-template<class Int = long long>
-struct Rational;
 ```
 
-`Rational<Int>` は整数行列の逆行列を有理数として返すための簡易分数型です。
+整数行列の逆行列には、共通の [Rational](Rational.md) 型を使います。`Matrix.hpp` からも自動的にインクルードされます。
 
 ## 関数
 
@@ -83,4 +80,4 @@ auto inv = inverse_matrix_rational(a);
 - `determinant` と `inverse_matrix` は割り算できる体上の型向けです。
 - 整数の行列式には `determinant_bareiss` を使うと、途中の分数を避けられます。
 - `inverse_matrix_rational` は逆行列が存在しない場合 `nullopt` を返します。
-- `Rational<long long>` は分子分母の積が大きいとオーバーフローします。
+- `Rational<long long>` は演算や比較の途中の積が大きいとオーバーフローします。詳細は [Rational](Rational.md) を参照してください。

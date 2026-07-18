@@ -24,8 +24,8 @@
 | [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
 | [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
 | [Compress.hpp](Compress.md) | `index`, `contains`, `compressed` | 構築 `O(N log N)`、変換 `O(log N)` |
-| [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `apply`, `prod` | 期待 `O(log N)` |
-| [ImplicitTreapBeats.hpp](ImplicitTreapBeats.md) | `insert`, `erase`, `reverse`, `range_chmin`, `range_chmax`, 区間集約 | 期待ならし `O(log^2 N)` |
+| [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `apply`, `prod`, 安定ハンドル | 期待 `O(log N)` |
+| [ImplicitTreapBeats.hpp](ImplicitTreapBeats.md) | `insert`, `erase`, `reverse`, `range_chmin`, `range_chmax`, 区間集約, 安定ハンドル | 期待ならし `O(log^2 N)` |
 | [SplayTreeSequence.hpp](SplayTreeSequence.md) | `insert`, `erase`, `reverse`, `prod` | ならし `O(log N)` |
 | [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
 | [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 `O(log X)` |
@@ -98,7 +98,7 @@ wm.range_freq(l, r, low, high); // low <= x < high
 
 詳細: [ImplicitTreapBeats.md](ImplicitTreapBeats.md)
 
-`long long` の動的列に対し、挿入・削除・反転を行いながら、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。各変更は期待ならし `O(log^2 N)` です。
+`long long` の動的列に対し、挿入・削除・反転を行いながら、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。安定ハンドルから要素の現在位置を取得したり、ハンドルを維持したまま要素を移動したりできます。各変更は期待ならし `O(log^2 N)` です。
 
 ## Offline Dynamic Connectivity
 

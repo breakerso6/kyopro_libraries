@@ -3,6 +3,7 @@
 
 struct ImplicitTreapBeats {
     using i64 = long long;
+    using Handle = int;
     static constexpr i64 INF = std::numeric_limits<i64>::max() / 4;
 
     struct Node {
@@ -10,9 +11,10 @@ struct ImplicitTreapBeats {
         i64 sum = 0, add = 0;
         i64 max1 = -INF, max2 = -INF, min1 = INF, min2 = INF;
         int max_count = 0, min_count = 0;
-        int left = -1, right = -1, size = 1;
+        int left = -1, right = -1, parent = -1, size = 1;
         uint32_t priority = 0;
         bool rev = false;
+        bool active = true;
     };
 
     int root = -1;
@@ -46,18 +48,60 @@ struct ImplicitTreapBeats {
         rebuild(root);
     }
 
-    void insert(int position, i64 value) {
+    Handle insert(int position, i64 value) {
         assert(0 <= position && position <= size());
+        Handle handle = make_node(value);
         auto [a, b] = split(root, position);
-        root = merge(merge(a, make_node(value)), b);
+        root = merge(merge(a, handle), b);
+        return handle;
     }
 
     void erase(int position) {
+        (void)extract(position);
+    }
+
+    Handle extract(int position) {
         assert(0 <= position && position < size());
         auto [a, bc] = split(root, position);
         auto [b, c] = split(bc, 1);
-        (void)b;
         root = merge(a, c);
+        reset_node(b, nodes[b].value);
+        nodes[b].active = false;
+        return b;
+    }
+
+    void reinsert(int position, Handle handle) {
+        assert(0 <= position && position <= size());
+        assert(valid_handle(handle) && !nodes[handle].active);
+        reset_node(handle, nodes[handle].value);
+        nodes[handle].active = true;
+        auto [a, b] = split(root, position);
+        root = merge(merge(a, handle), b);
+    }
+
+    void reinsert(int position, Handle handle, i64 value) {
+        assert(valid_handle(handle) && !nodes[handle].active);
+        reset_node(handle, value);
+        reinsert(position, handle);
+    }
+
+    Handle handle_at(int position) {
+        assert(0 <= position && position < size());
+        return kth(root, position);
+    }
+
+    int index_of(Handle handle) {
+        assert(valid_handle(handle) && nodes[handle].active);
+        push_path(handle);
+        int result = node_size(nodes[handle].left);
+        for (int v = handle; nodes[v].parent != -1; ) {
+            int p = nodes[v].parent;
+            if (nodes[p].right == v) {
+                result += node_size(nodes[p].left) + 1;
+            }
+            v = p;
+        }
+        return result;
     }
 
     void set(int position, i64 value) {
@@ -144,6 +188,13 @@ struct ImplicitTreapBeats {
         return result;
     }
 
+    std::vector<Handle> to_handles() {
+        std::vector<Handle> result;
+        result.reserve(size());
+        dfs_handles(root, result);
+        return result;
+    }
+
 private:
     int node_size(int v) const { return v == -1 ? 0 : nodes[v].size; }
     i64 node_sum(int v) const { return v == -1 ? 0 : nodes[v].sum; }
@@ -158,17 +209,25 @@ private:
         nodes.push_back(Node());
         int v = (int)nodes.size() - 1;
         nodes[v].priority = rng();
+        nodes[v].active = true;
         reset_node(v, value);
         return v;
     }
 
+    bool valid_handle(Handle handle) const {
+        return 0 <= handle && handle < (int)nodes.size();
+    }
+
     void reset_node(int v, i64 value) {
-        int left = nodes[v].left, right = nodes[v].right;
+        int left = nodes[v].left, right = nodes[v].right, parent = nodes[v].parent;
         uint32_t priority = nodes[v].priority;
+        bool active = nodes[v].active;
         nodes[v] = Node();
         nodes[v].left = left;
         nodes[v].right = right;
+        nodes[v].parent = parent;
         nodes[v].priority = priority;
+        nodes[v].active = active;
         nodes[v].value = value;
         pull(v);
     }
@@ -225,20 +284,24 @@ private:
         if (nodes[v].right != -1) info = merge_info(info, nodes[nodes[v].right]);
         i64 value = nodes[v].value;
         i64 add = nodes[v].add;
-        int left = nodes[v].left, right = nodes[v].right;
+        int left = nodes[v].left, right = nodes[v].right, parent = nodes[v].parent;
         uint32_t priority = nodes[v].priority;
         bool rev = nodes[v].rev;
+        bool active = nodes[v].active;
         nodes[v] = info;
         nodes[v].value = value;
         nodes[v].add = add;
         nodes[v].left = left;
         nodes[v].right = right;
+        nodes[v].parent = parent;
         nodes[v].priority = priority;
         nodes[v].rev = rev;
+        nodes[v].active = active;
     }
 
     void rebuild(int v) {
         if (v == -1) return;
+        nodes[v].parent = -1;
         std::vector<std::pair<int, bool>> stack{{v, false}};
         while (!stack.empty()) {
             auto [u, visited] = stack.back();
@@ -247,6 +310,8 @@ private:
             if (visited) {
                 pull(u);
             } else {
+                if (nodes[u].left != -1) nodes[nodes[u].left].parent = u;
+                if (nodes[u].right != -1) nodes[nodes[u].right].parent = u;
                 stack.push_back({u, true});
                 stack.push_back({nodes[u].right, false});
                 stack.push_back({nodes[u].left, false});
@@ -310,6 +375,13 @@ private:
         apply_chmax(nodes[v].right, nodes[v].min1);
     }
 
+    void push_path(int v) {
+        std::vector<int> path;
+        for (int u = v; u != -1; u = nodes[u].parent) path.push_back(u);
+        std::reverse(path.begin(), path.end());
+        for (int u : path) push(u);
+    }
+
     void subtree_chmin(int v, i64 x) {
         if (v == -1 || nodes[v].max1 <= x) return;
         if (nodes[v].max2 < x) {
@@ -337,16 +409,26 @@ private:
     }
 
     int merge(int a, int b) {
-        if (a == -1) return b;
-        if (b == -1) return a;
+        if (a == -1) {
+            if (b != -1) nodes[b].parent = -1;
+            return b;
+        }
+        if (b == -1) {
+            nodes[a].parent = -1;
+            return a;
+        }
         if (nodes[a].priority < nodes[b].priority) {
             push(a);
             nodes[a].right = merge(nodes[a].right, b);
+            nodes[nodes[a].right].parent = a;
+            nodes[a].parent = -1;
             pull(a);
             return a;
         } else {
             push(b);
             nodes[b].left = merge(a, nodes[b].left);
+            nodes[nodes[b].left].parent = b;
+            nodes[b].parent = -1;
             pull(b);
             return b;
         }
@@ -358,11 +440,17 @@ private:
         if (node_size(nodes[v].left) >= k) {
             auto [a, b] = split(nodes[v].left, k);
             nodes[v].left = b;
+            if (b != -1) nodes[b].parent = v;
+            if (a != -1) nodes[a].parent = -1;
+            nodes[v].parent = -1;
             pull(v);
             return {a, v};
         } else {
             auto [a, b] = split(nodes[v].right, k - node_size(nodes[v].left) - 1);
             nodes[v].right = a;
+            if (a != -1) nodes[a].parent = v;
+            if (b != -1) nodes[b].parent = -1;
+            nodes[v].parent = -1;
             pull(v);
             return {v, b};
         }
@@ -382,5 +470,13 @@ private:
         dfs(nodes[v].left, result);
         result.push_back(nodes[v].value);
         dfs(nodes[v].right, result);
+    }
+
+    void dfs_handles(int v, std::vector<Handle>& result) {
+        if (v == -1) return;
+        push(v);
+        dfs_handles(nodes[v].left, result);
+        result.push_back(v);
+        dfs_handles(nodes[v].right, result);
     }
 };

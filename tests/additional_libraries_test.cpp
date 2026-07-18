@@ -123,78 +123,128 @@ long long id_treap_add() {
 static void test_implicit_treap() {
     mt19937 rng(13579);
     vector<string> a;
-    ImplicitTreap<string, op_string, e_string> treap;
+    using StringTreap = ImplicitTreap<string, op_string, e_string>;
+    StringTreap treap;
+    vector<StringTreap::Handle> handles;
     for (int step = 0; step < 2000; ++step) {
-        int type = rng() % 7;
+        int type = rng() % 8;
         if (type == 0 || a.empty()) {
             int pos = rng() % (a.size() + 1);
             string value(1, char('a' + rng() % 26));
             a.insert(a.begin() + pos, value);
-            treap.insert(pos, value);
+            handles.insert(handles.begin() + pos, treap.insert(pos, value));
         } else if (type == 1) {
             int pos = rng() % a.size();
             a.erase(a.begin() + pos);
+            handles.erase(handles.begin() + pos);
             treap.erase(pos);
         } else if (type == 2) {
             int pos = rng() % a.size();
             string value(1, char('a' + rng() % 26));
             a[pos] = value;
             treap.set(pos, value);
+        } else if (type == 3) {
+            int l = rng() % (a.size() + 1), r = rng() % (a.size() + 1);
+            if (l > r) swap(l, r);
+            reverse(a.begin() + l, a.begin() + r);
+            reverse(handles.begin() + l, handles.begin() + r);
+            treap.reverse(l, r);
+        } else if (type == 4) {
+            int old_pos = rng() % a.size();
+            string value = a[old_pos];
+            auto handle = treap.extract(old_pos);
+            assert(handle == handles[old_pos]);
+            a.erase(a.begin() + old_pos);
+            handles.erase(handles.begin() + old_pos);
+
+            int new_pos = rng() % (a.size() + 1);
+            if (rng() & 1) {
+                value = string(1, char('a' + rng() % 26));
+                treap.reinsert(new_pos, handle, value);
+            } else {
+                treap.reinsert(new_pos, handle);
+            }
+            a.insert(a.begin() + new_pos, value);
+            handles.insert(handles.begin() + new_pos, handle);
         } else {
             int l = rng() % (a.size() + 1), r = rng() % (a.size() + 1);
             if (l > r) swap(l, r);
-            if (type == 3) {
-                reverse(a.begin() + l, a.begin() + r);
-                treap.reverse(l, r);
-            } else {
-                string expected;
-                for (int i = l; i < r; ++i) expected += a[i];
-                assert(treap.prod(l, r) == expected);
-            }
+            string expected;
+            for (int i = l; i < r; ++i) expected += a[i];
+            assert(treap.prod(l, r) == expected);
         }
         assert(treap.size() == (int)a.size());
+        for (int i = 0; i < (int)a.size(); ++i) {
+            assert(treap.index_of(handles[i]) == i);
+            assert(treap.handle_at(i) == handles[i]);
+        }
+        assert(treap.to_handles() == handles);
         assert(treap.to_vector() == a);
         for (int i = 0; i < (int)a.size(); ++i) assert(treap.get(i) == a[i]);
     }
     ImplicitTreap<string, op_string, e_string> built(vector<string>{"a", "b", "c", "d"});
+    auto built_handles = built.to_handles();
     built.reverse(0, 4);
     assert(built.prod(0, 4) == "dcba");
+    for (int i = 0; i < 4; ++i) assert(built.index_of(built_handles[i]) == 3 - i);
 
     vector<long long> b;
-    ImplicitTreap<TreapSum, op_treap_sum, e_treap_sum, long long,
-                  mapping_treap_add, composition_treap_add, id_treap_add> lazy_treap;
+    using LazyTreap = ImplicitTreap<TreapSum, op_treap_sum, e_treap_sum, long long,
+                                    mapping_treap_add, composition_treap_add, id_treap_add>;
+    LazyTreap lazy_treap;
+    vector<LazyTreap::Handle> lazy_handles;
     for (int step = 0; step < 3000; ++step) {
-        int type = rng() % 8;
+        int type = rng() % 9;
         if (type == 0 || b.empty()) {
             int pos = rng() % (b.size() + 1);
             long long value = (int)(rng() % 41) - 20;
             b.insert(b.begin() + pos, value);
-            lazy_treap.insert(pos, {value, 1});
+            lazy_handles.insert(lazy_handles.begin() + pos, lazy_treap.insert(pos, {value, 1}));
         } else if (type == 1) {
             int pos = rng() % b.size();
             b.erase(b.begin() + pos);
+            lazy_handles.erase(lazy_handles.begin() + pos);
             lazy_treap.erase(pos);
         } else if (type == 2) {
             int pos = rng() % b.size();
             long long value = (int)(rng() % 41) - 20;
             b[pos] = value;
             lazy_treap.set(pos, {value, 1});
+        } else if (type == 3) {
+            int l = rng() % (b.size() + 1), r = rng() % (b.size() + 1);
+            if (l > r) swap(l, r);
+            reverse(b.begin() + l, b.begin() + r);
+            reverse(lazy_handles.begin() + l, lazy_handles.begin() + r);
+            lazy_treap.reverse(l, r);
+        } else if (type == 4) {
+            int l = rng() % (b.size() + 1), r = rng() % (b.size() + 1);
+            if (l > r) swap(l, r);
+            long long add = (int)(rng() % 41) - 20;
+            for (int i = l; i < r; ++i) b[i] += add;
+            lazy_treap.apply(l, r, add);
+        } else if (type == 5) {
+            int old_pos = rng() % b.size();
+            long long value = b[old_pos];
+            auto handle = lazy_treap.extract(old_pos);
+            assert(handle == lazy_handles[old_pos]);
+            b.erase(b.begin() + old_pos);
+            lazy_handles.erase(lazy_handles.begin() + old_pos);
+            int new_pos = rng() % (b.size() + 1);
+            lazy_treap.reinsert(new_pos, handle);
+            b.insert(b.begin() + new_pos, value);
+            lazy_handles.insert(lazy_handles.begin() + new_pos, handle);
         } else {
             int l = rng() % (b.size() + 1), r = rng() % (b.size() + 1);
             if (l > r) swap(l, r);
-            if (type == 3) {
-                reverse(b.begin() + l, b.begin() + r);
-                lazy_treap.reverse(l, r);
-            } else if (type == 4) {
-                long long add = (int)(rng() % 41) - 20;
-                for (int i = l; i < r; ++i) b[i] += add;
-                lazy_treap.apply(l, r, add);
-            } else {
-                long long expected = accumulate(b.begin() + l, b.begin() + r, 0LL);
-                assert(lazy_treap.prod(l, r).sum == expected);
-            }
+            long long expected = accumulate(b.begin() + l, b.begin() + r, 0LL);
+            assert(lazy_treap.prod(l, r).sum == expected);
         }
         assert(lazy_treap.size() == (int)b.size());
+        for (int i = 0; i < (int)b.size(); ++i) {
+            assert(lazy_treap.index_of(lazy_handles[i]) == i);
+            assert(lazy_treap.handle_at(i) == lazy_handles[i]);
+        }
+        assert(lazy_treap.to_handles() == lazy_handles);
         auto values = lazy_treap.to_vector();
         assert(values.size() == b.size());
         for (int i = 0; i < (int)b.size(); ++i) {
@@ -207,23 +257,29 @@ static void test_implicit_treap() {
 static void test_implicit_treap_beats() {
     mt19937 rng(97531);
     ImplicitTreapBeats built(vector<long long>{5, 1, 8, 6});
+    auto built_handles = built.to_handles();
     assert((built.to_vector() == vector<long long>{5, 1, 8, 6}));
     assert(built.range_sum(0, 4) == 20);
     assert(built.range_min(0, 4) == 1);
     assert(built.range_max(0, 4) == 8);
+    built.reverse(0, 4);
+    for (int i = 0; i < 4; ++i) assert(built.index_of(built_handles[i]) == 3 - i);
+    built.reverse(0, 4);
 
     vector<long long> a;
     ImplicitTreapBeats treap;
+    vector<ImplicitTreapBeats::Handle> handles;
     for (int step = 0; step < 5000; ++step) {
-        int type = rng() % 11;
+        int type = rng() % 12;
         if (type == 0 || a.empty()) {
             int pos = rng() % (a.size() + 1);
             long long value = (int)(rng() % 101) - 50;
             a.insert(a.begin() + pos, value);
-            treap.insert(pos, value);
+            handles.insert(handles.begin() + pos, treap.insert(pos, value));
         } else if (type == 1) {
             int pos = rng() % a.size();
             a.erase(a.begin() + pos);
+            handles.erase(handles.begin() + pos);
             treap.erase(pos);
         } else if (type == 2) {
             int pos = rng() % a.size();
@@ -235,6 +291,7 @@ static void test_implicit_treap_beats() {
             if (l > r) swap(l, r);
             if (type == 3) {
                 reverse(a.begin() + l, a.begin() + r);
+                reverse(handles.begin() + l, handles.begin() + r);
                 treap.reverse(l, r);
             } else if (type == 4) {
                 long long x = (int)(rng() % 101) - 50;
@@ -248,6 +305,22 @@ static void test_implicit_treap_beats() {
                 long long x = (int)(rng() % 41) - 20;
                 for (int i = l; i < r; ++i) a[i] += x;
                 treap.range_add(l, r, x);
+            } else if (type == 7) {
+                int old_pos = rng() % a.size();
+                long long value = a[old_pos];
+                auto handle = treap.extract(old_pos);
+                assert(handle == handles[old_pos]);
+                a.erase(a.begin() + old_pos);
+                handles.erase(handles.begin() + old_pos);
+                int new_pos = rng() % (a.size() + 1);
+                if (rng() & 1) {
+                    value = (int)(rng() % 101) - 50;
+                    treap.reinsert(new_pos, handle, value);
+                } else {
+                    treap.reinsert(new_pos, handle);
+                }
+                a.insert(a.begin() + new_pos, value);
+                handles.insert(handles.begin() + new_pos, handle);
             } else {
                 long long expected_sum = accumulate(a.begin() + l, a.begin() + r, 0LL);
                 assert(treap.range_sum(l, r) == expected_sum);
@@ -258,6 +331,11 @@ static void test_implicit_treap_beats() {
             }
         }
         assert(treap.size() == (int)a.size());
+        for (int i = 0; i < (int)a.size(); ++i) {
+            assert(treap.index_of(handles[i]) == i);
+            assert(treap.handle_at(i) == handles[i]);
+        }
+        assert(treap.to_handles() == handles);
         assert(treap.to_vector() == a);
         for (int i = 0; i < (int)a.size(); ++i) assert(treap.get(i) == a[i]);
         if (!a.empty()) {

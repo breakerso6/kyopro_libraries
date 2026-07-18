@@ -1,32 +1,9 @@
 #pragma once
 #include <bits/stdc++.h>
+#include "libraries/math/Rational.hpp"
 
 template<class T>
 using Matrix = std::vector<std::vector<T>>;
-
-template<class Int = long long>
-struct Rational {
-    Int numerator, denominator;
-    Rational(Int numerator_ = 0, Int denominator_ = 1) : numerator(numerator_), denominator(denominator_) {
-        assert(denominator != 0);
-        normalize();
-    }
-    void normalize() {
-        if (denominator < 0) numerator = -numerator, denominator = -denominator;
-        Int g = std::gcd(numerator < 0 ? -numerator : numerator, denominator);
-        if (g) numerator /= g, denominator /= g;
-    }
-    Rational operator+(Rational r) const { return {numerator * r.denominator + r.numerator * denominator, denominator * r.denominator}; }
-    Rational operator-(Rational r) const { return {numerator * r.denominator - r.numerator * denominator, denominator * r.denominator}; }
-    Rational operator-() const { return {-numerator, denominator}; }
-    Rational operator*(Rational r) const { return {numerator * r.numerator, denominator * r.denominator}; }
-    Rational operator/(Rational r) const { assert(r.numerator != 0); return {numerator * r.denominator, denominator * r.numerator}; }
-    Rational& operator+=(Rational r) { return *this = *this + r; }
-    Rational& operator-=(Rational r) { return *this = *this - r; }
-    Rational& operator*=(Rational r) { return *this = *this * r; }
-    bool operator==(Rational r) const { return numerator == r.numerator && denominator == r.denominator; }
-    bool operator!=(Rational r) const { return !(*this == r); }
-};
 
 template<class T>
 Matrix<T> matrix_identity(int n) {
