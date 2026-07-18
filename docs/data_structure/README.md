@@ -13,7 +13,7 @@
 
 | library | 主な関数 | 計算量 |
 | --- | --- | --- |
-| [BinaryTrie.hpp](BinaryTrie.md) | `insert`, `erase`, `count`, `min_xor`, `max_xor` | 1操作 `O(BITS)` |
+| [BinaryTrie.hpp](BinaryTrie.md) | multiset、XOR順序統計・全体XOR・mex、可換モノイド値域集約 | `xor_all`: `O(1)`、他 `O(BITS)` |
 | [RollbackDSU.hpp](RollbackDSU.md) | `merge`, `undo`, `snapshot`, `rollback` | `merge`/`undo`: `O(log N)` |
 | [WeightedDSU.hpp](WeightedDSU.md) | `merge(a,b,w)`, `diff`, `same` | 償却 `O(alpha(N))` |
 | [SparseTable.hpp](SparseTable.md) | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
@@ -35,7 +35,7 @@
 | [CumulativeSumND.hpp](CumulativeSumND.md) | `add`, `build`, `sum` | 構築 `O(D prod(shape_i+1))`、取得 `O(D 2^D)` |
 | [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | `O(log H log W)` |
 | [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | `O(log H log W)` |
-| [WaveletMatrix.hpp](WaveletMatrix.md) | `kth_smallest`, `range_freq`, `prev_value`, `next_value` | 1クエリ `O(log sigma)` |
+| [WaveletMatrix.hpp](WaveletMatrix.md) | 順序統計、XOR順序、重み付き値域集約・更新、矩形クエリ | 静的 `O(log sigma)`、更新版 `O(log sigma log N)` |
 | [SegmentTreeBeats.hpp](SegmentTreeBeats.md) | `range_chmin`, `range_chmax`, `range_add`, 区間集約 | 償却 `O(log^2 N)` |
 | [OfflineDynamicConnectivity.hpp](OfflineDynamicConnectivity.md) | 辺追加・削除、`same_query`, `size_query` | 全体 `O((Q log Q) log N)` |
 | [CartesianTree.hpp](CartesianTree.md) | `parent`, `left`, `right`, `root` | 構築 `O(N)` |
@@ -76,6 +76,25 @@ RangeAddRangeSum2D<long long> add_sum(h, w);
 
 `CumulativeSumND` は静的な n 次元直方体和、`SegmentTree2D` は一点更新・長方形積、`RangeAddRangeSum2D` は長方形加算・長方形和に使います。
 
+## Binary Trie
+
+詳細: [BinaryTrie.md](BinaryTrie.md)
+
+```cpp
+BinaryTrie<unsigned, 30> trie;
+trie.insert(value);
+trie.xor_all(mask);
+trie.kth_xor(query_mask, k);
+trie.range_freq(lower, upper, query_mask);
+trie.mex();
+
+BinaryTrieSum<unsigned, long long, 30> weighted;
+weighted.set(key, payload);
+weighted.prod(lower, upper, query_mask);
+```
+
+`BinaryTrie` は重複を許す動的 multiset で、全体 XOR、XOR 後の k 番目・頻度・前後要素・mex に対応します。`BinaryTrieMonoid` は key ごとの payload を管理し、XOR 値域の可換モノイド集約と集約値による prefix 探索を行います。永続 version には `PersistentBinaryTrie`、静的な添字区間との組み合わせには `WaveletMatrix` を使います。
+
 ## Wavelet Matrix
 
 詳細: [WaveletMatrix.md](WaveletMatrix.md)
@@ -84,9 +103,19 @@ RangeAddRangeSum2D<long long> add_sum(h, w);
 WaveletMatrix<long long> wm(values);
 wm.kth_smallest(l, r, k);       // 0-indexed
 wm.range_freq(l, r, low, high); // low <= x < high
+
+XorWaveletMatrix<unsigned, 30> xor_wm(unsigned_values);
+xor_wm.kth_smallest(l, r, k, xor_mask);
+
+WaveletMatrixSum<long long, long long> sum_wm(keys, weights);
+sum_wm.prod(l, r, low, high);
+
+WaveletMatrix2DMax<int, int, long long> rect_max(x, y, weights);
+rect_max.set(point_index, new_weight);
+rect_max.rectangle_prod(left, right, down, up);
 ```
 
-値を座標圧縮して構築する静的データ構造です。`count_less(l,r,x)`、値の個数を返す `count`、`kth_largest` も提供します。`prev_value` は `upper` 未満の最大値、`next_value` は `lower` 以上の最小値を `optional` で返します。構築は `O(N log sigma)`、メモリも `O(N log sigma)` です。
+基本版は値を座標圧縮して構築し、`count_less`、`count`、`kth_largest`、`rank`、`select`、前後要素などを提供します。整数の XOR 順序は `XorWaveletMatrix`、別配列の静的和は `WaveletMatrixSum`、一点更新を伴う可換モノイド集約は `WaveletMatrixMonoid`、2次元矩形処理は `WaveletMatrix2D*` を使います。独自の補助構造を接続するための canonical node 分解も取得できます。
 
 ## Segment Tree Beats
 
