@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -201,5 +203,5 @@ static void test_persistent_binary_trie() {
 int main() {
     test_rerooting(); test_persistent_segment_tree(); test_persistent_lazy_segment_tree();
     test_persistent_dsu(); test_persistent_binary_trie();
-    cout << "persistent and rerooting tests passed\n";
+    cout << "Hello World\n";
 }

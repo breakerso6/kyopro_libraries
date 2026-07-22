@@ -25,6 +25,45 @@ struct Circle  { Point center; Real radius; };
 
 `Circle::radius` は非負である必要があります。
 
+## コンストラクタ・等値比較
+
+各型は従来の `{...}` に加え、座標や図形を表す `pair` から構築できます。
+
+```cpp
+Point();
+Point(Real x, Real y);
+Point(pair<X, Y> point);
+
+Line(Point a, Point b);
+Line(pair<X, Y> a, pair<U, V> b);
+Line(pair<A, B> points);
+
+Segment(Point a, Point b);
+Segment(pair<X, Y> a, pair<U, V> b);
+Segment(pair<A, B> points);
+
+Circle(Point center, Real radius);
+Circle(pair<X, Y> center, R radius);
+Circle(pair<Center, R> circle);
+```
+
+たとえば次の構築ができます。
+
+```cpp
+Point p = pair{1.0L, 2.0L};
+Line line = pair{pair{0.0L, 0.0L}, pair{2.0L, 2.0L}};
+Segment segment(pair{0.0L, 0.0L}, pair{3.0L, 1.0L});
+Circle circle = pair{pair{0.0L, 0.0L}, 5.0L};
+```
+
+`Point`, `Line`, `Segment`, `Circle` は `==`, `!=` に対応し、`EPS` を使って図形として比較します。
+
+- `Line`: 表現に使った2点が異なっても、同じ無限直線なら等しい
+- `Segment`: 端点の順序を無視する
+- `Circle`: 中心と半径が等しければ等しい
+
+退化した `Line` 同士は、表す点が同じ場合に限り等しいとします。
+
 ## 点・ベクトル・向き
 
 ```cpp

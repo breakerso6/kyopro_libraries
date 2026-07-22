@@ -1,5 +1,7 @@
 # kyopro_libraries
 
+[![Verify](https://github.com/breakerso6/kyopro_libraries/actions/workflows/verify.yml/badge.svg)](https://github.com/breakerso6/kyopro_libraries/actions/workflows/verify.yml)
+
 ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
 ## Directory Layout
@@ -75,20 +77,31 @@ g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 
 ## Tests
 
-すべてのテストを実行する例です。
+テストは [online-judge-tools/verification-helper](https://github.com/online-judge-tools/verification-helper) で管理しています。
+`tests/*.test.cpp` は AOJ の Hello World 問題をダミーとして使い、内部の決定的テスト・ランダムテストを実行します。
+
+AtCoder Library をリポジトリ直下に配置した後、次のコマンドですべてのテストを実行できます。
 
 ```bash
-for source in tests/*_test.cpp; do
-  name=$(basename "$source" .cpp)
-  g++ -std=c++17 -O2 -Wall -Wextra -Wshadow -I. -Iac-library "$source" -o "/tmp/$name"
-  "/tmp/$name"
-done
+python3 -m pip install -r requirements-verification.txt
+oj-verify run --jobs 2
+```
+
+コンパイラとオプションは [`.verify-helper/config.toml`](.verify-helper/config.toml) に固定しています。
+push・pull request 時にも GitHub Actions で同じ検証が走ります。
+
+ツールを使わず個別に実行する場合:
+
+```bash
+g++ -std=c++17 -O2 -Wall -Wextra -Wshadow -I. -Iac-library \
+  tests/geometry_and_more.test.cpp -o /tmp/geometry_and_more.test
+/tmp/geometry_and_more.test
 ```
 
 展開後のソースもinclude pathなしでコンパイルできます。
 
 ```bash
-tools/expand_includes.py tests/geometry_and_more_test.cpp -o /tmp/combined.cpp
+tools/expand_includes.py tests/geometry_and_more.test.cpp -o /tmp/combined.cpp
 g++ -std=c++17 -O2 -Wall -Wextra /tmp/combined.cpp -o /tmp/combined
 /tmp/combined
 ```

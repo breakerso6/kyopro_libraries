@@ -8,15 +8,62 @@ constexpr Real PI = 3.141592653589793238462643383279502884L;
 
 struct Point {
     Real x{}, y{};
+
+    Point() = default;
+    Point(Real x_value, Real y_value) : x(x_value), y(y_value) {}
+    template<class X, class Y>
+    Point(const std::pair<X, Y>& point) : x(point.first), y(point.second) {}
+
     Point operator+(Point p) const { return {x + p.x, y + p.y}; }
     Point operator-(Point p) const { return {x - p.x, y - p.y}; }
     Point operator*(Real k) const { return {x * k, y * k}; }
     Point operator/(Real k) const { return {x / k, y / k}; }
+    bool operator==(Point p) const { return std::hypot(x - p.x, y - p.y) <= EPS; }
+    bool operator!=(Point p) const { return !(*this == p); }
 };
-struct Line { Point a, b; };
-struct Segment { Point a, b; };
+struct Line {
+    Point a, b;
+
+    Line() = default;
+    Line(Point first, Point second) : a(first), b(second) {}
+    template<class A, class B>
+    Line(const std::pair<A, B>& points) : a(points.first), b(points.second) {}
+    template<class AX, class AY, class BX, class BY>
+    Line(const std::pair<AX, AY>& first, const std::pair<BX, BY>& second) : a(first), b(second) {}
+};
+struct Segment {
+    Point a, b;
+
+    Segment() = default;
+    Segment(Point first, Point second) : a(first), b(second) {}
+    template<class A, class B>
+    Segment(const std::pair<A, B>& points) : a(points.first), b(points.second) {}
+    template<class AX, class AY, class BX, class BY>
+    Segment(const std::pair<AX, AY>& first, const std::pair<BX, BY>& second) : a(first), b(second) {}
+
+    bool operator==(Segment segment) const {
+        return (a == segment.a && b == segment.b) || (a == segment.b && b == segment.a);
+    }
+    bool operator!=(Segment segment) const { return !(*this == segment); }
+};
 // Represents the circumference. radius must be nonnegative.
-struct Circle { Point center; Real radius; };
+struct Circle {
+    Point center;
+    Real radius{};
+
+    Circle() = default;
+    Circle(Point center_point, Real radius_value) : center(center_point), radius(radius_value) {}
+    template<class X, class Y, class R>
+    Circle(const std::pair<X, Y>& center_point, const R& radius_value)
+        : center(center_point), radius(radius_value) {}
+    template<class Center, class R>
+    Circle(const std::pair<Center, R>& circle) : center(circle.first), radius(circle.second) {}
+
+    bool operator==(Circle circle) const {
+        return center == circle.center && std::abs(radius - circle.radius) <= EPS;
+    }
+    bool operator!=(Circle circle) const { return !(*this == circle); }
+};
 
 enum class LineRelation { Intersecting, Parallel, Coincident };
 enum class SegmentRelation { Disjoint, Touching, Proper, Overlapping };
@@ -34,7 +81,7 @@ inline Real cross(Point a, Point b) { return a.x * b.y - a.y * b.x; }
 inline Real norm2(Point p) { return dot(p, p); }
 inline Real abs(Point p) { return std::sqrt(norm2(p)); }
 inline int sign(Real x) { return (x > EPS) - (x < -EPS); }
-inline bool same_point(Point a, Point b) { return abs(a - b) <= EPS; }
+inline bool same_point(Point a, Point b) { return a == b; }
 inline Point direction(Line line) { return line.b - line.a; }
 inline Point direction(Segment segment) { return segment.b - segment.a; }
 inline bool is_degenerate(Line line) { return abs(direction(line)) <= EPS; }
@@ -85,6 +132,12 @@ inline bool on_line(Line line, Point p) {
     assert(!is_degenerate(line));
     return sign(cross(direction(line), p - line.a)) == 0;
 }
+inline bool operator==(Line a, Line b) {
+    bool a_degenerate = is_degenerate(a), b_degenerate = is_degenerate(b);
+    if (a_degenerate || b_degenerate) return a_degenerate && b_degenerate && a.a == b.a;
+    return sign(cross(direction(a), direction(b))) == 0 && on_line(a, b.a);
+}
+inline bool operator!=(Line a, Line b) { return !(a == b); }
 inline bool on_segment(Segment segment, Point p) { return on_segment(segment.a, segment.b, p); }
 
 inline LineRelation line_relation(Line a, Line b) {

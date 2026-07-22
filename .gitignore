@@ -3,4 +3,6 @@ combined.cpp
 main.cpp
 *Zone.Identifier*
 ac-library/
+.verify-helper/cache/
+.verify-helper/markdown/
 .DS_Store

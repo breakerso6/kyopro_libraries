@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -194,5 +196,5 @@ int main() {
     test_compress();
     test_dynamic_segment_tree(); test_2d_structures(); test_cumulative_sum_nd(); test_optimization_and_strings();
     test_graphs(); test_math();
-    cout << "requested library tests passed\n";
+    cout << "Hello World\n";
 }

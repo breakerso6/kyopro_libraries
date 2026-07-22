@@ -25,6 +25,45 @@ template<class T = long long> struct Circle  { Point<T> center; T radius; };
 
 `Point` は加算、減算、等値比較、辞書順比較を持ちます。`Circle::radius` は非負である必要があります。
 
+## コンストラクタ・等値比較
+
+各型は従来の `{...}` に加え、座標や図形を表す `pair` から構築できます。
+
+```cpp
+Point<T>();
+Point<T>(T x, T y);
+Point<T>(pair<X, Y> point);
+
+Line<T>(Point<T> a, Point<T> b);
+Line<T>(pair<X, Y> a, pair<U, V> b);
+Line<T>(pair<A, B> points);
+
+Segment<T>(Point<T> a, Point<T> b);
+Segment<T>(pair<X, Y> a, pair<U, V> b);
+Segment<T>(pair<A, B> points);
+
+Circle<T>(Point<T> center, T radius);
+Circle<T>(pair<X, Y> center, R radius);
+Circle<T>(pair<Center, R> circle);
+```
+
+たとえば次の構築ができます。
+
+```cpp
+Point<long long> p = pair{1LL, 2LL};
+Line<long long> line = pair{pair{0LL, 0LL}, pair{2LL, 2LL}};
+Segment<long long> segment(pair{0LL, 0LL}, pair{3LL, 1LL});
+Circle<long long> circle = pair{pair{0LL, 0LL}, 5LL};
+```
+
+`Point`, `Line`, `Segment`, `Circle` は `==`, `!=` に対応します。比較は図形として行われます。
+
+- `Line`: 表現に使った2点が異なっても、同じ無限直線なら等しい
+- `Segment`: 端点の順序を無視する
+- `Circle`: 中心と半径が等しければ等しい
+
+退化した `Line` 同士は、表す点が同じ場合に限り等しいとします。
+
 ## Rational
 
 ```cpp

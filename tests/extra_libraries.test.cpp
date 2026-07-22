@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -212,5 +214,5 @@ static void test_timer() {
 int main() {
     test_dsu(); test_range_structures(); test_bit_structures(); test_graphs();
     test_strings(); test_offline_and_lines(); test_timer();
-    cout << "extra library tests passed\n";
+    cout << "Hello World\n";
 }

@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -17,6 +19,20 @@ using i128 = __int128_t;
 
 static void test_integer_geometry() {
     using namespace geometry_int;
+    pair<long long, long long> point_pair{2, 3};
+    IPoint point_from_pair = point_pair;
+    assert((point_from_pair == IPoint{2, 3}));
+    ILine line_from_pairs(pair<long long, long long>{0, 0}, pair<int, int>{2, 2});
+    ILine line_from_pair_of_pairs = pair{pair{0LL, 0LL}, pair{3LL, 3LL}};
+    ISegment segment_from_pair = pair{pair{1LL, 2LL}, pair{3LL, 4LL}};
+    ICircle circle_from_pair = pair{pair{5LL, 6LL}, 7LL};
+    assert(line_from_pairs == line_from_pair_of_pairs);
+    assert((line_from_pairs != ILine{{0, 1}, {2, 3}}));
+    assert((segment_from_pair == ISegment{{3, 4}, {1, 2}}));
+    assert((segment_from_pair != ISegment{{1, 2}, {4, 3}}));
+    assert((circle_from_pair == ICircle{{5, 6}, 7}));
+    assert((circle_from_pair != ICircle{{5, 6}, 8}));
+
     assert(ccw(IPoint{0, 0}, IPoint{2, 0}, IPoint{1, 1}) == 1);
     assert(on_segment(IPoint{0, 0}, IPoint{4, 2}, IPoint{2, 1}));
     assert(segments_intersect(IPoint{0, 0}, IPoint{4, 4}, IPoint{0, 4}, IPoint{4, 0}));
@@ -189,6 +205,18 @@ static void test_rational_geometry() {
 static bool close(long double a, long double b) { return abs(a - b) < 1e-10L; }
 static void test_real_geometry() {
     namespace gr = geometry_real;
+    gr::Point point_from_pair = pair{2.0, 3.0};
+    gr::Line line_from_pair = pair{pair{0.0, 0.0}, pair{1.0, 1.0}};
+    gr::Segment segment_from_pairs(pair{1.0, 2.0}, pair{3.0, 4.0});
+    gr::Circle circle_from_pair = pair{pair{5.0, 6.0}, 7.0};
+    assert(point_from_pair == gr::Point(2.0L + gr::EPS / 2, 3.0L));
+    assert(line_from_pair == gr::Line({2, 2}, {4, 4}));
+    assert(line_from_pair != gr::Line({0, 1}, {1, 2}));
+    assert(segment_from_pairs == gr::Segment({3, 4}, {1, 2}));
+    assert(segment_from_pairs != gr::Segment({1, 2}, {4, 3}));
+    assert(circle_from_pair == gr::Circle({5, 6}, 7 + gr::EPS / 2));
+    assert(circle_from_pair != gr::Circle({5, 6}, 8));
+
     gr::Line horizontal{{0, 0}, {2, 0}}, vertical{{1, -2}, {1, 2}};
     gr::Line parallel_line{{0, 1}, {4, 1}}, same_horizontal{{-3, 0}, {7, 0}};
     assert(gr::is_degenerate(gr::Segment{{1, 1}, {1, 1}}));
@@ -333,5 +361,5 @@ static void test_matching() {
 int main() {
     test_integer_geometry(); test_rational_geometry(); test_real_geometry(); test_closest_pair(); test_rectangle_area();
     test_kd_tree(); test_interval_set(); test_matching();
-    cout << "geometry and more tests passed\n";
+    cout << "Hello World\n";
 }

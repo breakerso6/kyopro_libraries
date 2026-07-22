@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -239,5 +241,5 @@ int main() {
     test_group_aggregation();
     test_dynamic_monoid();
     test_two_dimensional();
-    cout << "advanced wavelet matrix tests passed\n";
+    cout << "Hello World\n";
 }

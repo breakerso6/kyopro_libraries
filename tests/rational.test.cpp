@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 #include "libraries/math/Rational.hpp"
 
@@ -34,5 +36,6 @@ int main() {
            == Rational<i128>(((i128)1 << 100) + 2, 3));
     assert(Rational<long long>(1, 2) < Rational<i128>(2, 3));
 
+    cout << "Hello World\n";
     return 0;
 }

@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 #include <atcoder/modint>
 using namespace std;
@@ -650,5 +652,5 @@ static void test_tree_and_optimization() {
 int main() {
     test_wavelet_matrix(); test_segment_tree_beats(); test_offline_connectivity();
     test_implicit_treap(); test_implicit_treap_beats(); test_splay_tree_sequence(); test_link_cut_tree(); test_number_theory(); test_palindromes(); test_graph_components(); test_tree_and_optimization();
-    cout << "additional library tests passed\n";
+    cout << "Hello World\n";
 }

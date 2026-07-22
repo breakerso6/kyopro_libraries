@@ -40,6 +40,12 @@ exact_t<T> exact_cast(T value) { return ExactType<T>::cast(value); }
 template<class T = long long>
 struct Point {
     T x{}, y{};
+
+    Point() = default;
+    Point(const T& x_value, const T& y_value) : x(x_value), y(y_value) {}
+    template<class U, class V>
+    Point(const std::pair<U, V>& point) : x(point.first), y(point.second) {}
+
     Point operator+(const Point& p) const { return {x + p.x, y + p.y}; }
     Point operator-(const Point& p) const { return {x - p.x, y - p.y}; }
     Point operator*(const T& scale) const { return {x * scale, y * scale}; }
@@ -51,11 +57,30 @@ struct Point {
 template<class T = long long>
 struct Line {
     Point<T> a, b;
+
+    Line() = default;
+    Line(Point<T> first, Point<T> second) : a(first), b(second) {}
+    template<class A, class B>
+    Line(const std::pair<A, B>& points) : a(points.first), b(points.second) {}
+    template<class AX, class AY, class BX, class BY>
+    Line(const std::pair<AX, AY>& first, const std::pair<BX, BY>& second) : a(first), b(second) {}
 };
 
 template<class T = long long>
 struct Segment {
     Point<T> a, b;
+
+    Segment() = default;
+    Segment(Point<T> first, Point<T> second) : a(first), b(second) {}
+    template<class A, class B>
+    Segment(const std::pair<A, B>& points) : a(points.first), b(points.second) {}
+    template<class AX, class AY, class BX, class BY>
+    Segment(const std::pair<AX, AY>& first, const std::pair<BX, BY>& second) : a(first), b(second) {}
+
+    bool operator==(const Segment& segment) const {
+        return (a == segment.a && b == segment.b) || (a == segment.b && b == segment.a);
+    }
+    bool operator!=(const Segment& segment) const { return !(*this == segment); }
 };
 
 // Represents the circumference. radius must be nonnegative.
@@ -63,6 +88,19 @@ template<class T = long long>
 struct Circle {
     Point<T> center;
     T radius{};
+
+    Circle() = default;
+    Circle(Point<T> center_point, const T& radius_value) : center(center_point), radius(radius_value) {}
+    template<class X, class Y, class R>
+    Circle(const std::pair<X, Y>& center_point, const R& radius_value)
+        : center(center_point), radius(radius_value) {}
+    template<class Center, class R>
+    Circle(const std::pair<Center, R>& circle) : center(circle.first), radius(circle.second) {}
+
+    bool operator==(const Circle& circle) const {
+        return center == circle.center && radius == circle.radius;
+    }
+    bool operator!=(const Circle& circle) const { return !(*this == circle); }
 };
 
 enum class LineRelation { Intersecting, Parallel, Coincident };
@@ -135,6 +173,16 @@ template<class T>
 bool on_line(Line<T> line, Point<T> p) {
     assert(!is_degenerate(line));
     return cross(line.a, line.b, p) == 0;
+}
+template<class T>
+bool operator==(Line<T> a, Line<T> b) {
+    bool a_degenerate = is_degenerate(a), b_degenerate = is_degenerate(b);
+    if (a_degenerate || b_degenerate) return a_degenerate && b_degenerate && a.a == b.a;
+    return cross(direction(a), direction(b)) == exact_t<T>{0} && on_line(a, b.a);
+}
+template<class T>
+bool operator!=(Line<T> a, Line<T> b) {
+    return !(a == b);
 }
 template<class T>
 bool on_segment(Segment<T> segment, Point<T> p) {

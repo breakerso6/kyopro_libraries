@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 #include <atcoder/modint>
 #include "libraries/math/FormalPowerSeries.hpp"
@@ -86,5 +88,5 @@ int main() {
     test_basic_operations();
     test_fps_functions();
     test_large_convolution_path();
-    cout << "formal power series tests passed\n";
+    cout << "Hello World\n";
 }

@@ -1,3 +1,5 @@
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/problems/ITP1_1_A"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -251,5 +253,5 @@ static void test_monoid_trie() {
 int main() {
     test_multiset_trie();
     test_monoid_trie();
-    cout << "advanced binary trie tests passed\n";
+    cout << "Hello World\n";
 }
