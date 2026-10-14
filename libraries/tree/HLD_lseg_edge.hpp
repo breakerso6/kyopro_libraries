@@ -1,3 +1,5 @@
+// GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/tree/HLD_lseg_edge.hpp
+
 #include <bits/stdc++.h>
 #include <atcoder/lazysegtree>
 #include "edge.hpp"

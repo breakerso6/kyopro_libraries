@@ -52,6 +52,7 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 `ac-library/` は Git 管理対象外です。`tools/expand_includes.py` を使う前に、このリポジトリ直下へ AtCoder Library を配置してください。
 
 標準ライブラリの include、例えば `#include <bits/stdc++.h>` はそのまま残します。
+各ライブラリの先頭には、そのファイルに対応する GitHub URL をコメントで記載しています。このコメントは展開後も残るため、提出用コードから元のライブラリを確認できます。
 ACL include はデフォルトで展開します。ACL を展開せず、`#include <atcoder/all>` などをそのまま残したい場合は `--no-expand-acl` を指定してください。
 
 ### Basic Usage

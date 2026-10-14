@@ -1,3 +1,5 @@
+# GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/math/factorization.py
+
 from __future__ import annotations
 
 from collections import Counter

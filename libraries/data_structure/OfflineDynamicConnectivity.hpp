@@ -1,3 +1,5 @@
+// GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/data_structure/OfflineDynamicConnectivity.hpp
+
 #pragma once
 #include <bits/stdc++.h>
 #include "libraries/data_structure/RollbackDSU.hpp"

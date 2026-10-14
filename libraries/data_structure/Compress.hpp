@@ -1,3 +1,5 @@
+// GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/data_structure/Compress.hpp
+
 #pragma once
 #include <bits/stdc++.h>
 

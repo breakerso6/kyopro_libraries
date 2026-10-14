@@ -1,3 +1,5 @@
+// GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/tree/HLD.hpp
+
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
