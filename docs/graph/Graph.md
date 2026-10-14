@@ -56,9 +56,23 @@ int g.add_edge(int from, int to, Cost cost = Cost(1));
 ```cpp
 (1) void g.read_edges<false>(int m, istream& input = cin, int index_offset = 1);
 (2) void g.read_edges<true>(int m, istream& input = cin, int index_offset = 1);
+(3) void g.read_edges<false>(int m, int index_offset, istream& input = cin);
+(4) void g.read_edges<true>(int m, int index_offset, istream& input = cin);
 ```
 
 (1)は `u v`、(2)は `u v cost` を読み、既存の辺に追加します。頂点番号から `index_offset` を引きます。既定では1-indexed入力です。(1)のコストは1です。入力を読み取れなければ `runtime_error` を送出します。
+
+(3)、(4)は同じ操作で、番号変換を第2引数に指定できます。`0` は0-indexed、`1` は1-indexed入力です。
+
+```cpp
+Graph<> g(n);
+g.read_edges(m);             // cinから m 本の u v、1-indexed
+g.read_edges(m, 0);          // cinから m 本の u v、0-indexed
+g.read_edges<true>(m);       // cinから m 本の u v cost、1-indexed
+g.read_edges<true>(m, 0);    // cinから m 本の u v cost、0-indexed
+```
+
+上記はそれぞれ独立した呼び出し例です。有向・無向は `Graph` の型引数で決まり、読み込み後の頂点番号は0-indexedになります。
 
 ### 制約
 

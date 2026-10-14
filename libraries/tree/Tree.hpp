@@ -34,6 +34,10 @@ struct Tree {
         return graph.add_edge(from, to, cost);
     }
     template<bool Weighted = false>
+    void read_edges(int count, int index_offset, std::istream& input = std::cin) {
+        read_edges<Weighted>(count, input, index_offset);
+    }
+    template<bool Weighted = false>
     void read_edges(int count, std::istream& input = std::cin, int index_offset = 1) {
         ready = false;
         graph.template read_edges<Weighted>(count, input, index_offset);

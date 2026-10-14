@@ -91,6 +91,51 @@ void test_searches() {
     }
 }
 
+template<bool Weighted>
+static void test_edge_input() {
+    for (int offset : {0, 1}) {
+        ostringstream text;
+        text << offset << ' ' << offset + 1;
+        if constexpr (Weighted) text << " 7";
+        text << '\n' << offset + 1 << ' ' << offset + 2;
+        if constexpr (Weighted) text << " -2";
+        text << '\n';
+        Graph<long long, true> graph(3);
+        istringstream graph_input(text.str());
+        graph.template read_edges<Weighted>(2, offset, graph_input);
+        assert(graph.edges[0].from == 0 && graph.edges[0].to == 1);
+        assert(graph.edges[1].from == 1 && graph.edges[1].to == 2);
+        assert(graph.edges[0].cost == (Weighted ? 7 : 1));
+        assert(graph.edges[1].cost == (Weighted ? -2 : 1));
+        assert(graph.edges[1].id == 1 && graph.degree(2) == 0);
+
+        Tree<> tree(3);
+        tree.build();
+        istringstream tree_input(text.str());
+        tree.template read_edges<Weighted>(2, offset, tree_input);
+        tree.build(2);
+        assert(tree.lca(0, 1) == 1);
+        assert(tree.weighted_distance(0, 2) == optional<long long>(Weighted ? 5 : 2));
+
+        // Exercise the contest-facing overloads that default to std::cin.
+        istringstream contest_input(text.str() + text.str());
+        auto* previous = cin.rdbuf(contest_input.rdbuf());
+        Graph<> from_cin(3);
+        Tree<> tree_from_cin(3);
+        if (offset == 1) {
+            from_cin.template read_edges<Weighted>(2);
+            tree_from_cin.template read_edges<Weighted>(2);
+        } else {
+            from_cin.template read_edges<Weighted>(2, 0);
+            tree_from_cin.template read_edges<Weighted>(2, 0);
+        }
+        cin.rdbuf(previous);
+        tree_from_cin.build();
+        assert(from_cin.edges[1].to == 2 && from_cin.edges[1].cost == (Weighted ? -2 : 1));
+        assert(tree_from_cin.weighted_distance(0, 2) == optional<long long>(Weighted ? 5 : 2));
+    }
+}
+
 static void test_storage_and_limits() {
     Graph<> graph(3);
     istringstream unweighted("1 2\n2 3\n2 2\n");
@@ -333,6 +378,7 @@ static void test_adapters_and_large_inputs() {
 }
 
 int main() {
+    test_edge_input<false>(); test_edge_input<true>();
     test_storage_and_limits(); test_searches<false>(); test_searches<true>();
     test_directed_structure(); test_undirected_structure(); test_tree(); test_adapters_and_large_inputs();
     cout << "Hello World\n";

@@ -38,9 +38,23 @@
 ```cpp
 int tree.add_edge(int from, int to, Cost cost = Cost(1));
 void tree.read_edges<Weighted = false>(int m, istream& input = cin, int index_offset = 1);
+void tree.read_edges<Weighted = false>(int m, int index_offset, istream& input = cin);
 ```
 
 [Graph](../graph/Graph.md) と同じ意味で辺を追加します。辺追加後は、クエリの前に `build` を再実行してください。
+
+`Weighted=false` は `u v` をコスト1として、`true` は `u v cost` を読みます。番号変換の既定は1-indexedで、`index_offset=0` にすると0-indexed入力を受け取れます。内部の頂点番号と `build` の根は常に0-indexedです。
+
+```cpp
+Tree<> tree(n);
+tree.read_edges(n - 1);          // 重みなし、1-indexed、cin
+// tree.read_edges(n - 1, 0);    // 重みなし、0-indexed
+// tree.read_edges<true>(n - 1); // 重み付き、1-indexed
+// tree.read_edges<true>(n - 1, 0); // 重み付き、0-indexed
+tree.build(0);
+```
+
+連結な木では辺数は `n-1`、森では実際の辺数を渡します。入力ストリームを指定する場合は `tree.read_edges<true>(m, 0, input)` とも書けます。
 
 ### 制約
 

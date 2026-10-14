@@ -53,6 +53,12 @@ struct Graph {
     }
 
     // Input vertices are shifted by index_offset (1 for usual contest input).
+    // Convenient form: read_edges(m, 0) or read_edges<true>(m, 1).
+    template<bool Weighted = false>
+    void read_edges(int count, int index_offset, std::istream& input = std::cin) {
+        read_edges<Weighted>(count, input, index_offset);
+    }
+
     template<bool Weighted = false>
     void read_edges(int count, std::istream& input = std::cin, int index_offset = 1) {
         assert(count >= 0);
