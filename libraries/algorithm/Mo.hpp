@@ -14,8 +14,10 @@ struct Mo {
         int q = (int)left.size();
         int block = std::max(1, (int)(n / std::max(1.0, std::sqrt((double)q))));
         std::vector<int> order(q); std::iota(order.begin(), order.end(), 0);
+        std::vector<int> query_block(q);
+        for (int i = 0; i < q; ++i) query_block[i] = left[i] / block;
         std::sort(order.begin(), order.end(), [&](int a, int b) {
-            int ab = left[a] / block, bb = left[b] / block;
+            int ab = query_block[a], bb = query_block[b];
             if (ab != bb) return ab < bb;
             return ab & 1 ? right[a] > right[b] : right[a] < right[b];
         });

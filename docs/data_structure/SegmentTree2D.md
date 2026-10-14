@@ -1,8 +1,12 @@
 # SegmentTree2D
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SegmentTree2D.hpp](../../libraries/data_structure/SegmentTree2D.hpp)
+
 `libraries/data_structure/SegmentTree2D.hpp` は2次元グリッド上の一点更新・長方形積を扱います。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/SegmentTree2D.hpp"
@@ -17,14 +21,14 @@ SegmentTree2D<S, op, e> seg(values);
 
 `values` は `vector<vector<S>>` です。すべての行の長さが同じである必要があります。
 
-**制約**
+### 制約
 
 - $0 \leq height$
 - $0 \leq width$
 - `S op(S a, S b)` は結合的
 - `S e()` は `op` の単位元
 
-**計算量**
+### 計算量
 
 - $O(HW)$
 
@@ -36,12 +40,12 @@ void set(int row, int column, const S& value);
 
 1マスを `value` に代入します。
 
-**制約**
+### 制約
 
 - $0 \leq row < H$
 - $0 \leq column < W$
 
-**計算量**
+### 計算量
 
 - $O(\log H \log W)$
 
@@ -53,12 +57,12 @@ S prod(int row_l, int row_r, int column_l, int column_r) const;
 
 長方形 `[row_l,row_r) x [column_l,column_r)` の積を返します。
 
-**制約**
+### 制約
 
 - $0 \leq row_l \leq row_r \leq H$
 - $0 \leq column_l \leq column_r \leq W$
 
-**計算量**
+### 計算量
 
 - $O(\log H \log W)$
 

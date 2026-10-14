@@ -1,8 +1,12 @@
 # HLD
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [HLD.hpp](../../libraries/tree/HLD.hpp)
+
 `libraries/tree/HLD.hpp` は木を Heavy-Light Decomposition で前処理し、LCA、距離、祖先、パス上の頂点を高速に求めるライブラリです。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/tree/HLD.hpp"
@@ -18,15 +22,15 @@ HLD hld(graph, root);
 - `root`: 根。省略時は `0`
 - `graph` は無向木を想定します。
 
-**制約**
+### 制約
 
 - `graph` は連結な無向木
 - $0 \leq root < N$
 
-**計算量**
+### 計算量
 
-- 構築: `O(N)`
-- メモリ: `O(N)`
+- 構築: $O(N)$
+- メモリ: $O(N)$
 
 ## メンバ変数
 
@@ -52,14 +56,14 @@ int level_ancestor(int v, int d);
 
 頂点 `v` の祖先で、深さが `d` の頂点を返します。`depth[v] < d` の場合は `-1` を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq v < N$
 - $0 \leq d$
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ### lca
 
@@ -69,13 +73,13 @@ int lca(int u, int v);
 
 頂点 `u` と `v` の Lowest Common Ancestor を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq u, v < N$
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ### distance
 
@@ -85,13 +89,13 @@ int distance(int u, int v);
 
 頂点 `u` と `v` の間の辺数を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq u, v < N$
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ### in_subtree
 
@@ -101,13 +105,13 @@ bool in_subtree(int ancestor, int v) const;
 
 根付き木で `v` が `ancestor` の部分木に含まれるかを返します。Euler Tour上の区間 `[id[ancestor], out[ancestor])` を使います。
 
-**制約**
+#### 制約
 
 - $0 \leq ancestor, v < N$
 
-**計算量**
+#### 計算量
 
-- `O(1)`
+- $O(1)$
 
 ### path_segments
 
@@ -117,15 +121,15 @@ vector<pair<int, int>> path_segments(int u, int v, bool vertex_query = true);
 
 `u` から `v` へのパスを、HLD順の半開区間 `[l,r)` の列に分解します。各区間は `vertex` 配列上の連続区間です。
 
-`vertex_query=false` の場合は LCA に対応する頂点を除くため、辺値を親側の頂点位置に載せるときに使えます。
+`vertex_query=false` の場合は LCA に対応する頂点を除くため、辺値を深い側（子）の頂点位置に載せるときに使えます。
 
-**制約**
+#### 制約
 
 - $0 \leq u, v < N$
 
-**計算量**
+#### 計算量
 
-- `O(log N)` 個の区間を返します。
+- $O(\log N)$ 個の区間を返します。
 
 ### jump
 
@@ -137,14 +141,14 @@ int jump(int s, int t, int i);
 
 `i` がパス長を超える場合の返り値は未定義です。
 
-**制約**
+#### 制約
 
 - $0 \leq s, t < N$
 - $0 \leq i \leq distance(s, t)$
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ## 使用例
 

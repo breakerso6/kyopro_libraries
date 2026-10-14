@@ -1,8 +1,12 @@
 # SparseTable
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SparseTable.hpp](../../libraries/data_structure/SparseTable.hpp)
+
 `libraries/data_structure/SparseTable.hpp` は静的配列に対する冪等な区間積を $O(1)$ で返します。RMQに向いています。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/SparseTable.hpp"
@@ -14,11 +18,11 @@
 SparseTable<S, op> table(values);
 ```
 
-**制約**
+### 制約
 
 - `S op(S a, S b)` は結合的かつ冪等
 
-**計算量**
+### 計算量
 
 - 構築: $O(N \log N)$
 
@@ -30,11 +34,11 @@ S table.prod(int l, int r) const;
 
 半開区間 `[l,r)` の積を返します。
 
-**制約**
+### 制約
 
 - $0 \leq l < r \leq N$
 
-**計算量**
+### 計算量
 
 - $O(1)$
 

@@ -111,7 +111,22 @@ struct FormalPowerSeries {
     }
     FPS integral() const {
         FPS result(size() + 1);
-        for (int i = 0; i < size(); ++i) result.a[i + 1] = a[i] / Mint(i + 1);
+        if constexpr (!atcoder::internal::is_modint<Mint>::value) {
+            // Preserve arithmetic behavior for floating-point/rational and
+            // custom fields, whose factorials may overflow or lose precision.
+            for (int i = 0; i < size(); ++i) result.a[i + 1] = a[i] / Mint(i + 1);
+            return result;
+        }
+        if (empty()) return result;
+        // Batch inversion: one division instead of one per coefficient.
+        // As before, all integers 1..size() must be invertible in Mint.
+        std::vector<Mint> factorial(size() + 1, Mint(1));
+        for (int i = 1; i <= size(); ++i) factorial[i] = factorial[i - 1] * Mint(i);
+        Mint inverse_factorial = Mint(1) / factorial.back();
+        for (int i = size(); i > 0; --i) {
+            result.a[i] = a[i - 1] * factorial[i - 1] * inverse_factorial;
+            inverse_factorial *= Mint(i);
+        }
         return result;
     }
     FPS inv(int n) const {

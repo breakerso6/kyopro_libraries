@@ -1,8 +1,12 @@
 # EulerianTrail
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [EulerianTrail.hpp](../../libraries/graph/EulerianTrail.hpp)
+
 `libraries/graph/EulerianTrail.hpp` は有向・無向グラフのEuler trailを構築します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/graph/EulerianTrail.hpp"
@@ -19,12 +23,12 @@ optional<EulerianTrail::Result> EulerianTrail::undirected(
 
 無向グラフで全ての辺をちょうど1回通るtrailを返します。存在しなければ `nullopt` です。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - 各辺 `(u,v)` は $0 \leq u,v < n$
 
-**計算量**
+### 計算量
 
 - $O(V+E)$
 
@@ -39,7 +43,7 @@ optional<EulerianTrail::Result> EulerianTrail::directed(
 
 有向グラフで全ての辺をちょうど1回通るtrailを返します。存在しなければ `nullopt` です。
 
-**計算量**
+### 計算量
 
 - $O(V+E)$
 
@@ -58,3 +62,16 @@ struct Result {
 
 - 孤立点はtrailの存在判定に影響しません。
 - 辺が空の場合は頂点数が正なら頂点列1個のtrailを返します。
+
+## 使用例
+
+```cpp
+#include "libraries/graph/EulerianTrail.hpp"
+using namespace std;
+
+int main() {
+    vector<pair<int, int>> edges = {{0, 1}, {1, 2}, {2, 0}};
+    auto trail = EulerianTrail::undirected(3, edges);
+    assert(trail && trail->edge_ids.size() == 3);
+}
+```

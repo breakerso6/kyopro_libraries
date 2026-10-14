@@ -1,10 +1,14 @@
 # HLD_seg
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [HLD_seg.hpp](../../libraries/tree/HLD_seg.hpp)
+
 `libraries/tree/HLD_seg.hpp` は HLD と `atcoder::segtree` を組み合わせたライブラリです。各頂点に値を持たせ、一点更新とパス上の積を扱えます。
 
 `prod_path(s, t)` は `s` から `t` へのパスの頂点列 `(v0, ..., vk)` に対して `op(value[v0], ..., value[vk])` を返します。非可換な演算にも対応しています。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/tree/HLD_seg.hpp"
@@ -37,17 +41,17 @@ HLD_seg<S, op, e> hld(graph, initial_values, root);
 - `root`: 根。省略時は `0`
 - `graph` は無向木を想定します。
 
-**制約**
+### 制約
 
 - `graph` は連結な無向木
 - `initial_values` を渡す場合は `initial_values.size() == N`
 - `op` は結合的
 - `e()` は `op` の単位元
 
-**計算量**
+### 計算量
 
-- 構築: `O(N log N)`
-- メモリ: `O(N)`
+- 構築: $O(N \log N)$
+- メモリ: $O(N)$
 
 ## HLD関数
 
@@ -55,10 +59,10 @@ HLD_seg<S, op, e> hld(graph, initial_values, root);
 
 | 関数 | 説明 | 計算量 |
 | --- | --- | --- |
-| `level_ancestor(v, d)` | `v` の祖先で深さ `d` の頂点。存在しない場合は `-1` | `O(log N)` |
-| `lca(u, v)` | `u` と `v` の LCA | `O(log N)` |
-| `distance(u, v)` | `u` と `v` の距離 | `O(log N)` |
-| `jump(s, t, i)` | `s` から `t` へのパス上の `i` 番目の頂点 | `O(log N)` |
+| `level_ancestor(v, d)` | `v` の祖先で深さ `d` の頂点。存在しない場合は `-1` | $O(\log N)$ |
+| `lca(u, v)` | `u` と `v` の LCA | $O(\log N)$ |
+| `distance(u, v)` | `u` と `v` の距離 | $O(\log N)$ |
+| `jump(s, t, i)` | `s` から `t` へのパス上の `i` 番目の頂点 | $O(\log N)$ |
 
 ## セグメント木関数
 
@@ -70,9 +74,9 @@ void set(int v, S x);
 
 頂点 `v` の値を `x` に更新します。
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ### get
 
@@ -82,9 +86,9 @@ S get(int v);
 
 頂点 `v` の現在の値を返します。
 
-**計算量**
+#### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ### prod_path
 
@@ -94,9 +98,9 @@ S prod_path(int s, int t);
 
 `s` から `t` へのパス上の頂点値を、パスの順番で畳み込みます。
 
-**計算量**
+#### 計算量
 
-- `O(log^2 N)`
+- $O(\log^2 N)$
 
 ## 使用例
 

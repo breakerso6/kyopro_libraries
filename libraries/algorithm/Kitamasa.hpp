@@ -14,14 +14,24 @@ std::vector<T> kitamasa_coefficients(long long n, const std::vector<T>& c) {
         tmp.resize(k);
         return tmp;
     };
-    std::vector<T> result(k), base(k);
+    std::vector<T> result(k);
     result[0] = 1;
-    if (k == 1) base[0] = c[0];
-    else base[1] = 1;
-    while (n) {
-        if (n & 1) result = multiply(result, base);
-        base = multiply(base, base);
-        n >>= 1;
+    if (n < k) {
+        result[0] = 0;
+        result[(int)n] = 1;
+        return result;
+    }
+    // Read bits from the most significant end: multiply by x in O(k)
+    // instead of multiplying two dense polynomials for each set bit.
+    int highest = 0;
+    for (long long bits = n; bits > 1; bits >>= 1) ++highest;
+    for (int bit = highest; bit >= 0; --bit) {
+        if (bit != highest) result = multiply(result, result);
+        if ((n >> bit) & 1) {
+            T last = result.back();
+            for (int i = k - 1; i > 0; --i) result[i] = result[i - 1] + last * c[i];
+            result[0] = last * c[0];
+        }
     }
     return result;
 }

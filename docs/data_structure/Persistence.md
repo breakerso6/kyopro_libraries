@@ -1,5 +1,9 @@
 # Persistent data structures
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [PersistentSegmentTree.hpp](../../libraries/data_structure/PersistentSegmentTree.hpp) / [PersistentLazySegmentTree.hpp](../../libraries/data_structure/PersistentLazySegmentTree.hpp) / [PersistentDSU.hpp](../../libraries/data_structure/PersistentDSU.hpp) / [PersistentBinaryTrie.hpp](../../libraries/data_structure/PersistentBinaryTrie.hpp)
+
 永続データ構造は、更新前の状態を壊さずに新しい `root` を返します。各 `root` は同じインスタンス内でだけ有効です。
 
 このページでは以下をまとめます。
@@ -20,7 +24,9 @@
 
 任意モノイドの一点更新・半開区間積を永続化したセグメント木です。
 
-### Include
+`get` は該当する子だけを反復してたどります。`build` では必要なノード数を事前に確保し、既存versionを保持した複数回の構築でも容量を幾何的に増やして再確保を抑えます。
+
+### include
 
 ```cpp
 #include "libraries/data_structure/PersistentSegmentTree.hpp"
@@ -32,13 +38,13 @@
 PersistentSegmentTree<S, op, e> seg(int n);
 ```
 
-**制約**
+#### 制約
 
 - $1 \leq n$
 - `S op(S a, S b)` は結合的
 - `S e()` は `op` の単位元
 
-**計算量**
+#### 計算量
 
 - $O(1)$
 
@@ -51,11 +57,11 @@ int root = seg.build(values);
 
 初期versionを作って、その `root` を返します。`values` を省略した場合は全要素が `e()` です。
 
-**制約**
+#### 制約
 
 - `values` を渡す場合は `values.size() == n`
 
-**計算量**
+#### 計算量
 
 - $O(n)$
 
@@ -67,12 +73,12 @@ int new_root = seg.set(root, position, value);
 
 `root` の配列に対して `a[position] = value` とした新しいversionを返します。`root` の内容は変わりません。
 
-**制約**
+#### 制約
 
 - `root` は `seg` が返したroot
 - $0 \leq position < n$
 
-**計算量**
+#### 計算量
 
 - $O(\log n)$
 
@@ -85,13 +91,13 @@ S x = seg.prod(root, l, r);
 
 `get` は1点の値、`prod` は `op(a[l], ..., a[r-1])` を返します。`l = r` のときは `e()` を返します。
 
-**制約**
+#### 制約
 
 - `root` は `seg` が返したroot
 - `get`: $0 \leq position < n$
 - `prod`: $0 \leq l \leq r \leq n$
 
-**計算量**
+#### 計算量
 
 - $O(\log n)$
 
@@ -118,7 +124,7 @@ cout << seg.prod(root1, 0, 5) << '\n'; // 22
 
 区間加算・区間和に特化した永続遅延セグメント木です。
 
-### Include
+### include
 
 ```cpp
 #include "libraries/data_structure/PersistentLazySegmentTree.hpp"
@@ -130,12 +136,12 @@ cout << seg.prod(root1, 0, 5) << '\n'; // 22
 PersistentLazySegmentTree<T> seg(int n);
 ```
 
-**制約**
+#### 制約
 
 - $1 \leq n$
 - `T` は加減算と整数倍を扱える
 
-**計算量**
+#### 計算量
 
 - $O(1)$
 
@@ -148,11 +154,11 @@ int root = seg.build(values);
 
 初期versionを作ります。`values` を省略した場合は全要素が `T{}` です。
 
-**制約**
+#### 制約
 
 - `values` を渡す場合は `values.size() == n`
 
-**計算量**
+#### 計算量
 
 - $O(n)$
 
@@ -164,12 +170,12 @@ int new_root = seg.add(root, l, r, value);
 
 半開区間 `[l,r)` に `value` を加算した新しいversionを返します。
 
-**制約**
+#### 制約
 
 - `root` は `seg` が返したroot
 - $0 \leq l \leq r \leq n$
 
-**計算量**
+#### 計算量
 
 - $O(\log n)$
 
@@ -182,13 +188,13 @@ T x = seg.prod(root, l, r);
 
 `get` は1点の値、`prod` は区間和を返します。
 
-**制約**
+#### 制約
 
 - `root` は `seg` が返したroot
 - `get`: $0 \leq position < n$
 - `prod`: $0 \leq l \leq r \leq n$
 
-**計算量**
+#### 計算量
 
 - $O(\log n)$
 
@@ -196,7 +202,7 @@ T x = seg.prod(root, l, r);
 
 Union-Findを永続化した構造です。union by size を使い、経路圧縮は行いません。
 
-### Include
+### include
 
 ```cpp
 #include "libraries/data_structure/PersistentDSU.hpp"
@@ -208,7 +214,7 @@ Union-Findを永続化した構造です。union by size を使い、経路圧�
 PersistentDSU dsu(int n);
 ```
 
-**制約**
+#### 制約
 
 - $1 \leq n$
 
@@ -220,7 +226,7 @@ int root = dsu.build();
 
 $n$ 頂点 $0$ 辺の状態を作ります。
 
-**計算量**
+#### 計算量
 
 - $O(n)$
 
@@ -232,12 +238,12 @@ int new_root = dsu.merge(root, a, b);
 
 `root` の状態に辺 `(a,b)` を追加した新しいversionを返します。すでに連結なら同じ `root` を返します。
 
-**制約**
+#### 制約
 
 - `root` は `dsu` が返したroot
 - $0 \leq a,b < n$
 
-**計算量**
+#### 計算量
 
 - $O(\log^2 n)$
 
@@ -251,12 +257,12 @@ int sz = dsu.size(root, v);
 
 指定versionでの代表元、連結判定、連結成分サイズを返します。
 
-**制約**
+#### 制約
 
 - `root` は `dsu` が返したroot
 - $0 \leq v,a,b < n$
 
-**計算量**
+#### 計算量
 
 - $O(\log^2 n)$
 
@@ -264,7 +270,7 @@ int sz = dsu.size(root, v);
 
 非負整数のmultisetを永続化したBinary Trieです。prefix versionの差を取ることで、区間内の値に対するXOR最小/最大やk番目を処理できます。
 
-### Include
+### include
 
 ```cpp
 #include "libraries/data_structure/PersistentBinaryTrie.hpp"
@@ -288,7 +294,7 @@ int c = trie.count(root, value);
 
 空のroot、multisetのサイズ、値の個数を返します。
 
-**計算量**
+#### 計算量
 
 - `empty_root`, `size`: $O(1)$
 - `count`: $O(BITS)$
@@ -302,11 +308,11 @@ int new_root = trie.erase(root, value);
 
 値を1個追加/削除した新しいversionを返します。
 
-**制約**
+#### 制約
 
 - `erase` は `count(root, value) > 0`
 
-**計算量**
+#### 計算量
 
 - $O(BITS)$
 
@@ -320,13 +326,13 @@ UInt x = trie.max_xor(left_root, right_root, query);
 
 multiset差 `right_root - left_root` に含まれる値 `v` について、`v xor query` を昇順に並べたときの値を返します。
 
-**制約**
+#### 制約
 
 - `left_root` のmultisetは `right_root` に包含される
 - `kth_xor`: $0 \leq k < size(right)-size(left)$
 - `min_xor`, `max_xor`: 差集合が空でない
 
-**計算量**
+#### 計算量
 
 - $O(BITS)$
 

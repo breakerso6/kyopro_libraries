@@ -1,12 +1,24 @@
 # GeometryReal
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [GeometryReal.hpp](../../libraries/geometry/GeometryReal.hpp)
+
 `libraries/geometry/GeometryReal.hpp` は `long double` 座標の2次元幾何を `geometry_real` 名前空間で提供します。判定には `EPS = 1e-12` を使います。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/geometry/GeometryReal.hpp"
 ```
+
+## 共通の制約
+
+- 座標、半径、計算中の値は有限の `long double` の範囲に収まる
+- 半径は非負
+- 直線を使う関数では、退化を明示的に扱う比較・判定以外は `a` と `b` が異なる
+- 角度はラジアンで指定する
+
 
 ## 型
 
@@ -172,6 +184,11 @@ auto hits = circle_segment_intersections(circle, vertical);
 bool tangent = circle_relation(circle, {{4, 0}, 2})
              == CircleRelation::ExternallyTangent;
 ```
+
+## 計算量
+
+- このページに記載した各操作は $O(1)$
+- 交点配列は最大2点で、返すためのメモリも $O(1)$
 
 ## 注意
 

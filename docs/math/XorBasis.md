@@ -1,8 +1,12 @@
 # XorBasis
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [XorBasis.hpp](../../libraries/math/XorBasis.hpp)
+
 `libraries/math/XorBasis.hpp` は挿入された整数集合の部分集合xorで作れる値を管理します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/XorBasis.hpp"
@@ -16,7 +20,7 @@ XorBasis<UInt, BITS> basis;
 
 `UInt` は符号なし整数型、`BITS` は見るビット数です。
 
-**制約**
+### 制約
 
 - `UInt` はxor、比較、シフトを扱える整数型
 
@@ -28,7 +32,7 @@ bool basis.insert(UInt x);
 
 `x` を基底に追加します。rankが増えた場合は `true`、既存の基底で表現できる場合は `false` です。
 
-**計算量**
+### 計算量
 
 - $O(BITS)$
 
@@ -40,7 +44,7 @@ bool basis.contains(UInt x) const;
 
 挿入済みの値の部分集合xorで `x` を表現できるかを返します。
 
-**計算量**
+### 計算量
 
 - $O(BITS)$
 
@@ -52,7 +56,7 @@ UInt basis.max_xor(UInt seed = 0) const;
 
 `seed` に表現可能なxor値をxorして得られる最大値を返します。
 
-**計算量**
+### 計算量
 
 - $O(BITS)$
 

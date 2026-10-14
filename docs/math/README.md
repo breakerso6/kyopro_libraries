@@ -1,5 +1,7 @@
 # Math
 
+[全ライブラリ一覧](../README.md) · [共通事項](../README.md#共通事項)
+
 数論、線形代数、組合せカウント系のライブラリです。
 
 ## 一覧
@@ -29,7 +31,7 @@
 - `max_xor(seed)`: `seed` から得られる最大XOR
 - `rank`: 基底のrank
 
-各操作は `O(BITS)`、メモリは `O(BITS)` です。
+各操作は $O(BITS)$、メモリは $O(BITS)$ です。
 
 詳細は [XorBasis.md](XorBasis.md) を参照してください。
 
@@ -87,7 +89,7 @@ using namespace factorization;
 - `divisor_count(n)`, `divisor_sum<T>(n)`: 約数個数・約数和
 - `euler_phi(n)`, `mobius(n)`, `is_square_free(n)`, `radical(n)`: 代表的な乗法的関数
 
-Pollard's Rho法により `1` 以上の符号なし64-bit整数を扱います。`prime_factors(1)` と `factorize(1)` は空、`divisors(1)` は `{1}` です。`divisor_sum<T>` はACLの `modint` 系にも対応します。実行時間は確率的で、素因数分解の目安は `O(n^(1/4))` です。
+Pollard's Rho法により `1` 以上の符号なし64-bit整数を扱います。`prime_factors(1)` と `factorize(1)` は空、`divisors(1)` は `{1}` です。`divisor_sum<T>` はACLの `modint` 系にも対応します。実行時間は確率的で、素因数分解の目安は $O(n^(1/4))$ です。
 
 詳細は [Factorization.md](Factorization.md) を参照してください。
 
@@ -110,6 +112,8 @@ Python版は `libraries/math/factorization.py` にあり、同じく素因数分
 ```
 
 `mobius_sieve(n)` でMobius関数を作ります。約数方向の `divisor_zeta/divisor_mobius`、倍数方向の `multiple_zeta/multiple_mobius` もあります。
+
+現在の変換は更新済みの値を再利用する逐次加減算で、通常の約数和・倍数和とは異なります。動作の具体例は個別ページを参照してください。
 
 詳細は [Mobius.md](Mobius.md) を参照してください。
 

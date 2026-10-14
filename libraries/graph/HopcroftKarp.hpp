@@ -15,8 +15,23 @@ struct HopcroftKarp {
     int max_matching() {
         int result = 0;
         for (int v : match_left) result += v != -1;
-        while (bfs())
+        int upper_bound = std::min(left_size, right_size);
+        if (result == upper_bound) return result;
+        // This is the same direct augmentation done by the first BFS layer,
+        // but avoids scanning every edge to build that layer first.
+        for (int v = 0; v < left_size && result < upper_bound; ++v) if (match_left[v] == -1)
+            for (int to : graph[v]) if (match_right[to] == -1) {
+                match_left[v] = to; match_right[to] = v; ++result;
+                break;
+            }
+        if (result == upper_bound) return result;
+        cursor.resize(left_size);
+        queue_buffer.resize(left_size);
+        while (bfs()) {
+            std::fill(cursor.begin(), cursor.end(), 0);
             for (int v = 0; v < left_size; ++v) if (match_left[v] == -1 && dfs(v)) ++result;
+            if (result == upper_bound) break;
+        }
         return result;
     }
     // Call after max_matching(). Returns {left vertices, right vertices}.
@@ -39,24 +54,30 @@ struct HopcroftKarp {
     }
 
 private:
+    std::vector<int> cursor, queue_buffer;
+    int shortest = 0;
     bool bfs() {
-        std::queue<int> q; bool reachable = false;
+        int front = 0, back = 0;
+        shortest = left_size + 1;
         std::fill(distance.begin(), distance.end(), -1);
-        for (int v = 0; v < left_size; ++v) if (match_left[v] == -1) distance[v] = 0, q.push(v);
-        while (!q.empty()) {
-            int v = q.front(); q.pop();
+        for (int v = 0; v < left_size; ++v) if (match_left[v] == -1) distance[v] = 0, queue_buffer[back++] = v;
+        while (front < back) {
+            int v = queue_buffer[front++];
+            if (distance[v] >= shortest) continue;
             for (int to : graph[v]) {
                 int next = match_right[to];
-                if (next == -1) reachable = true;
-                else if (distance[next] == -1) distance[next] = distance[v] + 1, q.push(next);
+                if (next == -1) shortest = distance[v] + 1;
+                else if (distance[next] == -1) distance[next] = distance[v] + 1, queue_buffer[back++] = next;
             }
         }
-        return reachable;
+        return shortest <= left_size;
     }
     bool dfs(int v) {
-        for (int to : graph[v]) {
+        for (int& i = cursor[v]; i < (int)graph[v].size(); ++i) {
+            int to = graph[v][i];
             int next = match_right[to];
-            if (next == -1 || (distance[next] == distance[v] + 1 && dfs(next))) {
+            if ((next == -1 && distance[v] + 1 == shortest) ||
+                (next != -1 && distance[v] + 1 < shortest && distance[next] == distance[v] + 1 && dfs(next))) {
                 match_left[v] = to; match_right[to] = v; return true;
             }
         }

@@ -1,8 +1,12 @@
 # ImplicitTreapBeats
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [ImplicitTreapBeats.hpp](../../libraries/data_structure/ImplicitTreapBeats.hpp)
+
 `libraries/data_structure/ImplicitTreapBeats.hpp` は列を乱択平衡二分木として管理し、位置指定の挿入・削除・区間反転に加えて、Segment Tree Beats 型の区間 `chmin`、区間 `chmax`、区間加算、区間集約を行うデータ構造です。安定したノードハンドルから現在位置を取得し、同じハンドルを保ったまま要素を移動することもできます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/ImplicitTreapBeats.hpp"
@@ -17,14 +21,14 @@ ImplicitTreapBeats treap(values);
 
 `values` は `vector<long long>` です。
 
-**制約**
+### 制約
 
 - 和と更新結果が `long long` に収まる
 
-**計算量**
+### 計算量
 
-- 空構築: `O(1)`
-- `values` から構築: `O(N)`
+- 空構築: $O(1)$
+- `values` から構築: $O(N)$
 
 ## ノードハンドル
 
@@ -55,17 +59,17 @@ vector<Handle> to_handles();
 
 `insert` は `position` 番目の直前へ値を挿入し、新しい要素のハンドルを返します。戻り値は不要なら無視できます。`erase` は `position` 番目の要素を削除します。`set`、`get` は一点更新・一点取得です。`reverse` は半開区間 `[l,r)` の並びを反転します。`to_handles` は現在の並び順に対応するハンドル列を返します。
 
-**制約**
+### 制約
 
 - `insert`: $0 \leq position \leq N$
 - `erase`, `set`, `get`: $0 \leq position < N$
 - `reverse`: $0 \leq l \leq r \leq N$
 
-**計算量**
+### 計算量
 
-- `to_vector`: `O(N)`
-- `to_handles`: `O(N)`
-- それ以外: 期待 `O(log N)`
+- `to_vector`: $O(N)$
+- `to_handles`: $O(N)$
+- それ以外: 期待 $O(\log N)$
 
 ## ハンドル操作
 
@@ -83,15 +87,15 @@ void reinsert(int position, Handle handle, long long value);
 - 2引数の `reinsert` は取り出したときの値で再挿入する
 - 3引数の `reinsert` は値を `value` に置き換えて再挿入する
 
-**制約**
+### 制約
 
 - `handle_at`, `extract`: $0 \leq position < N$
 - `index_of`: `handle` は現在のTreapに含まれるアクティブなハンドル
 - `reinsert`: $0 \leq position \leq N$。`handle` はこのTreapから `extract` され、まだ再挿入されていないもの
 
-**計算量**
+### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ## 更新関数
 
@@ -109,13 +113,13 @@ void range_add(int l, int r, long long x);
 | `range_chmax` | `a[i] = max(a[i], x)` |
 | `range_add` | `a[i] += x` |
 
-**制約**
+### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+### 計算量
 
-- 期待ならし `O(log^2 N)`
+- 期待ならし $O(\log^2 N)$
 
 ## クエリ関数
 
@@ -127,14 +131,14 @@ long long range_max(int l, int r);
 
 `range_sum`、`range_min`、`range_max` は半開区間 `[l,r)` の和、最小値、最大値を返します。
 
-**制約**
+### 制約
 
 - `range_sum`: $0 \leq l \leq r \leq N$
 - `range_min`, `range_max`: $0 \leq l < r \leq N$
 
-**計算量**
+### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ## 使用例
 

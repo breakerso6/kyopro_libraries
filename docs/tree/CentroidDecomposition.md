@@ -1,10 +1,14 @@
 # CentroidDecomposition
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [CentroidDecomposition.hpp](../../libraries/tree/CentroidDecomposition.hpp)
+
 `libraries/tree/CentroidDecomposition.hpp` は無向木から重心分解木を構築します。
 
-重心分解は、木上の距離クエリや「条件を満たす頂点集合への最短距離」を `O(log N)` 個の重心経由で処理したいときに使います。
+重心分解は、木上の距離クエリや「条件を満たす頂点集合への最短距離」を $O(\log N)$ 個の重心経由で処理したいときに使います。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/tree/CentroidDecomposition.hpp"
@@ -13,14 +17,15 @@
 ## コンストラクタ
 
 ```cpp
-CentroidDecomposition cd(graph);
+CentroidDecomposition cd(const vector<vector<int>>& graph);
 ```
 
 `graph` は `vector<vector<int>>` の無向木です。
 
-**制約**
+### 制約
 
-- `graph` は連結な無向木
+- `graph` は連結な無向木、または空のグラフ
+- オブジェクトが保持する参照の寿命中、`graph` が存在する
 
 ## メンバ変数
 
@@ -38,11 +43,17 @@ CentroidDecomposition cd(graph);
 ## 使用例
 
 ```cpp
-vector<vector<int>> g(n);
-CentroidDecomposition cd(g);
+#include "libraries/tree/CentroidDecomposition.hpp"
+using namespace std;
 
-for (int v = 0; v < n; ++v) {
-    cout << v << ' ' << cd.parent[v] << ' ' << cd.depth[v] << '\n';
+int main() {
+    int n = 4;
+    vector<vector<int>> g = {{1}, {0, 2, 3}, {1}, {1}};
+    CentroidDecomposition cd(g);
+
+    for (int v = 0; v < n; ++v) {
+        cout << v << ' ' << cd.parent[v] << ' ' << cd.depth[v] << '\n';
+    }
 }
 ```
 
@@ -63,7 +74,7 @@ for c in centroid_ancestors[x]:
 answer = min(best[c] + dist(v, c)) over c in centroid_ancestors[v]
 ```
 
-各頂点の重心祖先は `O(log N)` 個なので、更新・クエリは `O(log N)` 個の候補を見るだけになります。距離 `dist` は `HLD` やLCAで求めるか、重心分解構築時に別途保存します。
+各頂点の重心祖先は $O(\log N)$ 個なので、更新・クエリは $O(\log N)$ 個の候補を見るだけになります。距離 `dist` は `HLD` やLCAで求めるか、重心分解構築時に別途保存します。
 
 ## 注意
 

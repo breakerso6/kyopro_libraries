@@ -1,8 +1,12 @@
 # MST
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [MST.hpp](../../libraries/graph/MST.hpp)
+
 `libraries/graph/MST.hpp` はKruskal法で最小全域木、非連結グラフでは最小全域森を求めます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/graph/MST.hpp"
@@ -16,11 +20,11 @@ KruskalMST<T> mst(n);
 
 頂点は `[0,n)` です。`T` は辺重みの型です。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 
-**計算量**
+### 計算量
 
 - $O(n)$
 
@@ -32,12 +36,12 @@ int add_edge(int u, int v, T cost);
 
 無向辺を追加し、追加した辺IDを返します。
 
-**制約**
+### 制約
 
 - $0 \leq u < n$
 - $0 \leq v < n$
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -59,7 +63,7 @@ struct Edge {
 };
 ```
 
-**計算量**
+### 計算量
 
 - $O(E \log E)$
 

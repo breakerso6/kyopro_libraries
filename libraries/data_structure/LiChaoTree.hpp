@@ -19,27 +19,40 @@ struct LiChaoTree {
 
 private:
     void add_line(Line line, int v, T l, T r) {
-        T m = l + (r - l) / 2;
-        bool left_better = line.eval(l) < nodes[v].line.eval(l);
-        bool mid_better = line.eval(m) < nodes[v].line.eval(m);
-        if (mid_better) std::swap(line, nodes[v].line);
-        if (r - l == 1) return;
-        bool go_left = left_better != mid_better;
-        int child = go_left ? nodes[v].left : nodes[v].right;
-        T nl = left_better != mid_better ? l : m, nr = left_better != mid_better ? m : r;
-        if (child == -1) {
-            child = (int)nodes.size(); nodes.push_back({line, -1, -1});
-            if (go_left) nodes[v].left = child;
-            else nodes[v].right = child;
+        while (true) {
+            if (line.a == nodes[v].line.a) {
+                if (line.b < nodes[v].line.b) nodes[v].line = line;
+                return;
+            }
+            T m = l + (r - l) / 2;
+            bool left_better = line.eval(l) < nodes[v].line.eval(l);
+            bool mid_better = line.eval(m) < nodes[v].line.eval(m);
+            if (mid_better) std::swap(line, nodes[v].line);
+            if (r - l == 1) return;
+            bool go_left = left_better != mid_better;
+            // The remaining line loses at the midpoint. If it also loses at
+            // both ends, it cannot improve any integer coordinate in this node.
+            if (!go_left && !(line.eval(r - 1) < nodes[v].line.eval(r - 1))) return;
+            int child = go_left ? nodes[v].left : nodes[v].right;
+            T nl = left_better != mid_better ? l : m, nr = left_better != mid_better ? m : r;
+            if (child == -1) {
+                child = (int)nodes.size(); nodes.push_back({line, -1, -1});
+                if (go_left) nodes[v].left = child;
+                else nodes[v].right = child;
+                return;
+            }
+            v = child; l = nl; r = nr;
         }
-        else add_line(line, child, nl, nr);
     }
     T query(T x, int v, T l, T r) const {
-        T result = nodes[v].line.eval(x);
-        if (r - l == 1) return result;
-        T m = l + (r - l) / 2;
-        int child = x < m ? nodes[v].left : nodes[v].right;
-        if (child == -1) return result;
-        return std::min(result, query(x, child, x < m ? l : m, x < m ? m : r));
+        T result = infinity;
+        while (v != -1) {
+            result = std::min(result, nodes[v].line.eval(x));
+            if (r - l == 1) break;
+            T m = l + (r - l) / 2;
+            if (x < m) { v = nodes[v].left; r = m; }
+            else { v = nodes[v].right; l = m; }
+        }
+        return result;
     }
 };

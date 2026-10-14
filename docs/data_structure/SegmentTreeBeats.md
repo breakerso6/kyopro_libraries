@@ -1,8 +1,12 @@
 # SegmentTreeBeats
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SegmentTreeBeats.hpp](../../libraries/data_structure/SegmentTreeBeats.hpp)
+
 `libraries/data_structure/SegmentTreeBeats.hpp` は区間 `chmin`、区間 `chmax`、区間加算を行いながら、区間和・最小値・最大値を取得するデータ構造です。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/SegmentTreeBeats.hpp"
@@ -16,13 +20,13 @@ SegmentTreeBeats seg(values);
 
 `values` は `vector<long long>` です。
 
-**制約**
+### 制約
 
 - $0 \leq N$
 - 和と更新結果が `long long` に収まる
 
-- 構築: `O(N)`
-- メモリ: `O(N)`
+- 構築: $O(N)$
+- メモリ: $O(N)$
 
 ## 更新関数
 
@@ -40,13 +44,13 @@ void range_add(int l, int r, long long x);
 | `range_chmax` | `a[i] = max(a[i], x)` |
 | `range_add` | `a[i] += x` |
 
-**制約**
+### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+### 計算量
 
-- ならし `O(log^2 N)`
+- ならし $O(\log^2 N)$
 
 ## クエリ関数
 
@@ -59,14 +63,14 @@ int size() const;
 
 `range_sum`、`range_min`、`range_max` は `[l,r)` の和、最小値、最大値を返します。`size()` は元の配列長です。
 
-**制約**
+### 制約
 
 - `range_sum`: $0 \leq l \leq r \leq N$
 - `range_min`, `range_max`: $0 \leq l < r \leq N$
 
-**計算量**
+### 計算量
 
-- `O(log N)`
+- $O(\log N)$
 
 ## 使用例
 

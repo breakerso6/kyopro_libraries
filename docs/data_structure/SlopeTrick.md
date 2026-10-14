@@ -1,8 +1,12 @@
 # SlopeTrick
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SlopeTrick.hpp](../../libraries/data_structure/SlopeTrick.hpp)
+
 `libraries/data_structure/SlopeTrick.hpp` は傾きが単調非減少な凸区分線形関数を管理します。関数全体を保持せず、折れ点を2つのヒープで管理します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/SlopeTrick.hpp"
@@ -19,7 +23,7 @@ SlopeTrick<long long> slope;
 
 初期状態はすべての `x` に対して `f(x)=0` です。`T` は順序比較、加減算、整数との乗算相当の計算でオーバーフローしない型を使います。
 
-**制約**
+### 制約
 
 - `T` は比較、加減算、コピーが可能
 
@@ -41,7 +45,7 @@ void add_abs(T a);
 | `add_x_minus_a(a)` | `max(x-a,0)` |
 | `add_abs(a)` | `abs(x-a)` |
 
-**計算量**
+### 計算量
 
 - `add_constant`: $O(1)$
 - その他: $O(\log N)$
@@ -55,9 +59,9 @@ pair<optional<T>, optional<T>> argmin() const;
 
 `min_f()` は関数の最小値です。`argmin()` は最小値を取る区間の左端・右端を返します。片側に非有界なら対応する値は `nullopt` です。
 
-**計算量**
+### 計算量
 
-- `O(1)`
+- $O(1)$
 
 ## 変換操作
 
@@ -73,7 +77,7 @@ void clear_right();
 - `clear_left`: 最小点より左側を水平にする
 - `clear_right`: 最小点より右側を水平にする
 
-いずれも `O(1)` です。
+いずれも $O(1)$ です。
 
 ## 使用例
 

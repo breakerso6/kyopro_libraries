@@ -1,10 +1,14 @@
 # LazySegmentTree2D
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [LazySegmentTree2D.hpp](../../libraries/data_structure/LazySegmentTree2D.hpp)
+
 `libraries/data_structure/LazySegmentTree2D.hpp` は長方形加算・長方形和に特化した2次元構造です。
 
 内部実装は4本の2次元Fenwick Treeです。用途としては遅延セグメント木の「長方形加算・長方形sum」と同じです。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/LazySegmentTree2D.hpp"
@@ -19,15 +23,17 @@ RangeAddRangeSum2D<T> seg(values);
 
 `values` は `vector<vector<T>>` です。
 
-**制約**
+### 制約
 
 - $0 \leq height$
 - $0 \leq width$
 
-**計算量**
+### 計算量
 
 - `RangeAddRangeSum2D(height, width)`: $O(HW)$
-- `RangeAddRangeSum2D(values)`: $O(HW \log H \log W)$
+- `RangeAddRangeSum2D(values)`: $O(HW)$
+
+配列からの構築では、2次元差分とその重み付き配列を作り、4本のFenwick Treeを線形時間で構築します。
 
 ## add
 
@@ -37,12 +43,12 @@ void add(int row_l, int row_r, int column_l, int column_r, T value);
 
 長方形 `[row_l,row_r) x [column_l,column_r)` に `value` を加算します。
 
-**制約**
+### 制約
 
 - $0 \leq row_l \leq row_r \leq H$
 - $0 \leq column_l \leq column_r \leq W$
 
-**計算量**
+### 計算量
 
 - $O(\log H \log W)$
 
@@ -54,12 +60,12 @@ T sum(int row_l, int row_r, int column_l, int column_r) const;
 
 長方形 `[row_l,row_r) x [column_l,column_r)` の和を返します。
 
-**制約**
+### 制約
 
 - $0 \leq row_l \leq row_r \leq H$
 - $0 \leq column_l \leq column_r \leq W$
 
-**計算量**
+### 計算量
 
 - $O(\log H \log W)$
 

@@ -12,15 +12,27 @@ struct PersistentSegmentTree {
     explicit PersistentSegmentTree(int n_) : n(n_) { assert(n > 0); }
     int build(const std::vector<S>& values = {}) {
         assert(values.empty() || (int)values.size() == n);
+        size_t required = nodes.size() + 2 * size_t(n) - 1;
+        if (nodes.capacity() < required) nodes.reserve(std::max(required, nodes.capacity() * 2));
         return build(0, n, values);
     }
     int set(int root, int position, const S& value) {
         assert(0 <= position && position < n);
         return set(root, position, value, 0, n);
     }
-    S get(int root, int position) const { return prod(root, position, position + 1); }
+    S get(int root, int position) const {
+        assert(0 <= position && position < n);
+        int v = root, l = 0, r = n;
+        while (r - l > 1) {
+            int m = (l + r) / 2;
+            if (position < m) { v = nodes[v].left; r = m; }
+            else { v = nodes[v].right; l = m; }
+        }
+        return nodes[v].value;
+    }
     S prod(int root, int left, int right) const {
         assert(0 <= left && left <= right && right <= n);
+        if (left == right) return e();
         return prod(root, left, right, 0, n);
     }
 

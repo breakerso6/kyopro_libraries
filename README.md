@@ -4,6 +4,8 @@
 
 ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
+[ドキュメント一覧](docs/README.md)から各APIを参照できます。宣言・動作・制約・計算量・使用例の構成はACLを参考にしています。追加・編集時の書式は [ドキュメント記法](docs/STYLE.md) を参照してください。
+
 ## Directory Layout
 
 `libraries/` と `docs/` は同じ分野名で整理しています。
@@ -13,10 +15,10 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 | `algorithm` | Mo's algorithm、SMAWK、Kitamasa、Z-algorithm | [docs/algorithm](docs/algorithm/README.md) |
 | `data_structure` | DSU、区間積、Wavelet Matrix、永続・動的データ構造、CHT | [docs/data_structure](docs/data_structure/README.md) |
 | `geometry` | 整数・実数幾何、最近点対、KD-tree、長方形和集合 | [docs/geometry](docs/geometry/README.md) |
-| `graph` | LowLink、二重連結成分、Euler路、二部マッチング、最短路、MST | [docs/graph](docs/graph/README.md) |
+| `graph` | 共通グラフ表現、BFS、SCC、LowLink、二重連結成分、Euler路、二部マッチング、最短路、MST | [docs/graph](docs/graph/README.md) |
 | `math` | 整数演算、modint組合せ、FPS、XOR線形基底、64-bit素因数分解、行列、Mobius、写像12相 | [docs/math](docs/math/README.md) |
 | `string` | Aho-Corasick、Rolling Hash、回文 | [docs/string](docs/string/README.md) |
-| `tree` | HLD、Virtual Tree、重心分解、全方位木DP | [docs/tree](docs/tree/README.md) |
+| `tree` | 汎用の木・森、LCA、直径・重心、HLD、Virtual Tree、重心分解、全方位木DP | [docs/tree](docs/tree/README.md) |
 | `utility` | 乱数生成器、時間計測 | [docs/utility](docs/utility/README.md) |
 
 ライブラリはリポジトリルートからのパスでincludeします。
@@ -27,6 +29,8 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 ```
 
 ## Requirements
+
+汎用グラフ・木ライブラリの使い方は [Graph](docs/graph/Graph.md)、[GraphAlgorithms](docs/graph/GraphAlgorithms.md)、[Tree](docs/tree/Tree.md) を参照してください。これらはACL不要です。実行例は [examples/graph_and_tree.cpp](examples/graph_and_tree.cpp) にあります。
 
 - C++17
 - AtCoder Library
@@ -108,3 +112,7 @@ g++ -std=c++17 -O2 -Wall -Wextra /tmp/combined.cpp -o /tmp/combined
 ```
 
 `template.cpp` は提出用テンプレート、`tests/` は決定的テストとランダムテストです。
+
+性能比較の入力・実行手順・測定結果は [docs/performance.md](docs/performance.md) を参照してください。`tools/benchmark_performance.cpp` で同じ入力を再測定できます。
+Wavelet Matrix・Mo・素因数分解の追加高速化は [docs/wavelet-performance.md](docs/wavelet-performance.md) にまとめています。再測定には `tools/benchmark_wavelet.cpp` を使います。
+SMAWK・Li Chao Tree・セグメント木・二部マッチングの追加高速化は [docs/more-performance.md](docs/more-performance.md) にまとめています。再測定には `tools/benchmark_more.cpp` を使います。

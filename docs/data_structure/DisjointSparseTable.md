@@ -1,8 +1,12 @@
 # DisjointSparseTable
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [DisjointSparseTable.hpp](../../libraries/data_structure/DisjointSparseTable.hpp)
+
 `libraries/data_structure/DisjointSparseTable.hpp` は静的配列に対する一般の結合的演算の区間積を $O(1)$ で返します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/DisjointSparseTable.hpp"
@@ -14,11 +18,11 @@
 DisjointSparseTable<S, op> table(values);
 ```
 
-**制約**
+### 制約
 
 - `S op(S a, S b)` は結合的
 
-**計算量**
+### 計算量
 
 - 構築: $O(N \log N)$
 
@@ -30,11 +34,11 @@ S table.prod(int l, int r) const;
 
 半開区間 `[l,r)` の積を返します。
 
-**制約**
+### 制約
 
 - $0 \leq l < r \leq N$
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -42,3 +46,17 @@ S table.prod(int l, int r) const;
 
 - `SparseTable` と異なり、演算が冪等である必要はありません。
 - 空区間は扱いません。
+
+## 使用例
+
+```cpp
+#include "libraries/data_structure/DisjointSparseTable.hpp"
+using namespace std;
+
+long long add(long long a, long long b) { return a + b; }
+
+int main() {
+    DisjointSparseTable<long long, add> table(vector<long long>{1, 2, 3, 4});
+    assert(table.prod(1, 4) == 9);
+}
+```

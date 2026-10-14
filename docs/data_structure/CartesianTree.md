@@ -1,8 +1,12 @@
 # CartesianTree
 
-`libraries/data_structure/CartesianTree.hpp` は配列の添字順を中間順巡回として保つヒープ順序付き二分木を `O(N)` で構築します。既定では最小Cartesian Treeです。
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
 
-## Include
+実装: [CartesianTree.hpp](../../libraries/data_structure/CartesianTree.hpp)
+
+`libraries/data_structure/CartesianTree.hpp` は配列の添字順を中間順巡回として保つヒープ順序付き二分木を $O(N)$ で構築します。既定では最小Cartesian Treeです。
+
+## include
 
 ```cpp
 #include "libraries/data_structure/CartesianTree.hpp"
@@ -18,7 +22,7 @@ struct CartesianTree;
 - `T`: 配列要素型
 - `Compare`: 親に置く値を判定する比較。`less<T>` なら最小、`greater<T>` なら最大Cartesian Tree
 
-**制約**
+### 制約
 
 - `T` は `Compare` で比較可能
 
@@ -28,9 +32,9 @@ struct CartesianTree;
 CartesianTree<T, Compare> tree(values, compare);
 ```
 
-`compare` は省略できます。構築時間・メモリは `O(N)` です。
+`compare` は省略できます。構築時間・メモリは $O(N)$ です。
 
-**計算量**
+### 計算量
 
 - $O(N)$
 

@@ -1,10 +1,14 @@
 # RerootingDP
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [RerootingDP.hpp](../../libraries/tree/RerootingDP.hpp)
+
 `libraries/tree/RerootingDP.hpp` は、すべての頂点を根にした木DPをまとめて計算するための全方位木DPです。
 
 子方向・親方向から来る寄与の型 `E`、頂点で確定したDP値の型 `V`、それらを結合・変換する関数をテンプレート引数として渡します。頂点ごとの初期値を持たせることもできます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/tree/RerootingDP.hpp"
@@ -36,7 +40,7 @@ V put_vertex(E value, int vertex_id);
 
 `edge_id` は `add_edge` で渡した向きごとのIDです。辺重みなどを使う場合は、外部配列を `edge_id` で参照します。
 
-**制約**
+### 制約
 
 - `merge` は結合的
 - `e()` は `merge` の単位元
@@ -54,12 +58,12 @@ RerootingDP<E, V, merge, e, put_edge, put_vertex> dp(int n, vector<E> initial_va
 
 `initial_values` を省略した場合、各頂点の初期値は `e()` です。頂点重みや「自分自身を候補に含める」情報をDPへ直接入れたい場合に `initial_values` を指定します。
 
-**制約**
+### 制約
 
 - $1 \leq n$
 - `initial_values` を指定する場合、`initial_values.size() == n`
 
-**計算量**
+### 計算量
 
 - 初期化: $O(n)$
 - メモリ: $O(n)$
@@ -77,13 +81,13 @@ void dp.add_edge(int u, int v, int idx, int xdi);
 
 無向辺で同じ重みを使う場合は、同じIDを両方に渡せます。向きごとに違う値を使う場合は、別々のIDを渡します。
 
-**制約**
+### 制約
 
 - $0 \leq u,v < n$
 - 最終的に追加する辺数は `n-1`
 - 追加する辺は連結な無向木をなす
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -97,12 +101,12 @@ vector<V> subdp = dp.build(int root = 0);
 
 `reroot()` を呼ぶ前に必ず一度 `build()` を呼びます。
 
-**制約**
+### 制約
 
 - $0 \leq root < n$
 - `add_edge` が `n-1` 回呼ばれている
 
-**計算量**
+### 計算量
 
 - $O(n)$
 
@@ -114,11 +118,11 @@ vector<V> answer = dp.reroot();
 
 全方位DPを行い、`vector<V>` を返します。`answer[v]` が頂点 `v` を根としたときの答えです。
 
-**制約**
+### 制約
 
 - 先に `build(root)` を呼んでいる
 
-**計算量**
+### 計算量
 
 - $O(n)$
 

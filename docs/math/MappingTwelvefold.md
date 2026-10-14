@@ -1,10 +1,14 @@
 # MappingTwelvefold
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [MappingTwelvefold.hpp](../../libraries/math/MappingTwelvefold.hpp)
+
 `libraries/math/MappingTwelvefold.hpp` は、写像12相の基本的な個数をまとめて計算します。
 
 「玉」と「箱」が区別できるか、空箱を許すか、1箱に高々1個か、などの典型式をAPI名で呼べるようにしたものです。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/MappingTwelvefold.hpp"
@@ -20,11 +24,11 @@ MappingTwelvefold<T> mt(max_n);
 
 `T` は `+`、`*`、`+=`、`0`、`1` を扱える型です。modint にも使えます。
 
-**制約**
+### 制約
 
 - $0 \leq max_n$
 
-**計算量**
+### 計算量
 
 - $O(max\_n^3)$
 
@@ -47,13 +51,13 @@ MappingTwelvefold<T> mt(max_n);
 | `identical_to_identical_injective(n,k)` | 区別なし | 区別なし | 高々1個 |
 | `identical_to_identical_surjective(n,k)` | 区別なし | 区別なし | 空箱なし |
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - $0 \leq k$
 - 必要な前計算範囲が `max_n` に収まる
 
-**計算量**
+### 計算量
 
 - ほとんどの関数は $O(1)$
 - 一部の `any` は $O(\min(n,k))$

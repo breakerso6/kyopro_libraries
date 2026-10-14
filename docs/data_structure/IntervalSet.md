@@ -1,8 +1,12 @@
 # IntervalSet
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [IntervalSet.hpp](../../libraries/data_structure/IntervalSet.hpp)
+
 `libraries/data_structure/IntervalSet.hpp` は整数上の半開区間集合を管理します。重なる区間は自動でマージされます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/IntervalSet.hpp"
@@ -23,13 +27,13 @@ void set.erase(T l, T r);
 
 半開区間 `[l,r)` を追加・削除します。
 
-**制約**
+### 制約
 
 - `l <= r`
 
-**計算量**
+### 計算量
 
-- 変更される区間数を $K$ として $O(K \log N)$
+- 操作前の区間数を $N$、変更される区間数を $K$ として $O((K+1)\log(N+2))$
 
 ## contains / covers / mex
 
@@ -43,7 +47,7 @@ T set.mex(T x) const;
 - `covers(l,r)`: `[l,r)` がすべて集合に含まれるか
 - `mex(x)`: `x` 以上で集合に含まれない最小値
 
-**計算量**
+### 計算量
 
 - $O(\log N)$
 
@@ -51,3 +55,19 @@ T set.mex(T x) const;
 
 - 区間はすべて半開区間 `[l,r)` です。
 - 空区間の `insert/erase` は集合を変えません。
+
+## 使用例
+
+```cpp
+#include "libraries/data_structure/IntervalSet.hpp"
+using namespace std;
+
+int main() {
+    IntervalSet<int> intervals;
+    intervals.insert(2, 5);
+    intervals.insert(5, 7);
+    assert(intervals.covers(2, 7));
+    intervals.erase(4, 6);
+    assert(intervals.mex(2) == 4);
+}
+```

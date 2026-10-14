@@ -1,8 +1,12 @@
 # Factorization
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [Factorization.hpp](../../libraries/math/Factorization.hpp)
+
 `libraries/math/Factorization.hpp` は符号なし64-bit整数に対する素数判定、素因数分解、約数列挙、約数関数を提供します。素数判定には決定的Miller-Rabin法、分解にはPollard's Rho法を使用します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/Factorization.hpp"
@@ -16,6 +20,8 @@ using factorization::u64;
 
 Python版は `libraries/math/factorization.py` にあります。
 
+C++版のPollard's RhoはBrent法の周期検出と128個の差分ごとのgcd集約を使用します。まとめたgcdが `n` になった場合はその区間を差分ごとに再検査し、必要なら乱数を変えて再試行します。多項式の定数加算は64-bitのオーバーフローを避けた条件分岐で行い、追加の剰余除算を省きます。
+
 ```python
 from factorization import is_prime, factorize, divisors, euler_phi
 ```
@@ -28,9 +34,9 @@ bool is_prime(u64 n);
 
 `n` が素数なら `true` を返します。`0` と `1` は `false` です。
 
-64-bit整数全域で決定的になる基底集合を使用します。計算量の目安は `O(log^3 n)` です。
+64-bit整数全域で決定的になる基底集合を使用します。計算量の目安は $O(\log^3 n)$ です。
 
-**制約**
+### 制約
 
 - $0 \leq n < 2^{64}$
 
@@ -42,7 +48,7 @@ vector<u64> prime_factors(u64 n);
 
 `n` の素因数を重複込みの昇順で返します。例えば `360` は `{2,2,2,3,3,5}` です。`n >= 1` が必要で、`n=1` なら空配列です。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
@@ -54,7 +60,7 @@ vector<pair<u64, int>> factorize(u64 n);
 
 `{素因数, 指数}` を素因数の昇順で返します。`n=1` なら空配列です。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
@@ -64,9 +70,9 @@ vector<pair<u64, int>> factorize(u64 n);
 vector<u64> divisors(u64 n);
 ```
 
-正の約数を昇順ですべて返します。`divisors(1)` は `{1}` です。出力サイズを `d(n)` とすると、素因数分解後の列挙は `O(d(n))`、ソートは `O(d(n) log d(n))` です。
+正の約数を昇順ですべて返します。`divisors(1)` は `{1}` です。出力サイズを `d(n)` とすると、素因数分解後の列挙は $O(d(n))$、ソートは $O(d(n) \log d(n))$ です。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
@@ -79,11 +85,11 @@ u64 divisor_count_from_factorization(vector<pair<u64, int>> factors);
 
 正の約数の個数を返します。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
-**計算量**
+### 計算量
 
 - `divisor_count`: 素因数分解の計算量
 - `divisor_count_from_factorization`: $O(\omega(n))$
@@ -100,13 +106,13 @@ T divisor_sum_from_factorization(vector<pair<u64, int>> factors);
 
 正の約数の総和を返します。`T` を指定すると ACL の `modint` 系など任意の環で計算できます。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 - `T` は `T(u64)`, `+`, `*` を扱える
 - `T = u64` の場合、答えが `u64` に収まる
 
-**計算量**
+### 計算量
 
 - `divisor_sum`: 素因数分解の計算量
 - `divisor_sum_from_factorization`: $O(\Omega(n))$
@@ -120,11 +126,11 @@ u64 euler_phi_from_factorization(u64 n, vector<pair<u64, int>> factors);
 
 Eulerのトーシェント関数 $\varphi(n)$ を返します。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
-**計算量**
+### 計算量
 
 - `euler_phi`: 素因数分解の計算量
 - `euler_phi_from_factorization`: $O(\omega(n))$
@@ -138,11 +144,11 @@ int mobius_from_factorization(vector<pair<u64, int>> factors);
 
 Mobius関数 $\mu(n)$ を返します。平方因子を持つ場合は `0`、相異なる素因数が偶数個なら `1`、奇数個なら `-1` です。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
-**計算量**
+### 計算量
 
 - `mobius`: 素因数分解の計算量
 - `mobius_from_factorization`: $O(\omega(n))$
@@ -156,11 +162,11 @@ bool is_square_free_from_factorization(vector<pair<u64, int>> factors);
 
 `n` が平方因子を持たないなら `true` を返します。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
-**計算量**
+### 計算量
 
 - `is_square_free`: 素因数分解の計算量
 - `is_square_free_from_factorization`: $O(\omega(n))$
@@ -174,11 +180,11 @@ u64 radical_from_factorization(vector<pair<u64, int>> factors);
 
 `n` を割る相異なる素数の積を返します。
 
-**制約**
+### 制約
 
 - $1 \leq n < 2^{64}$
 
-**計算量**
+### 計算量
 
 - `radical`: 素因数分解の計算量
 - `radical_from_factorization`: $O(\omega(n))$
@@ -215,7 +221,7 @@ int main() {
 
 ## 計算量と乱択性
 
-Pollard's Rho法の実行時間は確率的で、素因数分解の期待計算量の目安は `O(n^(1/4))` です。同じ入力でも内部乱数により実行経路が変わりますが、返される分解結果はソートされるため一定です。
+Pollard's Rho法の実行時間は確率的で、素因数分解の期待計算量の目安は $O(n^(1/4))$ です。同じ入力でも内部乱数により実行経路が変わりますが、返される分解結果はソートされるため一定です。
 
 ## 注意
 

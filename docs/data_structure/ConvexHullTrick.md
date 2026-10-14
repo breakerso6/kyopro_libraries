@@ -1,10 +1,14 @@
 # ConvexHullTrick
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [ConvexHullTrick.hpp](../../libraries/data_structure/ConvexHullTrick.hpp)
+
 `libraries/data_structure/ConvexHullTrick.hpp` は直線 `y = ax + b` の集合に対して、指定した `x` での最小値または最大値を求めます。
 
 直線の傾きが単調に追加される場合に使います。任意順に直線を追加したい場合は `LiChaoTree.hpp` を使います。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/ConvexHullTrick.hpp"
@@ -19,7 +23,7 @@ ConvexHullTrick<T> cht(false);  // maximum
 
 省略時は最小値クエリです。
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -31,14 +35,14 @@ void add_line(T a, T b);
 
 直線 `ax+b` を追加します。
 
-**制約**
+### 制約
 
 - 最小値クエリ: 傾き `a` を降順に追加
 - 最大値クエリ: 傾き `a` を昇順に追加
 
 同じ傾きの直線は、より良い切片だけが残ります。
 
-**計算量**
+### 計算量
 
 - ならし $O(1)$
 
@@ -50,12 +54,12 @@ T query(T x) const;
 
 現在の直線集合での最小値または最大値を返します。
 
-**制約**
+### 制約
 
 - 1本以上の直線が追加されている
 - `a*x+b` が `T` の範囲に収まる
 
-**計算量**
+### 計算量
 
 - $O(\log N)$
 

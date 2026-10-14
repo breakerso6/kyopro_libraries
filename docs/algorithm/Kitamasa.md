@@ -1,8 +1,12 @@
 # Kitamasa
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [Kitamasa.hpp](../../libraries/algorithm/Kitamasa.hpp)
+
 `libraries/algorithm/Kitamasa.hpp` は線形漸化式の第 `n` 項を高速に求めます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/algorithm/Kitamasa.hpp"
@@ -23,14 +27,14 @@ a_n = c[0] a_{n-K} + c[1] a_{n-K+1} + ... + c[K-1] a_{n-1}
 
 `initial[i]` は `a_i` です。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - `initial.size() == c.size()`
 - $1 \leq K$
 - `T` は `+`、`*`、`+=`、`0`、`1` を扱える
 
-**計算量**
+### 計算量
 
 - $O(K^2 \log n)$
 
@@ -43,12 +47,14 @@ vector<T> kitamasa_coefficients(long long n, const vector<T>& c);
 
 `a_n = sum coef[i] * a_i` となる係数列 `coef` を返します。
 
-**制約**
+指数を上位ビットから処理し、二乗を $O(K^2)$、$x$ の乗算を $O(K)$ で行います。$n < K$ の場合は対応する単位ベクトルを $O(K)$ で返します。
+
+### 制約
 
 - $0 \leq n$
 - $1 \leq K = c.size()$
 
-**計算量**
+### 計算量
 
 - $O(K^2 \log n)$
 
@@ -69,7 +75,7 @@ int main() {
 
 ## 典型的な使い方
 
-- Fibonacci 型の漸化式を `O(log N)` に近い感覚で扱う
+- Fibonacci 型の漸化式を $O(\log N)$ に近い感覚で扱う
 - DP の遷移が固定幅線形で、`N` だけ極端に大きい問題
 - 行列累乗より定数倍を軽くしたい場合
 

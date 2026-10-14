@@ -1,8 +1,12 @@
 # ZAlgorithm
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [ZAlgorithm.hpp](../../libraries/algorithm/ZAlgorithm.hpp)
+
 `libraries/algorithm/ZAlgorithm.hpp` は列 `s` の各位置について、`s[0...]` と `s[i...]` の最長共通接頭辞長を求めます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/algorithm/ZAlgorithm.hpp"
@@ -22,11 +26,11 @@ vector<int> z_algorithm(const Container& s);
 - `z[0] = s.size()`
 - `z[i] = lcp(s, s.substr(i))`
 
-**制約**
+### 制約
 
 - `s.size()` と `s[i]` が定義されている
 
-**計算量**
+### 計算量
 
 - $O(N)$
 

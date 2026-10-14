@@ -1,17 +1,23 @@
 # Graph
 
+[全ライブラリ一覧](../README.md) · [共通事項](../README.md#共通事項)
+
 基本的なグラフアルゴリズムを、問題でそのまま呼び出しやすい形で置いています。
 
 | library | purpose | 計算量 |
 | --- | --- | --- |
-| [LowLink.hpp](LowLink.md) | 無向多重グラフの橋・関節点 | `O(V+E)` |
-| [EulerianTrail.hpp](EulerianTrail.md) | 有向・無向Euler trailの構築 | `O(V+E)` |
-| [HopcroftKarp.hpp](HopcroftKarp.md) | 二部最大マッチング・最小頂点被覆 | `O(E sqrt(V))` |
-| [Dijkstra.hpp](Dijkstra.md) | 非負重み最短路 | `O(E log V)` |
-| [MST.hpp](MST.md) | Kruskal法による最小全域森 | `O(E log E)` |
-| [BiconnectedComponents.hpp](BiconnectedComponents.md) | 二重辺・二重頂点連結成分、橋木、Block-Cut Tree | `O(V+E)` |
+| [Graph.hpp](Graph.md) | 有向・無向、重み・辺ID、入力・変換の共通グラフ表現 | 格納 $O(V+E)$ |
+| [GraphAlgorithms.hpp](GraphAlgorithms.md) | BFS、0–1 BFS、Dijkstra、SCC、トポロジカル順、連結成分・二部性・閉路 | 各ドキュメント参照 |
+| [LowLink.hpp](LowLink.md) | 無向多重グラフの橋・関節点 | $O(V+E)$ |
+| [EulerianTrail.hpp](EulerianTrail.md) | 有向・無向Euler trailの構築 | $O(V+E)$ |
+| [HopcroftKarp.hpp](HopcroftKarp.md) | 二部最大マッチング・最小頂点被覆 | $O(E \sqrt{V})$ |
+| [Dijkstra.hpp](Dijkstra.md) | 非負重み最短路 | $O(E \log V)$ |
+| [MST.hpp](MST.md) | Kruskal法による最小全域森 | $O(E \log E)$ |
+| [BiconnectedComponents.hpp](BiconnectedComponents.md) | 二重辺・二重頂点連結成分、橋木、Block-Cut Tree | $O(V+E)$ |
 
 ## Include と関数
+
+共通のグラフ型で基本アルゴリズムを使う場合は、[Graph](Graph.md) と [GraphAlgorithms](GraphAlgorithms.md) を使います。実行できる例は [`examples/graph_and_tree.cpp`](../../examples/graph_and_tree.cpp) にあります。根付き木・森の操作は [Tree](../tree/Tree.md) にまとめています。
 
 ```cpp
 #include "libraries/graph/LowLink.hpp"

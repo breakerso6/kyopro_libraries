@@ -1,8 +1,12 @@
 # ImplicitTreap
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [ImplicitTreap.hpp](../../libraries/data_structure/ImplicitTreap.hpp)
+
 `libraries/data_structure/ImplicitTreap.hpp` は列を平衡二分木として管理し、位置指定の挿入・削除・区間反転・区間作用・区間積を行うデータ構造です。要素には安定したノードハンドルを付けられ、ハンドルから現在位置を取得したり、同じハンドルを保ったまま要素を移動したりできます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/ImplicitTreap.hpp"
@@ -31,7 +35,7 @@ struct ImplicitTreap;
 | `composition` | `F composition(F f, F g)` 形式で、`g` の後に `f` を適用する合成関数 |
 | `id_` | 恒等作用を返す `F id_()` |
 
-**制約**
+### 制約
 
 - `op` は結合的
 - `e()` は `op` の単位元
@@ -50,10 +54,10 @@ ImplicitTreap<S, op, e> treap(values);
 
 `values` を渡した場合は、先頭から順に列を構築します。
 
-**計算量**
+### 計算量
 
-- 空構築: `O(1)`
-- `values` から構築: `O(N)`
+- 空構築: $O(1)$
+- `values` から構築: $O(N)$
 
 ## ノードハンドル
 
@@ -80,9 +84,9 @@ bool empty() const;
 
 列の長さ、空判定を返します。
 
-**計算量**
+#### 計算量
 
-- `O(1)`
+- $O(1)$
 
 ### insert / erase
 
@@ -93,14 +97,14 @@ void erase(int position);
 
 `insert` は `position` 番目の直前へ `value` を挿入し、新しい要素のハンドルを返します。戻り値が不要なら従来どおり無視できます。`erase` は `position` 番目の要素を削除します。
 
-**制約**
+#### 制約
 
 - `insert`: $0 \leq position \leq N$
 - `erase`: $0 \leq position < N$
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### handle_at / index_of
 
@@ -111,14 +115,14 @@ int index_of(Handle handle);
 
 `handle_at` は現在 `position` 番目にある要素のハンドルを返します。`index_of` はアクティブな `handle` が現在何番目にあるかを返します。区間反転が遅延中でも論理的な現在位置を返します。
 
-**制約**
+#### 制約
 
 - `handle_at`: $0 \leq position < N$
 - `index_of`: `handle` は現在のTreapに含まれるアクティブなハンドル
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### extract / reinsert
 
@@ -132,15 +136,15 @@ void reinsert(int position, Handle handle, const S& value);
 
 `extract` と `reinsert` を使うと、外部に保存したハンドルを変更せずに要素を別の位置へ移動できます。
 
-**制約**
+#### 制約
 
 - `extract`: $0 \leq position < N$
 - `reinsert`: $0 \leq position \leq N$
 - `reinsert` の `handle` は、このTreapから `extract` され、まだ再挿入されていないハンドル
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### set / get
 
@@ -151,13 +155,13 @@ S get(int position);
 
 `set` は `position` 番目の要素を `value` に置き換えます。`get` は `position` 番目の要素を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq position < N$
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### prod
 
@@ -167,13 +171,13 @@ S prod(int l, int r);
 
 半開区間 `[l,r)` の `op` による積を返します。`l = r` のときは `e()` を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### reverse
 
@@ -183,13 +187,13 @@ void reverse(int l, int r);
 
 半開区間 `[l,r)` の並びを反転します。
 
-**制約**
+#### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### apply
 
@@ -199,13 +203,13 @@ void apply(int l, int r, F f);
 
 半開区間 `[l,r)` の各要素に作用 `f` を遅延適用します。
 
-**制約**
+#### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+#### 計算量
 
-- 期待 `O(log N)`
+- 期待 $O(\log N)$
 
 ### to_vector / to_handles
 
@@ -216,9 +220,9 @@ vector<Handle> to_handles();
 
 現在の値の列、または現在の並び順に対応するハンドルの列を返します。
 
-**計算量**
+#### 計算量
 
-- `O(N)`
+- $O(N)$
 
 ## 使用例
 

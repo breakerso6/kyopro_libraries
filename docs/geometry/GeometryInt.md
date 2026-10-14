@@ -1,8 +1,12 @@
 # GeometryInt
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [GeometryInt.hpp](../../libraries/geometry/GeometryInt.hpp)
+
 `libraries/geometry/GeometryInt.hpp` は整数・有理数座標の正確な2次元幾何を `geometry_int` 名前空間で提供します。整数座標の外積や距離は `__int128_t`、有理数座標では `Rational` を返します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/geometry/GeometryInt.hpp"
@@ -239,11 +243,11 @@ i128 lattice_points_on_boundary(const vector<Point<T>>& polygon);
 - `convex_diameter2`: 凸多角形の直径の2乗
 - `lattice_points_on_boundary`: 境界上の格子点数
 
-**制約**
+### 制約
 
 - `convex_diameter2` は反時計回りの凸多角形を渡す
 
-**計算量**
+### 計算量
 
 - `convex_hull`: $O(N \log N)$
 - その他: $O(N)$

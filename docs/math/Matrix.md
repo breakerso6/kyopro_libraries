@@ -1,8 +1,12 @@
 # Matrix
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [Matrix.hpp](../../libraries/math/Matrix.hpp)
+
 `libraries/math/Matrix.hpp` は小から中規模の行列計算用のユーティリティです。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/Matrix.hpp"
@@ -29,7 +33,7 @@ Int determinant_bareiss(Matrix<Int> a);
 optional<Matrix<Rational<Int>>> inverse_matrix_rational(const Matrix<Int>& a);
 ```
 
-**制約**
+### 制約
 
 - 行列積では `a[0].size() == b.size()`
 - `matrix_pow`、`determinant`、`inverse_matrix` は正方行列
@@ -37,15 +41,15 @@ optional<Matrix<Rational<Int>>> inverse_matrix_rational(const Matrix<Int>& a);
 - `determinant` と `inverse_matrix` は割り算できる型を使う
 - `determinant_bareiss` と `inverse_matrix_rational` は整数型を使う
 
-**計算量**
+### 計算量
 
 `N x N` 行列について:
 
-- `matrix_mul`: `O(N^3)`
-- `matrix_pow`: `O(N^3 log e)`
-- `determinant`: `O(N^3)`
-- `inverse_matrix`: `O(N^3)`
-- `determinant_bareiss`: `O(N^3)`
+- `matrix_mul`: $O(N^3)$
+- `matrix_pow`: $O(N^3 \log e)$
+- `determinant`: $O(N^3)$
+- `inverse_matrix`: $O(N^3)$
+- `determinant_bareiss`: $O(N^3)$
 
 ## 使用例: $F_p$ 上の行列累乗
 

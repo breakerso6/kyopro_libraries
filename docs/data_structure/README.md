@@ -1,5 +1,7 @@
 # Data structures
 
+[全ライブラリ一覧](../README.md) · [共通事項](../README.md#共通事項)
+
 区間クエリ、集合管理、永続化、オフライン処理をまとめています。迷ったら次の基準で選びます。
 
 - 静的RMQ: `SparseTable`
@@ -13,33 +15,33 @@
 
 | library | 主な関数 | 計算量 |
 | --- | --- | --- |
-| [BinaryTrie.hpp](BinaryTrie.md) | multiset、XOR順序統計・全体XOR・mex、可換モノイド値域集約 | `xor_all`: `O(1)`、他 `O(BITS)` |
-| [RollbackDSU.hpp](RollbackDSU.md) | `merge`, `undo`, `snapshot`, `rollback` | `merge`/`undo`: `O(log N)` |
-| [WeightedDSU.hpp](WeightedDSU.md) | `merge(a,b,w)`, `diff`, `same` | 償却 `O(alpha(N))` |
-| [SparseTable.hpp](SparseTable.md) | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
-| [DisjointSparseTable.hpp](DisjointSparseTable.md) | `prod(l,r)` | 構築 `O(N log N)`、取得 `O(1)` |
-| [SWAG.hpp](SWAG.md) | `push`, `pop`, `prod` | 償却 `O(1)` |
-| [LiChaoTree.hpp](LiChaoTree.md) | `add_line(a,b)`, `min(x)` | `O(log X)` |
-| [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 `O(1)` 償却、取得 `O(log N)` |
-| [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 `O(log N)` |
-| [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 `O(1)` |
-| [Compress.hpp](Compress.md) | `index`, `contains`, `compressed` | 構築 `O(N log N)`、変換 `O(log N)` |
-| [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `apply`, `prod`, 安定ハンドル | 期待 `O(log N)` |
-| [ImplicitTreapBeats.hpp](ImplicitTreapBeats.md) | `insert`, `erase`, `reverse`, `range_chmin`, `range_chmax`, 区間集約, 安定ハンドル | 期待ならし `O(log^2 N)` |
-| [SplayTreeSequence.hpp](SplayTreeSequence.md) | `insert`, `erase`, `reverse`, `prod` | ならし `O(log N)` |
-| [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 `O(log N)` |
-| [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 `O(log X)` |
-| [PersistentLazySegmentTree.hpp](Persistence.md#persistentlazysegmenttree) | `build`, `add`, `prod`, `get` | 取得・更新 `O(log N)` |
-| [PersistentDSU.hpp](Persistence.md#persistentdsu) | `build`, `merge`, `same`, `size` | 各操作 `O(log^2 N)` |
-| [PersistentBinaryTrie.hpp](Persistence.md#persistentbinarytrie) | `insert`, `erase`, `kth_xor` | 1操作 `O(BITS)` |
-| [CumulativeSumND.hpp](CumulativeSumND.md) | `add`, `build`, `sum` | 構築 `O(D prod(shape_i+1))`、取得 `O(D 2^D)` |
-| [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | `O(log H log W)` |
-| [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | `O(log H log W)` |
-| [WaveletMatrix.hpp](WaveletMatrix.md) | 順序統計、XOR順序、重み付き値域集約・更新、矩形クエリ | 静的 `O(log sigma)`、更新版 `O(log sigma log N)` |
-| [SegmentTreeBeats.hpp](SegmentTreeBeats.md) | `range_chmin`, `range_chmax`, `range_add`, 区間集約 | 償却 `O(log^2 N)` |
-| [OfflineDynamicConnectivity.hpp](OfflineDynamicConnectivity.md) | 辺追加・削除、`same_query`, `size_query` | 全体 `O((Q log Q) log N)` |
-| [CartesianTree.hpp](CartesianTree.md) | `parent`, `left`, `right`, `root` | 構築 `O(N)` |
-| [SlopeTrick.hpp](SlopeTrick.md) | `add_abs`, `add_x_minus_a`, `shift`, `min_f` | 追加 `O(log N)` |
+| [BinaryTrie.hpp](BinaryTrie.md) | multiset、XOR順序統計・全体XOR・mex、可換モノイド値域集約 | `xor_all`: $O(1)$、他 $O(BITS)$ |
+| [RollbackDSU.hpp](RollbackDSU.md) | `merge`, `undo`, `snapshot`, `rollback` | `merge`/`undo`: $O(\log N)$ |
+| [WeightedDSU.hpp](WeightedDSU.md) | `merge(a,b,w)`, `diff`, `same` | 償却 $O(alpha(N))$ |
+| [SparseTable.hpp](SparseTable.md) | `prod(l,r)` | 構築 $O(N \log N)$、取得 $O(1)$ |
+| [DisjointSparseTable.hpp](DisjointSparseTable.md) | `prod(l,r)` | 構築 $O(N \log N)$、取得 $O(1)$ |
+| [SWAG.hpp](SWAG.md) | `push`, `pop`, `prod` | 償却 $O(1)$ |
+| [LiChaoTree.hpp](LiChaoTree.md) | `add_line(a,b)`, `min(x)` | $O(\log X)$ |
+| [ConvexHullTrick.hpp](ConvexHullTrick.md) | `add_line(a,b)`, `query(x)` | 追加 $O(1)$ 償却、取得 $O(\log N)$ |
+| [IntervalSet.hpp](IntervalSet.md) | `insert`, `erase`, `contains`, `covers`, `mex` | 変更区間数に依存、検索 $O(\log N)$ |
+| [Indexset.hpp](Indexset.md) | `push`, `erase`, `contain`, `random` | 1操作 $O(1)$ |
+| [Compress.hpp](Compress.md) | `index`, `contains`, `compressed` | 構築 $O(N \log N)$、変換 $O(\log N)$ |
+| [ImplicitTreap.hpp](ImplicitTreap.md) | `insert`, `erase`, `reverse`, `apply`, `prod`, 安定ハンドル | 期待 $O(\log N)$ |
+| [ImplicitTreapBeats.hpp](ImplicitTreapBeats.md) | `insert`, `erase`, `reverse`, `range_chmin`, `range_chmax`, 区間集約, 安定ハンドル | 期待ならし $O(\log^2 N)$ |
+| [SplayTreeSequence.hpp](SplayTreeSequence.md) | `insert`, `erase`, `reverse`, `prod` | ならし $O(\log N)$ |
+| [PersistentSegmentTree.hpp](Persistence.md#persistentsegmenttree) | `build`, `set`, `prod`, `get` | 取得・更新 $O(\log N)$ |
+| [DynamicSegmentTree.hpp](DynamicSegmentTree.md) | `set`, `get`, `prod` | 取得・更新 $O(\log X)$ |
+| [PersistentLazySegmentTree.hpp](Persistence.md#persistentlazysegmenttree) | `build`, `add`, `prod`, `get` | 取得・更新 $O(\log N)$ |
+| [PersistentDSU.hpp](Persistence.md#persistentdsu) | `build`, `merge`, `same`, `size` | 各操作 $O(\log^2 N)$ |
+| [PersistentBinaryTrie.hpp](Persistence.md#persistentbinarytrie) | `insert`, `erase`, `kth_xor` | 1操作 $O(BITS)$ |
+| [CumulativeSumND.hpp](CumulativeSumND.md) | `add`, `build`, `sum` | 構築 $O(D prod(shape_i+1))$、取得 $O(D 2^D)$ |
+| [SegmentTree2D.hpp](SegmentTree2D.md) | `set`, `prod` | $O(\log H \log W)$ |
+| [LazySegmentTree2D.hpp](LazySegmentTree2D.md) | `add`, `sum` | $O(\log H \log W)$ |
+| [WaveletMatrix.hpp](WaveletMatrix.md) | 順序統計、XOR順序、重み付き値域集約・更新、矩形クエリ | 静的 $O(\log sigma)$、更新版 $O(\log sigma \log N)$ |
+| [SegmentTreeBeats.hpp](SegmentTreeBeats.md) | `range_chmin`, `range_chmax`, `range_add`, 区間集約 | 償却 $O(\log^2 N)$ |
+| [OfflineDynamicConnectivity.hpp](OfflineDynamicConnectivity.md) | 辺追加・削除、`same_query`, `size_query` | 全体 $O((Q \log Q) \log N)$ |
+| [CartesianTree.hpp](CartesianTree.md) | `parent`, `left`, `right`, `root` | 構築 $O(N)$ |
+| [SlopeTrick.hpp](SlopeTrick.md) | `add_abs`, `add_x_minus_a`, `shift`, `min_f` | 追加 $O(\log N)$ |
 
 ## 注意
 
@@ -121,13 +123,13 @@ rect_max.rectangle_prod(left, right, down, up);
 
 詳細: [SegmentTreeBeats.md](SegmentTreeBeats.md)
 
-`long long` 配列に対し、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。空区間の最小・最大取得は対象外です。各変更は償却 `O(log^2 N)` です。
+`long long` 配列に対し、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。空区間の最小・最大取得は対象外です。各変更は償却 $O(\log^2 N)$ です。
 
 ## Implicit Treap Beats
 
 詳細: [ImplicitTreapBeats.md](ImplicitTreapBeats.md)
 
-`long long` の動的列に対し、挿入・削除・反転を行いながら、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。安定ハンドルから要素の現在位置を取得したり、ハンドルを維持したまま要素を移動したりできます。各変更は期待ならし `O(log^2 N)` です。
+`long long` の動的列に対し、挿入・削除・反転を行いながら、半開区間へ `chmin`、`chmax`、加算を行い、`range_sum`、`range_min`、`range_max` を取得します。安定ハンドルから要素の現在位置を取得したり、ハンドルを維持したまま要素を移動したりできます。各変更は期待ならし $O(\log^2 N)$ です。
 
 ## Offline Dynamic Connectivity
 

@@ -1,8 +1,12 @@
 # SMAWK
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SMAWK.hpp](../../libraries/algorithm/SMAWK.hpp)
+
 `libraries/algorithm/SMAWK.hpp` はTotally Monotoneな行列について、各行の最小要素がある最左列を求めます。行列を保存せず、要素を評価する関数を渡します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/algorithm/SMAWK.hpp"
@@ -22,17 +26,20 @@ vector<int> smawk(int rows, int columns, F value);
 
 `value` の返り値には `<` が定義されている必要があります。同値な最小値が複数ある場合は小さい列番号を返します。
 
-**制約**
+### 制約
 
 - $0 \leq rows$
 - $0 \leq columns$
 - `value(row, col)` は比較可能な値を返す
 - 行列はTotally Monotone
 
-**計算量**
+### 計算量
 
 - 評価回数: $O(rows + columns)$
+- 内部の探索も $O(rows + columns)$。評価1回が $O(F)$ なら総時間は $O((rows + columns)F)$
 - メモリ: $O(rows + columns)$
+
+奇数行の最小列が単調に進む性質を使い、補間時の列位置も一方向に進めます。各行で先頭から `find` し直す処理を省き、内部探索の二乗時間を避けます。
 
 列数が `0` の場合、返り値はすべて `-1` です。
 
@@ -70,7 +77,7 @@ int main() {
 
 ## DPでの典型的な使い方
 
-遷移コスト行列がMonge性を持つDPでは、行を状態、列を遷移元として `value` 内で遷移値を計算できます。評価関数は何度も呼ばれるため、1回の評価が `O(1)` になるよう前計算してください。
+遷移コスト行列がMonge性を持つDPでは、行を状態、列を遷移元として `value` 内で遷移値を計算できます。評価関数は何度も呼ばれるため、1回の評価が $O(1)$ になるよう前計算してください。
 
 ## 注意
 

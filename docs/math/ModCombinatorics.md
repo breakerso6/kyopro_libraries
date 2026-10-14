@@ -1,8 +1,12 @@
 # ModCombinatorics
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [ModCombinatorics.hpp](../../libraries/math/ModCombinatorics.hpp)
+
 `libraries/math/ModCombinatorics.hpp` はmodint上の階乗・逆階乗・逆元を前計算し、順列・二項係数・多項係数などを計算します。AtCoder Library の `atcoder::static_modint`、`atcoder::dynamic_modint` に対応します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/ModCombinatorics.hpp"
@@ -17,12 +21,12 @@ ModCombinatorics<Mint> comb(int n);
 
 `n` を渡した場合、`0..n` まで前計算します。後から大きい `n` が必要になった場合は自動で拡張されます。
 
-**制約**
+### 制約
 
 - `Mint` は `+`, `-`, `*`, `/`, `Mint(int)` を扱える
 - `fact[n]` が割れる必要があるため、通常は法が素数で `n < mod`
 
-**計算量**
+### 計算量
 
 - 構築: $O(n)$
 
@@ -34,11 +38,11 @@ void comb.ensure(int n);
 
 `0..n` まで前計算します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 
-**計算量**
+### 計算量
 
 - 追加で伸びた長さに比例
 
@@ -52,14 +56,14 @@ Mint comb.inverse(int n);
 
 `n!`、`(n!)^{-1}`、`n^{-1}` を返します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - `inverse(n)` は $1 \leq n$
 
-**計算量**
+### 計算量
 
-- 償却 $O(1)$
+- ならし $O(1)$
 
 ## perm / comb / homo
 
@@ -75,9 +79,9 @@ Mint comb.homo(int n, int k);
 
 範囲外の `k` では `0` を返します。
 
-**計算量**
+### 計算量
 
-- 償却 $O(1)$
+- ならし $O(1)$
 
 ## multinomial
 
@@ -95,11 +99,11 @@ $$
 
 を返します。`n` を渡す overload は `sum(counts) != n` のとき `0` を返します。
 
-**制約**
+### 制約
 
 - `counts[i] >= 0`
 
-**計算量**
+### 計算量
 
 - $O(|counts|)$
 
@@ -117,14 +121,14 @@ $$
 
 を返します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - `n + 1` が割れる
 
-**計算量**
+### 計算量
 
-- 償却 $O(1)$
+- ならし $O(1)$
 
 ## derangement
 
@@ -140,11 +144,11 @@ $$
 
 を前計算します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 
-**計算量**
+### 計算量
 
 - 追加で伸びた長さに比例
 

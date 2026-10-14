@@ -1,8 +1,12 @@
 # PalindromicTree
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [PalindromicTree.hpp](../../libraries/string/PalindromicTree.hpp)
+
 `libraries/string/PalindromicTree.hpp` は文字列に現れる異なる回文をノードとして管理するPalindromic Tree、別名Eertreeです。文字を末尾へ追加しながら構築できます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/string/PalindromicTree.hpp"
@@ -15,13 +19,13 @@ PalindromicTree tree;
 PalindromicTree tree(text);
 ```
 
-空文字列から始めるか、`std::string` 全体から構築します。遷移を `std::map<char,int>` で保持するため、構築は `O(N log sigma)`、メモリは `O(N sigma)` ではなく実際に存在する遷移数に対して `O(N)` です。
+空文字列から始めるか、`std::string` 全体から構築します。遷移を `std::map<char,int>` で保持するため、構築は $O(N \log \sigma)$、メモリは $O(N \sigma)$ ではなく実際に存在する遷移数に対して $O(N)$ です。
 
-**制約**
+### 制約
 
 - $0 \leq N$
 
-**計算量**
+### 計算量
 
 - $O(N \log \sigma)$
 
@@ -47,13 +51,13 @@ int node = tree.add(char c);
 
 文字列末尾へ `c` を追加し、新しい文字列の最長回文接尾辞ノードを返します。高々1つの新規ノードが作られます。
 
-**制約**
+### 制約
 
 - `propagate_occurrences()` の呼び出し前である
 
-**計算量**
+### 計算量
 
-- ならし `O(log sigma)`
+- ならし $O(\log \sigma)$
 
 ## クエリ
 
@@ -70,7 +74,7 @@ string palindrome(int node) const;
 void propagate_occurrences();
 ```
 
-長い回文からsuffix linkへ出現数を伝播し、各ノードの全文中での出現回数を確定します。計算量はノード数を `P` として `O(P log P)` です。
+長い回文からsuffix linkへ出現数を伝播し、各ノードの全文中での出現回数を確定します。計算量はノード数を `P` として $O(P \log P)$ です。
 
 伝播は複数回呼んでも結果を重複加算しません。ただし、伝播後に `add` を呼ぶと `logic_error` になります。
 

@@ -1,12 +1,23 @@
 # Rational
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [Rational.hpp](../../libraries/math/Rational.hpp)
+
 `libraries/math/Rational.hpp` は、符号付き整数型を分子・分母に使う既約分数型を提供します。行列や幾何に依存せず単体で利用できます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/Rational.hpp"
 ```
+
+## 共通の制約
+
+- `Int` は対応する符号付き整数型
+- 分母は `0` でない。除算の右辺の分子も `0` でない
+- 符号反転、積、加減算を含む中間値が演算に用いる整数型に収まる
+
 
 ## 型と基本操作
 
@@ -59,10 +70,16 @@ using Fraction = Rational<__int128_t>;
 Fraction value((__int128_t)1 << 100, 3);
 ```
 
-## 計算量と注意
+## 補足
 
-正規化にはユークリッドの互除法を使うため、各四則演算は整数演算を除いて `O(log min(|numerator|, denominator))` です。加算・乗算・除算では可能な範囲で先に約分してから積を取ります。
+正規化にはユークリッドの互除法を使うため、各四則演算は整数演算を除いて $O(\log \min(|numerator|, denominator))$ です。加算・乗算・除算では可能な範囲で先に約分してから積を取ります。
 
 固定長整数を使うため、最終結果が収まっていても加減算や大小比較の途中の積が `Int` の範囲を超える場合があります。値域に応じて `long long` と `__int128_t` を使い分けてください。
 
 整数幾何の `geometry_int::Rational128` は `Rational<__int128_t>` の別名です。整数行列の `inverse_matrix_rational` もこの共通型を返します。
+
+## 計算量
+
+- コンストラクタ、`normalize`、四則演算は最大の整数の絶対値を $M$ として $O(\log(M+1))$
+- 比較、`floor`、`ceil`、`is_integer`、`to_long_double`、`sign` は $O(1)$
+- 整数演算を $O(1)$ として数える

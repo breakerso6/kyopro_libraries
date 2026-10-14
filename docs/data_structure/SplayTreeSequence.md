@@ -1,8 +1,12 @@
 # SplayTreeSequence
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [SplayTreeSequence.hpp](../../libraries/data_structure/SplayTreeSequence.hpp)
+
 `libraries/data_structure/SplayTreeSequence.hpp` は列をSplay Treeとして管理し、位置指定の挿入・削除・区間反転・区間積を行うデータ構造です。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/SplayTreeSequence.hpp"
@@ -21,7 +25,7 @@ struct SplayTreeSequence;
 | `op` | `S op(S, S)` 形式の結合的な演算 |
 | `e` | 単位元を返す `S e()` |
 
-**制約**
+### 制約
 
 - `op` は結合的
 - `e()` は `op` の単位元
@@ -35,10 +39,10 @@ SplayTreeSequence<S, op, e> splay(values);
 
 `values` を渡した場合は、先頭から順に列を構築します。
 
-**計算量**
+### 計算量
 
-- 空構築: `O(1)`
-- `values` から構築: ならし `O(N log N)`
+- 空構築: $O(1)$
+- `values` から構築: ならし $O(N \log N)$
 
 ## 関数
 
@@ -51,9 +55,9 @@ bool empty() const;
 
 列の長さ、空判定を返します。
 
-**計算量**
+#### 計算量
 
-- `O(1)`
+- $O(1)$
 
 ### insert / erase
 
@@ -64,14 +68,14 @@ void erase(int position);
 
 `insert` は `position` 番目の直前へ `value` を挿入します。`erase` は `position` 番目の要素を削除します。
 
-**制約**
+#### 制約
 
 - `insert`: $0 \leq position \leq N$
 - `erase`: $0 \leq position < N$
 
-**計算量**
+#### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ### set / get
 
@@ -82,13 +86,13 @@ S get(int position);
 
 `set` は `position` 番目の要素を `value` に置き換えます。`get` は `position` 番目の要素を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq position < N$
 
-**計算量**
+#### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ### prod
 
@@ -98,13 +102,13 @@ S prod(int l, int r);
 
 半開区間 `[l,r)` の `op` による積を返します。`l = r` のときは `e()` を返します。
 
-**制約**
+#### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+#### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ### reverse
 
@@ -114,13 +118,13 @@ void reverse(int l, int r);
 
 半開区間 `[l,r)` の並びを反転します。
 
-**制約**
+#### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+#### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ### to_vector
 
@@ -130,9 +134,9 @@ vector<S> to_vector();
 
 現在の列を `vector` として返します。
 
-**計算量**
+#### 計算量
 
-- `O(N)`
+- $O(N)$
 
 ## 使用例
 

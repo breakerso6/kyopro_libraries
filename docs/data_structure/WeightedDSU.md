@@ -1,8 +1,12 @@
 # WeightedDSU
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [WeightedDSU.hpp](../../libraries/data_structure/WeightedDSU.hpp)
+
 `libraries/data_structure/WeightedDSU.hpp` は各頂点にポテンシャルを持つUnion-Findです。制約 `potential(b) - potential(a) = w` を追加し、差分を問い合わせます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/WeightedDSU.hpp"
@@ -14,7 +18,7 @@
 WeightedDSU<T> dsu(int n);
 ```
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - `T` は加減算と単位元 `T{}` を扱える
@@ -27,11 +31,11 @@ bool dsu.merge(int a, int b, T w);
 
 制約 `potential(b) - potential(a) = w` を追加します。既存制約と矛盾する場合は `false` を返します。
 
-**制約**
+### 制約
 
 - $0 \leq a,b < n$
 
-**計算量**
+### 計算量
 
 - ならし $O(\alpha(n))$
 
@@ -49,11 +53,11 @@ int dsu.size(int v);
 - `same(a,b)`: 同じ連結成分か
 - `size(v)`: 連結成分サイズ
 
-**制約**
+### 制約
 
 - `diff(a,b)` は `same(a,b)` が `true` のときに使う
 
-**計算量**
+### 計算量
 
 - ならし $O(\alpha(n))$
 

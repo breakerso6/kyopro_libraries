@@ -16,27 +16,38 @@ struct WaveletMatrix {
     std::vector<int> original_code;
     std::vector<std::vector<int>> prefix_one;
     std::vector<int> zero_count;
+    // Original indices grouped by compressed value, stable within a group.
+    std::vector<int> occurrence_index, occurrence_start;
 
     WaveletMatrix() = default;
     explicit WaveletMatrix(const std::vector<T>& a) { build(a); }
 
     void build(const std::vector<T>& a) {
         n = (int)a.size();
-        values = a;
-        std::sort(values.begin(), values.end());
-        values.erase(std::unique(values.begin(), values.end(), [](const T& x, const T& y) {
-            return !(x < y) && !(y < x);
-        }), values.end());
+        occurrence_index.resize(n);
+        std::iota(occurrence_index.begin(), occurrence_index.end(), 0);
+        std::stable_sort(occurrence_index.begin(), occurrence_index.end(),
+                         [&](int i, int j) { return a[i] < a[j]; });
+        std::vector<T> compressed_values;
+        compressed_values.reserve(n);
+        occurrence_start.clear();
+        original_code.resize(n);
+        for (int i = 0; i < n; ++i) {
+            int index = occurrence_index[i];
+            if (compressed_values.empty() || compressed_values.back() < a[index]) {
+                occurrence_start.push_back(i);
+                compressed_values.push_back(a[index]);
+            }
+            original_code[index] = (int)compressed_values.size() - 1;
+        }
+        values = std::move(compressed_values);
+        occurrence_start.push_back(n);
         levels = 0;
         while ((1ULL << levels) < std::max<size_t>(1, values.size())) ++levels;
         levels = std::max(levels, 1);
 
         prefix_one.assign(levels, std::vector<int>(n + 1));
         zero_count.assign(levels, 0);
-        original_code.resize(n);
-        for (int i = 0; i < n; ++i)
-            original_code[i] = (int)(std::lower_bound(values.begin(), values.end(), a[i]) - values.begin());
-
         std::vector<int> cur = original_code, next(n);
         for (int depth = 0; depth < levels; ++depth) {
             int bit = levels - 1 - depth;
@@ -55,14 +66,7 @@ struct WaveletMatrix {
 
     T access(int index) const {
         assert(0 <= index && index < n);
-        int code = 0;
-        for (int depth = 0; depth < levels; ++depth) {
-            int ones = prefix_one[depth][index];
-            int bit = prefix_one[depth][index + 1] - ones;
-            code = (code << 1) | bit;
-            index = bit ? zero_count[depth] + ones : index - ones;
-        }
-        return values[code];
+        return values[original_code[index]];
     }
     T operator[](int index) const { return access(index); }
 
@@ -105,6 +109,12 @@ struct WaveletMatrix {
 
     int range_freq(int l, int r, const T& lower, const T& upper) const {
         assert(!(upper < lower));
+        if constexpr (std::is_integral<T>::value && sizeof(T) <= sizeof(uint64_t)) {
+            // Keep the common wide-range path small enough to inline.
+            // Promote before subtraction to handle the full 64-bit domain.
+            if ((__int128)upper - (__int128)lower <= 32)
+                return range_freq_small(l, r, lower, upper);
+        }
         return count_less(l, r, upper) - count_less(l, r, lower);
     }
 
@@ -116,9 +126,19 @@ struct WaveletMatrix {
 
     int count(int l, int r, const T& value) const {
         assert(0 <= l && l <= r && r <= n);
+        if (l == r) return 0;
         auto it = std::lower_bound(values.begin(), values.end(), value);
         if (it == values.end() || value < *it || *it < value) return 0;
         int code = (int)(it - values.begin());
+        int begin = occurrence_start[code], end = occurrence_start[code + 1];
+        if (l == 0 && r == n) return end - begin;
+        // Sparse values are cheaper to search in their contiguous occurrence
+        // list. For frequent values retain the O(log(sigma)) matrix traversal.
+        if ((uint64_t)(end - begin) <= (1ULL << levels)) {
+            auto first = occurrence_index.begin() + begin, last = occurrence_index.begin() + end;
+            auto left = std::lower_bound(first, last, l);
+            return (int)(std::lower_bound(left, last, r) - left);
+        }
         for (int depth = 0; depth < levels; ++depth) {
             int ones_l = prefix_one[depth][l], ones_r = prefix_one[depth][r];
             int bit = levels - 1 - depth;
@@ -140,16 +160,15 @@ struct WaveletMatrix {
     int rank(const T& value, int l, int r) const { return count(l, r, value); }
 
     // Returns the index of the kth (0-indexed) occurrence, or nullopt.
-    // This convenience operation is O(log(sigma) log(n)).
+    // O(log(sigma)) to find the value, then O(1) to select its occurrence.
     std::optional<int> select(const T& value, int k) const {
-        if (k < 0 || count(0, n, value) <= k) return std::nullopt;
-        int low = 0, high = n;
-        while (low < high) {
-            int mid = low + (high - low) / 2;
-            if (rank(value, mid + 1) >= k + 1) high = mid;
-            else low = mid + 1;
-        }
-        return low;
+        if (k < 0) return std::nullopt;
+        auto it = std::lower_bound(values.begin(), values.end(), value);
+        if (it == values.end() || value < *it) return std::nullopt;
+        int code = (int)(it - values.begin());
+        int begin = occurrence_start[code], end = occurrence_start[code + 1];
+        if (k >= end - begin) return std::nullopt;
+        return occurrence_index[begin + k];
     }
 
     std::optional<T> prev_value(int l, int r, const T& upper) const {
@@ -182,37 +201,57 @@ struct WaveletMatrix {
     // arbitrary static/dynamic range-query data structures to every depth.
     std::vector<RangeSegment> range_segments(
         int l, int r, const T& lower, const T& upper) const {
+        std::vector<RangeSegment> result;
+        for_each_range_segment(l, r, lower, upper, [&](RangeSegment segment) { result.push_back(segment); });
+        return result;
+    }
+
+    // Allocation-free variant for attaching aggregators to each segment.
+    template<class Callback>
+    void for_each_range_segment(int l, int r, const T& lower, const T& upper, Callback callback) const {
         assert(0 <= l && l <= r && r <= n && !(upper < lower));
         int ql = (int)(std::lower_bound(values.begin(), values.end(), lower) - values.begin());
         int qr = (int)(std::lower_bound(values.begin(), values.end(), upper) - values.begin());
-        return range_segments_code(l, r, ql, qr);
+        visit_range_segments_code(l, r, ql, qr, callback);
     }
 
     std::vector<RangeSegment> range_segments_less(int l, int r, const T& upper) const {
+        std::vector<RangeSegment> result;
+        for_each_range_segment_less(l, r, upper, [&](RangeSegment segment) { result.push_back(segment); });
+        return result;
+    }
+
+    template<class Callback>
+    void for_each_range_segment_less(int l, int r, const T& upper, Callback callback) const {
         assert(0 <= l && l <= r && r <= n);
         int qr = (int)(std::lower_bound(values.begin(), values.end(), upper) - values.begin());
-        return range_segments_code(l, r, 0, qr);
+        visit_range_segments_code(l, r, 0, qr, callback);
     }
 
     // payload[d] is payload reordered in exactly the sequence used at depth d.
     template<class S>
     std::vector<std::vector<S>> reorder_each_level(const std::vector<S>& payload) const {
-        assert((int)payload.size() == n);
-        std::vector<std::vector<S>> result(levels + 1, std::vector<S>(n));
-        result[0] = payload;
-        std::vector<int> cur_code = original_code, next_code(n);
-        for (int depth = 0; depth < levels; ++depth) {
-            int bit = levels - 1 - depth;
-            int zi = 0, oi = zero_count[depth];
-            for (int i = 0; i < n; ++i) {
-                int& to = ((cur_code[i] >> bit) & 1) ? oi : zi;
-                next_code[to] = cur_code[i];
-                result[depth + 1][to] = result[depth][i];
-                ++to;
-            }
-            cur_code.swap(next_code);
-        }
+        std::vector<std::vector<S>> result(levels + 1);
+        for_each_reordered_level(payload, [&](int depth, const std::vector<S>& current) { result[depth] = current; });
         return result;
+    }
+
+    // The callback sees a borrowed sequence valid only during that call.
+    // Only two O(n) payload buffers are retained, rather than every level.
+    template<class S, class Callback>
+    void for_each_reordered_level(const std::vector<S>& payload, Callback callback) const {
+        assert((int)payload.size() == n);
+        std::vector<S> current = payload, next(n);
+        callback(0, current);
+        for (int depth = 0; depth < levels; ++depth) {
+            int zi = 0, oi = zero_count[depth];
+            const auto& rank = prefix_one[depth];
+            for (int i = 0; i < n; ++i) {
+                next[rank[i + 1] != rank[i] ? oi++ : zi++] = current[i];
+            }
+            current.swap(next);
+            callback(depth + 1, current);
+        }
     }
 
     std::array<std::pair<int, int>, 2> children(int depth, int l, int r) const {
@@ -223,6 +262,27 @@ struct WaveletMatrix {
     }
 
 private:
+    int range_freq_small(int l, int r, const T& lower, const T& upper) const {
+        assert(0 <= l && l <= r && r <= n && !(upper < lower));
+        int ql = (int)(std::lower_bound(values.begin(), values.end(), lower) - values.begin());
+        int qr = (int)(std::lower_bound(values.begin(), values.end(), upper) - values.begin());
+        if (l == r || ql == qr) return 0;
+        if (l == 0 && r == n) return occurrence_start[qr] - occurrence_start[ql];
+        // More than 32 distinct values cannot take the short scan path.
+        // Avoid fetching their occurrence offsets for ordinary wide queries.
+        if (qr - ql > 32) return count_code_less(l, r, qr) - count_code_less(l, r, ql);
+        int begin = occurrence_start[ql], end = occurrence_start[qr];
+        // A narrow value range with at most 32 total occurrences fits in a
+        // few cache lines; scan it instead of walking two matrix paths.
+        if (end - begin <= 32) {
+            int answer = 0;
+            for (int i = begin; i < end; ++i)
+                answer += l <= occurrence_index[i] && occurrence_index[i] < r;
+            return answer;
+        }
+        return count_code_less(l, r, qr) - count_code_less(l, r, ql);
+    }
+
     int count_code_less(int l, int r, int code) const {
         if (code <= 0) return 0;
         if (code >= (int)values.size()) return r - l;
@@ -242,15 +302,15 @@ private:
         return answer;
     }
 
-    std::vector<RangeSegment> range_segments_code(int l, int r, int ql, int qr) const {
-        std::vector<RangeSegment> result;
-        if (l == r || ql >= qr) return result;
+    template<class Callback>
+    void visit_range_segments_code(int l, int r, int ql, int qr, Callback callback) const {
+        if (l == r || ql >= qr) return;
         uint64_t universe = 1ULL << levels;
         auto dfs = [&](auto&& self, int depth, int left, int right,
                        uint64_t value_l, uint64_t value_r) -> void {
             if (left == right || value_r <= (uint64_t)ql || (uint64_t)qr <= value_l) return;
             if ((uint64_t)ql <= value_l && value_r <= (uint64_t)qr) {
-                result.push_back({depth, left, right});
+                callback(RangeSegment{depth, left, right});
                 return;
             }
             if (depth == levels) return;
@@ -260,7 +320,6 @@ private:
             self(self, depth + 1, child[1].first, child[1].second, mid, value_r);
         };
         dfs(dfs, 0, l, r, 0, universe);
-        return result;
     }
 };
 
@@ -275,6 +334,7 @@ struct XorWaveletMatrix {
     int n = 0;
     std::vector<std::vector<int>> prefix_one;
     std::vector<int> zero_count;
+    std::vector<UInt> original_value;
 
     XorWaveletMatrix() = default;
     explicit XorWaveletMatrix(const std::vector<UInt>& a) { build(a); }
@@ -282,6 +342,7 @@ struct XorWaveletMatrix {
     void build(const std::vector<UInt>& a) {
         n = (int)a.size();
         for (UInt value : a) assert(fits(value));
+        original_value = a;
         prefix_one.assign(LOG, std::vector<int>(n + 1));
         zero_count.assign(LOG, 0);
         std::vector<UInt> cur = a, next(n);
@@ -301,14 +362,7 @@ struct XorWaveletMatrix {
 
     UInt access(int index) const {
         assert(0 <= index && index < n);
-        UInt value = 0;
-        for (int depth = 0; depth < LOG; ++depth) {
-            int ones = prefix_one[depth][index];
-            int bit = prefix_one[depth][index + 1] - ones;
-            value |= UInt(bit) << (LOG - 1 - depth);
-            index = bit ? zero_count[depth] + ones : index - ones;
-        }
-        return value;
+        return original_value[index];
     }
 
     UInt kth_smallest(int l, int r, int k, UInt xor_mask = 0) const {
@@ -466,27 +520,29 @@ struct WaveletMatrixGroup {
     void build(const std::vector<Key>& keys, const std::vector<S>& weights) {
         assert(keys.size() == weights.size());
         matrix.build(keys);
-        auto reordered = matrix.reorder_each_level(weights);
-        prefix.assign(matrix.levels + 1, std::vector<S>(matrix.n + 1, e()));
-        for (int depth = 0; depth <= matrix.levels; ++depth)
-            for (int i = 0; i < matrix.n; ++i)
-                prefix[depth][i + 1] = op(prefix[depth][i], reordered[depth][i]);
+        build_payload(weights);
+    }
+
+    void build(const WaveletMatrix<Key>& layout, const std::vector<S>& weights) {
+        assert(layout.size() == (int)weights.size());
+        matrix = layout;
+        build_payload(weights);
     }
 
     int size() const { return matrix.size(); }
 
     S prod(int l, int r, const Key& lower, const Key& upper) const {
-        S answer = e();
-        for (auto segment : matrix.range_segments(l, r, lower, upper))
-            answer = op(answer, node_prod(segment.depth, segment.left, segment.right));
-        return answer;
+        assert(0 <= l && l <= r && r <= size() && !(upper < lower));
+        int ql = (int)(std::lower_bound(matrix.values.begin(), matrix.values.end(), lower) - matrix.values.begin());
+        int qr = (int)(std::lower_bound(matrix.values.begin(), matrix.values.end(), upper) - matrix.values.begin());
+        if (l == r || ql == qr) return e();
+        return op(inverse(prod_code_less(l, r, ql)), prod_code_less(l, r, qr));
     }
 
     S prod_less(int l, int r, const Key& upper) const {
-        S answer = e();
-        for (auto segment : matrix.range_segments_less(l, r, upper))
-            answer = op(answer, node_prod(segment.depth, segment.left, segment.right));
-        return answer;
+        assert(0 <= l && l <= r && r <= size());
+        int code = (int)(std::lower_bound(matrix.values.begin(), matrix.values.end(), upper) - matrix.values.begin());
+        return prod_code_less(l, r, code);
     }
 
     S all_prod(int l, int r) const {
@@ -524,6 +580,30 @@ struct WaveletMatrixGroup {
     }
 
 private:
+    S prod_code_less(int l, int r, int code) const {
+        if (code <= 0 || l == r) return e();
+        if (code >= matrix.alphabet_size()) return node_prod(0, l, r);
+        S answer = e();
+        for (int depth = 0; depth < matrix.levels && l < r; ++depth) {
+            auto child = matrix.children(depth, l, r);
+            if ((code >> (matrix.levels - 1 - depth)) & 1) {
+                answer = op(answer, node_prod(depth + 1, child[0].first, child[0].second));
+                l = child[1].first; r = child[1].second;
+            } else {
+                l = child[0].first; r = child[0].second;
+            }
+        }
+        return answer;
+    }
+
+    void build_payload(const std::vector<S>& weights) {
+        prefix.assign(matrix.levels + 1, std::vector<S>(matrix.n + 1, e()));
+        matrix.for_each_reordered_level(weights, [&](int depth, const std::vector<S>& current) {
+            for (int i = 0; i < matrix.n; ++i)
+                prefix[depth][i + 1] = op(prefix[depth][i], current[i]);
+        });
+    }
+
     S node_prod(int depth, int l, int r) const {
         return op(inverse(prefix[depth][l]), prefix[depth][r]);
     }
@@ -551,24 +631,13 @@ struct WaveletMatrixMonoid {
     void build(const std::vector<Key>& keys, const std::vector<S>& initial_weights) {
         assert(keys.size() == initial_weights.size());
         matrix.build(keys);
-        weights = initial_weights;
-        auto reordered = matrix.reorder_each_level(initial_weights);
-        segment_tree.resize(matrix.levels + 1);
-        for (int depth = 0; depth <= matrix.levels; ++depth)
-            segment_tree[depth].build(reordered[depth]);
+        build_payload(initial_weights);
+    }
 
-        position.assign(matrix.levels + 1, std::vector<int>(matrix.n));
-        for (int original = 0; original < matrix.n; ++original) {
-            int p = original;
-            position[0][original] = p;
-            int code = matrix.original_code[original];
-            for (int depth = 0; depth < matrix.levels; ++depth) {
-                int ones = matrix.prefix_one[depth][p];
-                int bit = matrix.levels - 1 - depth;
-                p = ((code >> bit) & 1) ? matrix.zero_count[depth] + ones : p - ones;
-                position[depth + 1][original] = p;
-            }
-        }
+    void build(const WaveletMatrix<Key>& layout, const std::vector<S>& initial_weights) {
+        assert(layout.size() == (int)initial_weights.size());
+        matrix = layout;
+        build_payload(initial_weights);
     }
 
     int size() const { return matrix.size(); }
@@ -587,15 +656,17 @@ struct WaveletMatrixMonoid {
 
     S prod(int l, int r, const Key& lower, const Key& upper) const {
         S answer = e();
-        for (auto segment : matrix.range_segments(l, r, lower, upper))
+        matrix.for_each_range_segment(l, r, lower, upper, [&](auto segment) {
             answer = op(answer, node_prod(segment.depth, segment.left, segment.right));
+        });
         return answer;
     }
 
     S prod_less(int l, int r, const Key& upper) const {
         S answer = e();
-        for (auto segment : matrix.range_segments_less(l, r, upper))
+        matrix.for_each_range_segment_less(l, r, upper, [&](auto segment) {
             answer = op(answer, node_prod(segment.depth, segment.left, segment.right));
+        });
         return answer;
     }
 
@@ -631,6 +702,23 @@ struct WaveletMatrixMonoid {
     }
 
 private:
+    void build_payload(const std::vector<S>& initial_weights) {
+        weights = initial_weights;
+        segment_tree.resize(matrix.levels + 1);
+        position.assign(matrix.levels + 1, std::vector<int>(matrix.n));
+        std::vector<int> indices(matrix.n);
+        std::iota(indices.begin(), indices.end(), 0);
+        std::vector<S> ordered_weights(matrix.n);
+        matrix.for_each_reordered_level(indices, [&](int depth, const std::vector<int>& current) {
+            for (int i = 0; i < matrix.n; ++i) {
+                int original = current[i];
+                position[depth][original] = i;
+                ordered_weights[i] = initial_weights[original];
+            }
+            segment_tree[depth].build(ordered_weights);
+        });
+    }
+
     S node_prod(int depth, int l, int r) const {
         return segment_tree[depth].prod(l, r);
     }
@@ -728,7 +816,7 @@ struct WaveletMatrix2DGroup {
         std::vector<S> sorted_weight(weights.size());
         for (int i = 0; i < points.size(); ++i)
             sorted_weight[i] = weights[points.sorted_index[i]];
-        aggregate.build(points.sorted_y, sorted_weight);
+        aggregate.build(points.matrix, sorted_weight);
     }
 
     int size() const { return points.size(); }
@@ -765,7 +853,7 @@ struct WaveletMatrix2DMonoid {
             sorted_weight[i] = weights[original];
             sorted_position[original] = i;
         }
-        aggregate.build(points.sorted_y, sorted_weight);
+        aggregate.build(points.matrix, sorted_weight);
     }
 
     int size() const { return points.size(); }

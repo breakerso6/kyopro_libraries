@@ -20,6 +20,20 @@ struct RangeAddRangeSum2D {
                 for (int j = y; j > 0; j -= j & -j) result += bit[i][j];
             return result;
         }
+        // Convert raw 1-indexed cell values into a Fenwick tree in O(n*m).
+        // This is a one-time build operation, not an update.
+        void build_from_cells() {
+            for (int i = 1; i <= n; ++i) {
+                int parent = i + (i & -i);
+                if (parent <= n)
+                    for (int j = 1; j <= m; ++j) bit[parent][j] += bit[i][j];
+            }
+            for (int i = 1; i <= n; ++i)
+                for (int j = 1; j <= m; ++j) {
+                    int parent = j + (j & -j);
+                    if (parent <= m) bit[i][parent] += bit[i][j];
+                }
+        }
     };
     Fenwick2D b00, b10, b01, b11;
 
@@ -32,8 +46,20 @@ struct RangeAddRangeSum2D {
         : RangeAddRangeSum2D((int)a.size(), a.empty() ? 0 : (int)a[0].size()) {
         for (int i = 0; i < height; ++i) {
             assert((int)a[i].size() == width);
-            for (int j = 0; j < width; ++j) add(i, i + 1, j, j + 1, a[i][j]);
+            for (int j = 0; j < width; ++j) {
+                // Rectangle updates operate on the 2D difference array.
+                T value = a[i][j];
+                if (i) value = value - a[i - 1][j];
+                if (j) value = value - a[i][j - 1];
+                if (i && j) value += a[i - 1][j - 1];
+                b00.bit[i + 1][j + 1] = value;
+                b10.bit[i + 1][j + 1] = value * i;
+                b01.bit[i + 1][j + 1] = value * j;
+                b11.bit[i + 1][j + 1] = value * i * j;
+            }
         }
+        b00.build_from_cells(); b10.build_from_cells();
+        b01.build_from_cells(); b11.build_from_cells();
     }
     void add(int row_l, int row_r, int column_l, int column_r, T value) {
         assert(0 <= row_l && row_l <= row_r && row_r <= height);

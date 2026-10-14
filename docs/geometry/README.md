@@ -1,5 +1,7 @@
 # Geometry
 
+[全ライブラリ一覧](../README.md) · [共通事項](../README.md#共通事項)
+
 整数幾何は誤差を避けるため `__int128_t` と既約分数 `Rational` を使い、実数幾何は `long double` と `EPS` による判定を使います。まず入力が整数・有理数で表せる問題なら [GeometryInt.hpp](GeometryInt.md) を優先します。
 
 ## 整数幾何

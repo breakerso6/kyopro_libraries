@@ -1,8 +1,12 @@
 # LinkCutTree
 
-`libraries/tree/LinkCutTree.hpp` は動的森を管理し、辺の追加・削除、連結判定、根の変更、パス積をならし `O(log N)` で行うデータ構造です。
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
 
-## Include
+実装: [LinkCutTree.hpp](../../libraries/tree/LinkCutTree.hpp)
+
+`libraries/tree/LinkCutTree.hpp` は動的森を管理し、辺の追加・削除、連結判定、根の変更、パス積をならし $O(\log N)$ で行うデータ構造です。
+
+## include
 
 ```cpp
 #include "libraries/tree/LinkCutTree.hpp"
@@ -31,7 +35,7 @@ struct LinkCutTree;
 | `composition` | `F composition(F f, F g)` 形式で、`g` の後に `f` を適用する合成関数 |
 | `id_` | 恒等作用を返す `F id_()` |
 
-**制約**
+### 制約
 
 - `op` は結合的
 - `e()` は `op` の単位元
@@ -51,9 +55,9 @@ LinkCutTree<S, op, e> lct(values);
 
 `n` を渡した場合、各頂点値は `e()` で初期化されます。`values` を渡した場合、`values[i]` が頂点 `i` の値になります。
 
-**計算量**
+### 計算量
 
-- `O(N)`
+- $O(N)$
 
 ## 頂点値
 
@@ -64,13 +68,13 @@ S get(int v);
 
 頂点 `v` の値を更新・取得します。
 
-**制約**
+### 制約
 
 - $0 \leq v < N$
 
-**計算量**
+### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ## 動的森操作
 
@@ -92,15 +96,15 @@ int lca(int u, int v);
 | `root` | `v` が属する木の根を返す |
 | `lca` | 現在の根付き木での LCA を返す。非連結なら `-1` |
 
-**制約**
+### 制約
 
 - $0 \leq u,v < N$
 - `link(u, v)` は `u` と `v` が非連結のときだけ辺を追加します。
 - `cut(u, v)` は辺 `(u,v)` が存在するときだけ削除します。
 
-**計算量**
+### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ## パスクエリ
 
@@ -112,14 +116,14 @@ void apply(int u, int v, F f);
 `u` から `v` へ向かうパス上の頂点値の積を返します。
 `apply` は同じパス上の各頂点に作用 `f` を遅延適用します。
 
-**制約**
+### 制約
 
 - $0 \leq u,v < N$
 - `u` と `v` は連結
 
-**計算量**
+### 計算量
 
-- ならし `O(log N)`
+- ならし $O(\log N)$
 
 ## 使用例
 

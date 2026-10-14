@@ -35,14 +35,40 @@ inline bool is_prime(u64 n) {
 }
 inline u64 pollard_rho(u64 n) {
     if (n % 2 == 0) return 2;
+    if (n % 3 == 0) return 3;
     static std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
     while (true) {
         u64 c = std::uniform_int_distribution<u64>(1, n - 1)(rng);
-        u64 x = std::uniform_int_distribution<u64>(0, n - 1)(rng), y = x, d = 1;
-        auto f = [&](u64 v) { return (u128(multiply_mod(v, v, n)) + c) % n; };
+        u64 y = std::uniform_int_distribution<u64>(0, n - 1)(rng), x = y, saved_y = y, d = 1;
+        auto f = [&](u64 v) {
+            u64 square = multiply_mod(v, v, n);
+            // Add c modulo n without a second division or 64-bit overflow.
+            return square < n - c ? square + c : square - (n - c);
+        };
+        // Brent's cycle detection with batches of 128 differences per gcd.
+        u64 span = 1;
         while (d == 1) {
-            x = f(x); y = f(f(y));
-            d = std::gcd(x > y ? x - y : y - x, n);
+            x = y;
+            for (u64 i = 0; i < span; ++i) y = f(y);
+            for (u64 offset = 0; offset < span && d == 1;) {
+                saved_y = y;
+                u64 product = 1, count = std::min<u64>(128, span - offset);
+                for (u64 i = 0; i < count; ++i) {
+                    y = f(y);
+                    product = multiply_mod(product, x > y ? x - y : y - x, n);
+                }
+                d = std::gcd(product, n);
+                offset += count;
+            }
+            span <<= 1;
+        }
+        if (d == n) {
+            // A batch can contain both factors (or a zero difference).
+            // Replay that batch one difference at a time before restarting.
+            do {
+                saved_y = f(saved_y);
+                d = std::gcd(x > saved_y ? x - saved_y : saved_y - x, n);
+            } while (d == 1);
         }
         if (d != n) return d;
     }

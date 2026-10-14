@@ -30,8 +30,8 @@ Matrix<T> matrix_pow(Matrix<T> a, long long e) {
     Matrix<T> result = matrix_identity<T>((int)a.size());
     while (e) {
         if (e & 1) result = matrix_mul(result, a);
-        a = matrix_mul(a, a);
         e >>= 1;
+        if (e) a = matrix_mul(a, a);
     }
     return result;
 }

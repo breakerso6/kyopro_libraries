@@ -1,8 +1,12 @@
 # Timer
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [Timer.hpp](../../libraries/utility/Timer.hpp)
+
 `libraries/utility/Timer.hpp` は経過時間を測るための軽量なタイマーです。焼きなまし、ビームサーチ、反復深化などで制限時間を見ながら処理する用途に向きます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/utility/Timer.hpp"
@@ -17,11 +21,11 @@ Timer timer(time_limit_seconds);
 
 構築時点を開始時刻として記録します。引数を渡した場合は制限時間も秒単位で設定します。内部時計は `std::chrono::steady_clock` です。
 
-**制約**
+### 制約
 
 - `time_limit_seconds` は秒単位
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -33,7 +37,7 @@ void timer.reset();
 
 開始時刻を現在時刻に更新します。設定済みの制限時間は変えません。
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -46,7 +50,7 @@ double timer.time_limit() const;
 
 制限時間を秒単位で設定・取得します。
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -67,7 +71,7 @@ double timer.elapsed_sec() const;
 - `elapsed_ms`: ミリ秒
 - `elapsed`, `elapsed_sec`: 秒
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -84,11 +88,11 @@ double timer.remaining(double seconds) const;
 
 `remaining()` は設定済み制限時間までの残り秒数、`remaining(seconds)` は `seconds` 秒までの残り秒数を返します。残り秒数は負にはなりません。
 
-**制約**
+### 制約
 
 - `seconds` は秒単位
 
-**計算量**
+### 計算量
 
 - $O(1)$
 
@@ -103,7 +107,7 @@ double timer.progress_clamped() const;
 
 `progress()` は制限時間を超えると `1.0` より大きい値を返します。`progress_clamped()` は最大 `1.0` に丸めます。制限時間が未設定または `0` 以下なら `0.0` を返します。
 
-**計算量**
+### 計算量
 
 - $O(1)$
 

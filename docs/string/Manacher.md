@@ -1,8 +1,12 @@
 # Manacher
 
-`libraries/string/Manacher.hpp` は文字列中の各位置を中心とする最長回文半径を線形時間で計算します。前処理後は任意の部分文字列が回文かを `O(1)` で判定できます。
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
 
-## Include
+実装: [Manacher.hpp](../../libraries/string/Manacher.hpp)
+
+`libraries/string/Manacher.hpp` は文字列中の各位置を中心とする最長回文半径を線形時間で計算します。前処理後は任意の部分文字列が回文かを $O(1)$ で判定できます。
+
+## include
 
 ```cpp
 #include "libraries/string/Manacher.hpp"
@@ -16,12 +20,12 @@ Manacher manacher(text);
 
 `text` は `std::string` です。
 
-**制約**
+### 制約
 
 - $0 \leq N$
 
-- 構築: `O(N)`
-- メモリ: `O(N)`
+- 構築: $O(N)$
+- メモリ: $O(N)$
 
 既存インスタンスは `build(text)` で再構築できます。
 
@@ -44,13 +48,13 @@ bool is_palindrome(int l, int r) const;
 
 半開部分文字列 `text[l,r)` が回文かを返します。空文字列は回文として `true` です。
 
-**制約**
+### 制約
 
 - $0 \leq l \leq r \leq N$
 
-**計算量**
+### 計算量
 
-- `O(1)`
+- $O(1)$
 
 ## 使用例
 

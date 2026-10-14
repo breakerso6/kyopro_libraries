@@ -1,8 +1,12 @@
 # OfflineDynamicConnectivity
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [OfflineDynamicConnectivity.hpp](../../libraries/data_structure/OfflineDynamicConnectivity.hpp)
+
 `libraries/data_structure/OfflineDynamicConnectivity.hpp` は辺の追加・削除を含む無向グラフの連結性をオフラインで処理します。時間軸セグメント木と `RollbackDSU` を使用します。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/data_structure/OfflineDynamicConnectivity.hpp"
@@ -16,7 +20,7 @@ OfflineDynamicConnectivity dc(n);
 
 頂点は `[0,n)` です。構築直後のグラフに辺はありません。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 
@@ -31,7 +35,7 @@ void remove_edge(int u, int v);
 
 存在しない辺を削除すると `invalid_argument` を送出します。
 
-**制約**
+### 制約
 
 - $0 \leq u,v < n$
 - `remove_edge` は未削除の同じ辺が存在する時だけ呼ぶ
@@ -54,7 +58,7 @@ int components_query();
 
 クエリ登録も時刻を1進めます。
 
-**制約**
+### 制約
 
 - `same_query`: $0 \leq u,v < n$
 - `size_query`: $0 \leq v < n$
@@ -67,9 +71,9 @@ vector<long long> answer = dc.run();
 
 登録した全操作を処理し、`answer[query_id]` に結果を格納して返します。`run()` は登録内容を変更しないため、同じ操作列に対して再実行できます。
 
-操作数を `Q` とすると、計算量は `O(Q log Q log N)`、メモリは `O(Q log Q + N)` です。
+操作数を `Q` とすると、計算量は $O(Q \log Q \log N)$、メモリは $O(Q \log Q + N)$ です。
 
-**計算量**
+### 計算量
 
 - $O(Q \log Q \log N)$
 

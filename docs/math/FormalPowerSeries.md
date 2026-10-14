@@ -1,8 +1,12 @@
 # FormalPowerSeries
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [FormalPowerSeries.hpp](../../libraries/math/FormalPowerSeries.hpp)
+
 `libraries/math/FormalPowerSeries.hpp` は modint などの体上で形式的冪級数を扱うライブラリです。ACL の `atcoder::convolution` を使う高速版を標準にし、`UseNTT=false` で素朴畳み込みにもできます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/math/FormalPowerSeries.hpp"
@@ -62,7 +66,7 @@ f % g;
 
 多項式除算では `g` が零多項式でない必要があります。
 
-**計算量**
+### 計算量
 
 - 加減算: $O(n)$
 - 乗算: `UseNTT=true` なら $O(n \log n)$、短い列や `UseNTT=false` では $O(nm)$
@@ -75,9 +79,9 @@ f.diff();
 f.integral();
 ```
 
-`integral()` は $i+1$ の逆元を使います。
+`integral()` は $i+1$ の逆元を使います。各整数 $1,\ldots,|f|$ が `Mint` 上で可逆である必要があります。ACL の modint では階乗の積を使って逆元を一括計算するため、除算は1回で済みます。その他の演算と追加メモリは $O(|f|)$ です。浮動小数点数・有理数・独自の型では、従来通り係数ごとの除算を使います。
 
-**計算量**
+### 計算量
 
 - $O(n)$
 
@@ -89,12 +93,12 @@ FPS inv = f.inv(n);
 
 $f^{-1} \bmod x^n$ を返します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - $f(0) \neq 0$
 
-**計算量**
+### 計算量
 
 - $O(n \log n)$
 
@@ -106,12 +110,12 @@ FPS lg = f.log(n);
 
 $\log f \bmod x^n$ を返します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - $f(0) = 1$
 
-**計算量**
+### 計算量
 
 - $O(n \log n)$
 
@@ -123,12 +127,12 @@ FPS ex = f.exp(n);
 
 $\exp f \bmod x^n$ を返します。
 
-**制約**
+### 制約
 
 - $0 \leq n$
 - $f(0) = 0$
 
-**計算量**
+### 計算量
 
 - $O(n \log n)$
 
@@ -140,13 +144,13 @@ FPS p = f.pow(k, n);
 
 $f^k \bmod x^n$ を返します。
 
-**制約**
+### 制約
 
 - $0 \leq k$
 - $0 \leq n$
 - 非零定数項の累乗に `Mint::pow(long long)` を使える
 
-**計算量**
+### 計算量
 
 - $O(n \log n)$
 

@@ -1,13 +1,17 @@
 # BiconnectedComponents
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [BiconnectedComponents.hpp](../../libraries/graph/BiconnectedComponents.hpp)
+
 `libraries/graph/BiconnectedComponents.hpp` は無向グラフの二重辺連結成分と二重頂点連結成分を構築します。橋木とBlock-Cut Forestも同時に得られます。
 
-**制約**
+## 制約
 
 - 頂点番号は `0`-indexed
 - 自己ループは対象外
 
-## Include
+## include
 
 ```cpp
 #include "libraries/graph/BiconnectedComponents.hpp"
@@ -27,9 +31,9 @@ int edge_id = graph.add_edge(u, v);
 graph.build();
 ```
 
-`add_edge` は0から追加順に辺IDを返します。`build()` の計算量は `O(V+E)`、メモリも `O(V+E)` です。
+`add_edge` は0から追加順に辺IDを返します。`build()` の計算量は $O(V+E)$、メモリも $O(V+E)$ です。
 
-**制約**
+#### 制約
 
 - $0 \leq u,v < n$
 
@@ -57,7 +61,7 @@ int edge_id = graph.add_edge(u, v);
 graph.build();
 ```
 
-`build()` の計算量・メモリは `O(V+E)` です。
+`build()` の計算量・メモリは $O(V+E)$ です。
 
 ### メンバ変数
 

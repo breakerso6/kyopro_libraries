@@ -1,8 +1,12 @@
 # VirtualTree
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [VirtualTree.hpp](../../libraries/tree/VirtualTree.hpp)
+
 `libraries/tree/VirtualTree.hpp` は指定された頂点と、それらを結ぶために必要なLCAだけからなる圧縮木を構築します。多数の頂点を含む元の木上で、クエリごとに小さな木DPを行う用途に向きます。
 
-## Include
+## include
 
 ```cpp
 #include "libraries/tree/HLD.hpp"
@@ -23,12 +27,12 @@ VirtualTree tree = VirtualTree::build(selected_vertices, hld);
 
 異なる指定頂点数を `K` とすると、Virtual Treeの頂点数は高々 `2K-1` です。
 
-**制約**
+### 制約
 
 - `selected_vertices` の各要素は元の木の頂点
 - `hld` は同じ木から構築済み
 
-**計算量**
+### 計算量
 
 - 構築: $O(K \log K)$
 - メモリ: $O(K)$

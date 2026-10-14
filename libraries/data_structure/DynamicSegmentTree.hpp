@@ -17,9 +17,20 @@ struct DynamicSegmentTree {
         assert(low <= position && position < high);
         set(0, low, high, position, value);
     }
-    S get(long long position) const { return prod(position, position + 1); }
+    S get(long long position) const {
+        assert(low <= position && position < high);
+        int v = 0;
+        long long l = low, r = high;
+        while (v != -1 && r - l > 1) {
+            long long m = l + (r - l) / 2;
+            if (position < m) { v = nodes[v].left; r = m; }
+            else { v = nodes[v].right; l = m; }
+        }
+        return node_value(v);
+    }
     S prod(long long left, long long right) const {
         assert(low <= left && left <= right && right <= high);
+        if (left == right) return e();
         return prod(0, low, high, left, right);
     }
 
@@ -45,6 +56,8 @@ private:
         if (v == -1 || qr <= l || r <= ql) return e();
         if (ql <= l && r <= qr) return nodes[v].value;
         long long m = l + (r - l) / 2;
+        if (qr <= m) return prod(nodes[v].left, l, m, ql, qr);
+        if (m <= ql) return prod(nodes[v].right, m, r, ql, qr);
         return op(prod(nodes[v].left, l, m, ql, qr), prod(nodes[v].right, m, r, ql, qr));
     }
 };

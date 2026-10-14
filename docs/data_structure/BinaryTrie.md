@@ -1,5 +1,9 @@
 # BinaryTrie
 
+[分野別一覧](README.md) · [共通事項](../README.md#共通事項)
+
+実装: [BinaryTrie.hpp](../../libraries/data_structure/BinaryTrie.hpp)
+
 `libraries/data_structure/BinaryTrie.hpp` は、固定ビット幅の非負整数をオンラインに管理する Binary Trie です。
 
 | 構造 | 用途 |
@@ -9,6 +13,22 @@
 | `BinaryTrieSum` / `BinaryTrieMax` | 加算・最大値集約の簡易 alias |
 
 永続 version や prefix version の差集合には [`PersistentBinaryTrie`](Persistence.md#persistentbinarytrie)、静的な添字区間も同時に扱う場合は [`WaveletMatrix`](WaveletMatrix.md) を使います。
+
+## include
+
+```cpp
+#include "libraries/data_structure/BinaryTrie.hpp"
+```
+
+## 共通の制約
+
+- `UInt` は unsigned 整数型、$1 \leq BITS \leq \mathrm{numeric\_limits<UInt>::digits}$
+- 値と XOR mask は `[0, 2^BITS)` に収まる
+- 追加個数は正、削除個数は非負で、要素数が `int` に収まる
+- 順序統計の順位は $0 \leq k < size()$
+- `at(key)` は key が存在する
+- モノイドと prefix 探索の条件は各節の説明に従う
+
 
 ## multiset 版
 
@@ -42,7 +62,7 @@ trie.reserve(expected_values);
 trie.allocated_nodes();
 ```
 
-各変更・検索は `O(BITS)` です。削除した node は再利用・解放されないため、追加予定数が分かる場合は `reserve` を利用できます。
+各変更・検索は $O(BITS)$ です。削除した node は再利用・解放されないため、追加予定数が分かる場合は `reserve` を利用できます。
 
 ### 全体 XOR
 
@@ -50,7 +70,7 @@ trie.allocated_nodes();
 trie.xor_all(mask);
 ```
 
-格納済みのすべての論理値へ XOR します。遅延 mask だけを更新するため `O(1)` です。その後の `insert`、`erase`、`count` などは XOR 後の値に対して動作します。
+格納済みのすべての論理値へ XOR します。遅延 mask だけを更新するため $O(1)$ です。その後の `insert`、`erase`、`count` などは XOR 後の値に対して動作します。
 
 ### XOR 順序統計
 
@@ -69,7 +89,7 @@ trie.max_value();
 
 `k` は 0-indexed です。`min_xor` / `max_xor` は格納値そのものではなく XOR の結果を返します。格納値が必要なら `argmin_xor` / `argmax_xor` を使用します。
 
-`min_value` と `max_value` は空なら `nullopt`、それ以外の順序統計は空でないことが必要です。各操作は `O(BITS)` です。
+`min_value` と `max_value` は空なら `nullopt`、それ以外の順序統計は空でないことが必要です。各操作は $O(BITS)$ です。
 
 ### 頻度・前後要素
 
@@ -84,7 +104,7 @@ trie.lower_bound(value);            // mask = 0 の next_value
 trie.upper_bound(value);            // value より大きい最小値
 ```
 
-`mask` は省略すると `0` です。`prev_value`、`next_value`、`lower_bound`、`upper_bound` は条件を満たす値がなければ `nullopt` を返します。計算量は `O(BITS)` です。
+`mask` は省略すると `0` です。`prev_value`、`next_value`、`lower_bound`、`upper_bound` は条件を満たす値がなければ `nullopt` を返します。計算量は $O(BITS)$ です。
 
 ### mex
 
@@ -92,7 +112,7 @@ trie.upper_bound(value);            // value より大きい最小値
 optional<unsigned> result = trie.mex(mask);
 ```
 
-`value xor mask` の集合に含まれない最小値を `O(BITS)` で返します。重複は無視します。`BITS` bit の値がすべて存在する場合は `nullopt` です。
+`value xor mask` の集合に含まれない最小値を $O(BITS)$ で返します。重複は無視します。`BITS` bit の値がすべて存在する場合は `nullopt` です。
 
 ## 可換モノイド payload 版
 
@@ -132,7 +152,7 @@ trie.count_less(upper, mask);       // payload ではなく key 数
 trie.kth_smallest(k, mask);         // key xor mask の昇順 k 番目
 ```
 
-`mask` は省略できます。各操作は `O(BITS)`、`all_prod` は `O(1)` です。
+`mask` は省略できます。各操作は $O(BITS)$、`all_prod` は $O(1)$ です。
 
 加算・最大値には alias を利用できます。
 
@@ -150,7 +170,7 @@ auto result = trie.max_prefix_fold(
     [&](long long sum) { return sum <= budget; }, mask);
 ```
 
-key を `key xor mask` の昇順に追加し、predicate が成立する最大 prefix を `O(BITS)` で求めます。
+key を `key xor mask` の昇順に追加し、predicate が成立する最大 prefix を $O(BITS)$ で求めます。
 
 - `result.first_rejected`: 最初に追加できなかった XOR 後の key。全 key を受理した場合は `nullopt`
 - `result.accepted_keys`: 受理した key 数
@@ -158,12 +178,29 @@ key を `key xor mask` の昇順に追加し、predicate が成立する最大 p
 
 predicate は `pred(e()) == true` で、prefix を伸ばすにつれて `true` から `false` へ高々一度だけ変化する必要があります。非負和と上限などに利用できます。
 
-## 計算量・メモリ
+## 計算量
 
-- `xor_all`: `O(1)`
-- それ以外の主要操作: `O(BITS)`
-- 1 個の新しい key が初めて通る経路: 最大 `BITS` node を確保
-- 削除した node は保持される
+- $N$ 個の値・key による構築は $O(N BITS)$
+- 空の構築、`size`、`empty`、`xor_all`、`all_prod` は $O(1)$
+- 検索・追加・削除・順序統計・値域集約は $O(BITS)$。ノード追加の再確保を含める場合、追加はならし計算量
+- `clear` は保持ノード数に比例し、メモリは生成した経路数を $U$ として $O(1+U BITS)$
+- 新しい key が初めて通る経路には最大 `BITS` ノードを確保する。削除したノードは保持される
+
+## 使用例
+
+```cpp
+#include "libraries/data_structure/BinaryTrie.hpp"
+using namespace std;
+
+int main() {
+    BinaryTrie<unsigned, 4> trie;
+    trie.insert(1);
+    trie.insert(3);
+    assert(trie.min_xor(2) == 1);
+    trie.xor_all(2);
+    assert(trie.count(3) == 1);
+}
+```
 
 ## 注意
 
