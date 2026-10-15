@@ -4,7 +4,7 @@
 
 | library | purpose | documentation |
 | --- | --- | --- |
-| [Tree.hpp](Tree.md) | 重み付き木・森、LCA、祖先、パス・部分木、直径・重心 | [Tree.md](Tree.md) |
+| [Tree.hpp](Tree.md) | 重み付き木・森、LCA、祖先、直径・重心、部分木・パスの加算と合計 | [Tree.md](Tree.md) |
 | [HLD.hpp](HLD.md) | LCA、距離、祖先、パス上の頂点 | [HLD.md](HLD.md) |
 | [HLD_seg.hpp](HLD_seg.md) | 頂点値の一点更新・パス積 | [HLD_seg.md](HLD_seg.md) |
 | [HLD_lseg.hpp](HLD_lseg.md) | 頂点値のパス作用・パス積 | [HLD_lseg.md](HLD_lseg.md) |
@@ -18,6 +18,8 @@
 HLDの構築は $O(N)$、パスクエリはセグメント木の操作を除いて $O(\log N)$ 区間に分解されます。`HLD` は `lca`、`distance`、`jump` に加え、Euler Tour上の `id/out`、`in_subtree`、`path_segments` を持ちます。`HLD_*seg*` はAtCoder Libraryが必要です。
 
 汎用の木表現と根付きクエリには [Tree](Tree.md) を使えます。構築は反復処理で、森・重み付き距離・向き付きパス区間に対応します。ACLは不要です。共通グラフ表現は [Graph](../graph/Graph.md)、実行例は [`examples/graph_and_tree.cpp`](../../examples/graph_and_tree.cpp) にあります。
+
+`Tree::read_edges()` は既定で1-indexedの辺を `n-1` 本読みます。`tree.make_add_sum(initial_values)` で頂点値を持ち、部分木の加算・合計を $O(\log(n+2))$、パスの加算・合計を $O(\log^2(n+2))$ で扱えます。
 
 ## Link-Cut Tree
 

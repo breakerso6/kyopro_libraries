@@ -124,10 +124,10 @@ static void test_edge_input() {
         Tree<> tree_from_cin(3);
         if (offset == 1) {
             from_cin.template read_edges<Weighted>(2);
-            tree_from_cin.template read_edges<Weighted>(2);
+            tree_from_cin.template read_edges<Weighted>();
         } else {
             from_cin.template read_edges<Weighted>(2, 0);
-            tree_from_cin.template read_edges<Weighted>(2, 0);
+            tree_from_cin.template read_edges<Weighted>(-1, 0);
         }
         cin.rdbuf(previous);
         tree_from_cin.build();
@@ -137,6 +137,15 @@ static void test_edge_input() {
 }
 
 static void test_storage_and_limits() {
+    for (int size : {0, 1}) {
+        Tree<> trivial(size);
+        istringstream no_edges("99");
+        trivial.read_edges(-1, no_edges);
+        int remaining;
+        no_edges >> remaining;
+        assert(remaining == 99 && trivial.graph.edge_count() == 0);
+        trivial.build();
+    }
     Graph<> graph(3);
     istringstream unweighted("1 2\n2 3\n2 2\n");
     graph.read_edges(3, unweighted);

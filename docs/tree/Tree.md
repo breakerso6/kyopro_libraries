@@ -37,7 +37,7 @@
 
 ```cpp
 int tree.add_edge(int from, int to, Cost cost = Cost(1));
-void tree.read_edges<Weighted = false>(int m, istream& input = cin, int index_offset = 1);
+void tree.read_edges<Weighted = false>(int m = -1, istream& input = cin, int index_offset = 1);
 void tree.read_edges<Weighted = false>(int m, int index_offset, istream& input = cin);
 ```
 
@@ -47,24 +47,24 @@ void tree.read_edges<Weighted = false>(int m, int index_offset, istream& input =
 
 ```cpp
 Tree<> tree(n);
-tree.read_edges(n - 1);          // 重みなし、1-indexed、cin
-// tree.read_edges(n - 1, 0);    // 重みなし、0-indexed
-// tree.read_edges<true>(n - 1); // 重み付き、1-indexed
-// tree.read_edges<true>(n - 1, 0); // 重み付き、0-indexed
+tree.read_edges();              // n-1本、重みなし、1-indexed、cin
+// tree.read_edges(-1, 0);      // n-1本、重みなし、0-indexed
+// tree.read_edges<true>();     // n-1本、重み付き、1-indexed
+// tree.read_edges<true>(-1, 0); // n-1本、重み付き、0-indexed
 tree.build(0);
 ```
 
-連結な木では辺数は `n-1`、森では実際の辺数を渡します。入力ストリームを指定する場合は `tree.read_edges<true>(m, 0, input)` とも書けます。
+辺数を省略するか `m=-1` にすると `max(0,n-1)` 本を読みます。空の木・1頂点の木では入力を消費しません。既存の辺がある場合も、指定した本数を追加します。森では実際の辺数を明示してください。入力ストリームを指定する場合は `tree.read_edges<true>(m, 0, input)` とも書けます。
 
 ### 制約
 
 - 各端点は $[0,n)$
-- $0 \leq m$
+- $m=-1$ または $0 \leq m$
 
 ### 計算量
 
 - `add_edge`: ならし $O(1)$
-- `read_edges`: ならし $O(m)$（入力読み取りを除く）
+- `read_edges`: 実際に読む辺数を $k$ として、ならし $O(k)$（入力読み取りを除く）
 
 ## build
 
@@ -233,6 +233,102 @@ vector<int> tree.centroids() const;
 - `diameter`: $O(n+m)$、作業メモリ $O(n)$
 - `centroids`: $O(n)$、結果のメモリ $O(n)$
 
+## make_add_sum
+
+```cpp
+(1) TreeAddSum<long long> values = tree.make_add_sum();
+(2) TreeAddSum<Value> values = tree.make_add_sum<Value>();
+(3) TreeAddSum<Value> values = tree.make_add_sum(const vector<Value>& initial_values);
+```
+
+構築済みの木・森に対する、頂点値の加算・合計用オブジェクトを作ります。(1)、(2)は全頂点を0で初期化し、(3)は頂点番号順の初期値を指定します。`Value` は辺コストの `Cost` と独立です。
+
+`TreeAddSum<Value> values(tree)`、`TreeAddSum<Value> values(tree, initial_values)` でも構築できます。HLDの配置と根付き構造をコピーして保持するため、作成元のTreeを破棄・変更・再構築しても、このオブジェクトの根や頂点集合は変わりません。新しい根や辺集合に対応するには作り直してください。
+
+### 制約
+
+- 作成元のTreeが最新の辺集合に対して構築済み
+- (3): `initial_values.size() == tree.size()`
+- `Value` は0・非負整数からの構築、コピー、加減算、`+=`、整数倍に使う乗算ができる数値型
+- 加算は可換で、減算が逆操作となる。整数では値・合計・差分・添字との積などの中間値が型の範囲に収まる
+- 浮動小数点型を用いる場合は加減算の丸め誤差が生じる
+
+### 計算量
+
+- 構築時間・保持メモリともに $O(n)$。2本のFenwick木を使い、ACLは不要
+
+## TreeAddSum
+
+以下の頂点番号は、作成元Treeと同じ0-indexedです。更新対象は頂点値です。辺コストと `weighted_distance` はこの更新によって変わりません。部分木は作成時の根に対する部分木で、頂点自身も含みます。
+
+### get / set / add_vertex
+
+```cpp
+Value values.get(int v) const;
+void values.set(int v, Value value);
+void values.add_vertex(int v, Value delta);
+```
+
+頂点値を取得・代入・加算します。
+
+#### 制約
+
+- $0 \leq v < n$
+
+#### 計算量
+
+- $O(\log(n+2))$
+
+### add_subtree / sum_subtree
+
+```cpp
+void values.add_subtree(int v, Value delta);
+Value values.sum_subtree(int v) const;
+```
+
+`add_subtree` はvの部分木の全頂点にdeltaを加えます。`sum_subtree` はその全頂点の値の合計を返します。森では、ほかの成分に影響しません。
+
+#### 制約
+
+- $0 \leq v < n$
+
+#### 計算量
+
+- $O(\log(n+2))$
+
+### add_path / sum_path
+
+```cpp
+bool values.add_path(int u, int v, Value delta);
+optional<Value> values.sum_path(int u, int v) const;
+```
+
+uからvへのパスの両端を含む全頂点について、値を加算・合計します。同じ頂点を指定した場合はその頂点のみを対象にします。
+
+別成分なら `add_path` は値を変更せず `false`、`sum_path` は `nullopt` を返します。同じ成分での `add_path` は `true` を返します。
+
+#### 制約
+
+- $0 \leq u,v < n$
+
+#### 計算量
+
+- $O(\log^2(n+2))$
+
+### size / sum_all
+
+```cpp
+int values.size() const;
+Value values.sum_all() const;
+```
+
+頂点数、全成分の全頂点の合計を返します。空の森ではそれぞれ0を返します。
+
+#### 計算量
+
+- `size`: $O(1)$
+- `sum_all`: $O(\log(n+2))$
+
 ## 使用例
 
 ```cpp
@@ -249,6 +345,30 @@ int main() {
     cout << tree.diameter()->length << '\n';        // 4
 }
 ```
+
+### 部分木への加算・合計
+
+```cpp
+#include "libraries/tree/Tree.hpp"
+#include <iostream>
+
+int main() {
+    Tree<> tree(4);
+    tree.add_edge(0, 1);
+    tree.add_edge(1, 2);
+    tree.add_edge(1, 3);
+    tree.build(0);
+    auto values = tree.make_add_sum(std::vector<long long>{1, 2, 3, 4});
+    values.add_subtree(1, 10); // 頂点1,2,3に加算
+    std::cout << values.sum_subtree(1) << '\n'; // 39
+    values.add_path(0, 2, 2); // 頂点0,1,2に加算
+    std::cout << *values.sum_path(0, 2) << '\n'; // 32
+    values.set(3, -1);
+    std::cout << values.get(3) << '\n';         // -1
+}
+```
+
+入力から読み込む実行例と入出力形式は [tree_subtree_add_sum.cpp](../../examples/tree_subtree_add_sum.cpp) を参照してください。
 
 ## 既存ライブラリとの連携
 

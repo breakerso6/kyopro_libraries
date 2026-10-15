@@ -14,6 +14,9 @@ struct TreeDiameter {
     GraphPath path;
 };
 
+template<class Value = long long>
+class TreeAddSum;
+
 // An owned undirected forest with iterative heavy-light preprocessing.
 // Add edges, then build(). Paths/queries require an up-to-date build.
 template<class Cost = long long>
@@ -38,10 +41,17 @@ struct Tree {
         read_edges<Weighted>(count, input, index_offset);
     }
     template<bool Weighted = false>
-    void read_edges(int count, std::istream& input = std::cin, int index_offset = 1) {
+    void read_edges(int count = -1, std::istream& input = std::cin, int index_offset = 1) {
+        if (count == -1) count = std::max(0, n - 1);
         ready = false;
         graph.template read_edges<Weighted>(count, input, index_offset);
     }
+
+    // Vertex values, independent of edge costs. Copies the current rooted layout.
+    template<class Value = long long>
+    TreeAddSum<Value> make_add_sum() const;
+    template<class Value>
+    TreeAddSum<Value> make_add_sum(const std::vector<Value>& initial_values) const;
 
     void build(int root_ = 0) {
         ready = false; n = graph.size(); root = root_;
@@ -210,8 +220,132 @@ struct Tree {
     }
 
 private:
+    template<class> friend class TreeAddSum;
     bool ready = false;
     int built_edge_count = -1;
     void check_ready() const { assert(ready && n == graph.size() && built_edge_count == graph.edge_count()); }
     void check_vertex(int v) const { check_ready(); assert(0 <= v && v < n); (void)v; }
 };
+
+// A snapshot of a built Tree's HLD layout with two Fenwick trees.
+// Subtree add/sum: O(log n), path add/sum: O(log^2 n), build: O(n).
+// Rebuilding/destroying the source Tree does not affect this object.
+template<class Value>
+class TreeAddSum {
+public:
+    template<class Cost>
+    explicit TreeAddSum(const Tree<Cost>& tree)
+        : TreeAddSum(tree, std::vector<Value>(tree.size(), Value(0))) {}
+
+    template<class Cost>
+    TreeAddSum(const Tree<Cost>& tree, const std::vector<Value>& initial_values)
+        : n_(tree.size()) {
+        tree.check_ready();
+        assert((int)initial_values.size() == n_);
+        id_ = tree.id; out_ = tree.out; head_ = tree.head;
+        parent_ = tree.parent; depth_ = tree.depth; component_ = tree.component;
+        difference_.assign(n_ + 1, Value(0));
+        weighted_.assign(n_ + 1, Value(0));
+        Value previous = Value(0);
+        for (int i = 0; i < n_; ++i) {
+            Value current = initial_values[tree.vertex[i]];
+            difference_[i + 1] = current - previous;
+            weighted_[i + 1] = difference_[i + 1] * Value(i);
+            previous = current;
+        }
+        for (int i = 1; i <= n_; ++i) {
+            int next = i + (i & -i);
+            if (next <= n_) {
+                difference_[next] += difference_[i];
+                weighted_[next] += weighted_[i];
+            }
+        }
+    }
+
+    int size() const { return n_; }
+
+    Value get(int v) const {
+        check_vertex(v);
+        Value result = Value(0);
+        for (int i = id_[v] + 1; i > 0; i -= i & -i) result += difference_[i];
+        return result;
+    }
+    void set(int v, Value value) { add_vertex(v, value - get(v)); }
+    void add_vertex(int v, Value delta) {
+        check_vertex(v);
+        add_range(id_[v], id_[v] + 1, delta);
+    }
+    void add_subtree(int v, Value delta) {
+        check_vertex(v);
+        add_range(id_[v], out_[v], delta);
+    }
+    Value sum_subtree(int v) const {
+        check_vertex(v);
+        return sum_range(id_[v], out_[v]);
+    }
+    Value sum_all() const { return prefix_sum(n_); }
+
+    // Both endpoints are included. A cross-component update changes nothing.
+    bool add_path(int u, int v, Value delta) {
+        return for_each_path_range(u, v, [&](int l, int r) { add_range(l, r, delta); });
+    }
+    std::optional<Value> sum_path(int u, int v) const {
+        Value result = Value(0);
+        if (!for_each_path_range(u, v, [&](int l, int r) { result += sum_range(l, r); }))
+            return std::nullopt;
+        return result;
+    }
+
+private:
+    int n_;
+    std::vector<int> id_, out_, head_, parent_, depth_, component_;
+    std::vector<Value> difference_, weighted_;
+
+    void check_vertex(int v) const { assert(0 <= v && v < n_); (void)v; }
+    void add_boundary(int position, Value delta) {
+        if (position == n_) return;
+        Value scaled = delta * Value(position);
+        for (int i = position + 1; i <= n_; i += i & -i) {
+            difference_[i] += delta;
+            weighted_[i] += scaled;
+        }
+    }
+    void add_range(int l, int r, Value delta) {
+        add_boundary(l, delta);
+        add_boundary(r, Value(0) - delta);
+    }
+    Value prefix_sum(int r) const {
+        Value difference = Value(0), weighted = Value(0);
+        for (int i = r; i > 0; i -= i & -i) {
+            difference += difference_[i];
+            weighted += weighted_[i];
+        }
+        return difference * Value(r) - weighted;
+    }
+    Value sum_range(int l, int r) const { return prefix_sum(r) - prefix_sum(l); }
+
+    template<class Callback>
+    bool for_each_path_range(int u, int v, Callback callback) const {
+        check_vertex(u); check_vertex(v);
+        if (component_[u] != component_[v]) return false;
+        while (head_[u] != head_[v]) {
+            if (depth_[head_[u]] < depth_[head_[v]]) std::swap(u, v);
+            callback(id_[head_[u]], id_[u] + 1);
+            u = parent_[head_[u]];
+        }
+        callback(std::min(id_[u], id_[v]), std::max(id_[u], id_[v]) + 1);
+        return true;
+    }
+};
+
+template<class Cost>
+template<class Value>
+TreeAddSum<Value> Tree<Cost>::make_add_sum() const {
+    return TreeAddSum<Value>(*this);
+}
+
+template<class Cost>
+template<class Value>
+TreeAddSum<Value> Tree<Cost>::make_add_sum(const std::vector<Value>& initial_values) const {
+    return TreeAddSum<Value>(*this, initial_values);
+}
