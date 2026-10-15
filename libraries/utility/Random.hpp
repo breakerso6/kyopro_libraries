@@ -1,4 +1,5 @@
 // GitHub: https://github.com/breakerso6/kyopro_libraries/blob/feature/icpc-extra-libraries/libraries/utility/Random.hpp
+// SPDX-License-Identifier: CC0-1.0
 
 #include <bits/stdc++.h>
 using namespace std;

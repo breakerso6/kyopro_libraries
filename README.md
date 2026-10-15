@@ -4,6 +4,8 @@
 
 ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
+本リポジトリのコード・ドキュメントには [CC0 1.0 Universal](LICENSE) を適用します。ライセンス全文は `LICENSE`、公式の説明は [Creative Commons](https://creativecommons.org/publicdomain/zero/1.0/deed.ja) を参照してください。AtCoder Libraryなどの外部依存ライブラリには、それぞれのライセンスが適用されます。
+
 [ドキュメント一覧](docs/README.md)から各APIを参照できます。宣言・動作・制約・計算量・使用例の構成はACLを参考にしています。追加・編集時の書式は [ドキュメント記法](docs/STYLE.md) を参照してください。
 
 ## Directory Layout
