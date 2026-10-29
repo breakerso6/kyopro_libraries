@@ -6,7 +6,7 @@ C++17の競技プログラミング用ライブラリです。[ACL日本語ド�
 
 | 分野 | 内容 |
 | --- | --- |
-| [algorithm](algorithm/README.md) | Mo、SMAWK、Kitamasa、Z-algorithm |
+| [algorithm](algorithm/README.md) | Mo、SMAWK、Kitamasa、Z-algorithm、BeamSearch（固定幅・chokudai・key別） |
 | [data_structure](data_structure/README.md) | Union-Find、区間クエリ、永続化、Wavelet Matrix、CHT |
 | [geometry](geometry/README.md) | 整数・実数幾何、凸包、最近点対、KD-tree |
 | [graph](graph/README.md) | Graph、BFS、SCC、最短路、MST、LowLink、Euler路、二部マッチング |
@@ -14,6 +14,12 @@ C++17の競技プログラミング用ライブラリです。[ACL日本語ド�
 | [string](string/README.md) | Aho-Corasick、RollingHash、回文 |
 | [tree](tree/README.md) | Tree、HLD、全方位木DP、重心分解、Virtual Tree |
 | [utility](utility/README.md) | 乱数、時間計測、128-bit入出力 |
+
+### 設計案（未実装）
+
+- [SimulatedAnnealing](algorithm/SimulatedAnnealing.md): 焼きなましの温度・予算・採否判定と、問題ごとの近傍処理。
+
+上記は設計案で、対応するヘッダは未作成です。実装済みの [BeamSearch](algorithm/BeamSearch.md) と [問題側コード全体の6つの例・TODOひな型](../examples/beam_search_draft/README.md) は、algorithmの一覧から参照できます。
 
 ## 導入
 
