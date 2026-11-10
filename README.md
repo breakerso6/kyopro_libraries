@@ -51,11 +51,15 @@ ICPC・競技プログラミング用の C++17 ライブラリ集です。
 
 展開対象:
 
-- `#include "libraries/HLD.hpp"` のようなローカル include
+- `#include "libraries/tree/HLD.hpp"` のようなローカル include
 - `#include <atcoder/segtree>` のような ACL include
 - ACL 内部の再帰 include
 
-`ac-library/` は Git 管理対象外です。`tools/expand_includes.py` を使う前に、このリポジトリ直下へ AtCoder Library を配置してください。
+`ac-library/` は Git 管理対象外です。ACL を展開する場合は、このリポジトリ直下、またはこのリポジトリと同じ親ディレクトリの下へ AtCoder Library を配置してください。
+
+スクリプトの配置場所を基準に、リポジトリルート・`libraries/`・上記の `ac-library/` を自動で探索します。
+別のディレクトリから実行しても、`#include "libraries/..."` や `#include "geometry/ClosestPair.hpp"`、ライブラリ内部の再帰 include を追加の `-I` なしで展開できます。
+include 元のファイルと同じディレクトリ、実行ディレクトリ、入力ファイルのディレクトリ、`CPLUS_INCLUDE_PATH`、`-I` で指定した探索先も利用できます。
 
 標準ライブラリの include、例えば `#include <bits/stdc++.h>` はそのまま残します。
 各ライブラリの先頭には、そのファイルに対応する GitHub URL をコメントで記載しています。このコメントは展開後も残るため、提出用コードから元のライブラリを確認できます。
@@ -67,6 +71,12 @@ ACL include はデフォルトで展開します。ACL を展開せず、`#inclu
 tools/expand_includes.py main.cpp -o combined.cpp
 tools/expand_includes.py main.cpp --stdout
 tools/expand_includes.py main.cpp -I other_libs -o combined.cpp
+```
+
+このリポジトリを `kyopro_libraries/` として作業ディレクトリ内に配置した場合:
+
+```bash
+python3 kyopro_libraries/tools/expand_includes.py a.cpp -o combined.cpp
 ```
 
 ACL include を展開しない場合:
@@ -83,6 +93,12 @@ g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 ```
 
 ## Tests
+
+include 展開スクリプトの回帰テストは、追加パッケージなしで実行できます。
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
 
 テストは [online-judge-tools/verification-helper](https://github.com/online-judge-tools/verification-helper) で管理しています。
 `tests/*.test.cpp` は AOJ の Hello World 問題をダミーとして使い、内部の決定的テスト・ランダムテストを実行します。

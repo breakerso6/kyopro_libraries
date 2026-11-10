@@ -94,6 +94,16 @@ def default_include_dirs(source):
     env = os.environ.get("CPLUS_INCLUDE_PATH", "")
     dirs.extend(Path(p) for p in env.split(os.pathsep) if p)
 
+    # Headers use repository-root-relative includes even when the source and
+    # working directory are outside this repository (e.g. a VS Code workspace).
+    repo_root = Path(__file__).resolve().parent.parent
+    dirs.extend([
+        repo_root,
+        repo_root / "libraries",
+        repo_root / "ac-library",
+        repo_root.parent / "ac-library",
+    ])
+
     unique = []
     seen = set()
     for directory in dirs:
