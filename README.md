@@ -92,6 +92,12 @@ tools/expand_includes.py main.cpp -o combined.cpp
 g++ -std=c++17 -O2 -Wall -Wextra combined.cpp -o main
 ```
 
+## AtCoder Userscript
+
+[tools/atcoder-library-expander.user.js](tools/atcoder-library-expander.user.js) を Tampermonkey に登録すると、AtCoder の提出欄から GitHub 上のライブラリを取得・展開できます。
+内部の include も再帰展開し、「元に戻す」で展開前のコードに戻せます。取得先のリポジトリとブランチも設定できます。
+インストール方法・使用例は [AtCoder ユーザースクリプト](docs/atcoder-userscript.md) を参照してください。
+
 ## Tests
 
 include 展開スクリプトの回帰テストは、追加パッケージなしで実行できます。
