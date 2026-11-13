@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Library Expander
 // @namespace    https://github.com/breakerso6/kyopro_libraries
-// @version      1.0.0
+// @version      1.0.1
 // @description  GitHub の C++ ライブラリを提出欄で再帰展開します。
 // @match        https://atcoder.jp/contests/*/submit*
 // @match        https://atcoder.jp/contests/*/tasks/*
@@ -238,23 +238,44 @@
     }
 
     function install(page, doc, storage, request = requestHeader) {
-        const anchor = doc.querySelector("#sourceCode, #editor, #plain-textarea, textarea[name='data.SourceCode'], textarea[name='sourceCode']");
-        if (!anchor || doc.getElementById("github-library-expander")) return false;
+        // #sourceCode can be the whole Bootstrap form row, including its label
+        // and sidebar. Mount inside the editor column instead of before that row.
+        const editorNode = doc.querySelector("#editor, #plain-textarea, .plain-textarea, textarea[name='data.SourceCode'], textarea[name='sourceCode'], .editor");
+        const source = doc.getElementById("sourceCode");
+        const column = editorNode?.closest(".col-sm-10, .col-md-10, .col-lg-10, .col-xs-10");
+        const anchor = column ? null : editorNode || source;
+        const container = column || anchor?.parentNode;
+        if (!container || doc.getElementById("github-library-expander")) return false;
         const panel = doc.createElement("div");
         panel.id = "github-library-expander";
-        panel.style.cssText = "margin:10px 0;padding:10px;border:1px solid #ccc;border-radius:4px;";
+        panel.style.cssText = "display:flow-root;clear:both;box-sizing:border-box;width:100%;min-width:0;max-width:100%;margin:0 0 10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#fafafa;text-align:left;";
         // All markup is static; remote source is only written into the code editor.
         panel.innerHTML = `
-            <button type="button" class="btn btn-default btn-sm" data-action="expand">ライブラリを展開</button>
-            <button type="button" class="btn btn-default btn-sm" data-action="restore" disabled>元に戻す</button>
-            <span role="status" aria-live="polite" style="margin-left:8px;white-space:pre-wrap;overflow-wrap:anywhere"></span>
-            <details style="margin-top:8px"><summary>GitHub の取得設定</summary>
-                <label>Owner <input data-setting="owner" size="14"></label>
-                <label>Repository <input data-setting="repository" size="20"></label>
-                <label>ブランチ・タグ・コミット <input data-setting="ref" size="28"></label>
-                <label><input type="checkbox" data-setting="expandAcl"> ACL も展開する</label>
+            <style>
+                #github-library-expander .ghle-actions { display:flex;flex-wrap:wrap;align-items:center;gap:6px; }
+                #github-library-expander [role="status"] { flex:1 1 200px;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere; }
+                #github-library-expander details { margin-top:8px; }
+                #github-library-expander summary { cursor:pointer;text-align:left; }
+                #github-library-expander .ghle-settings { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:10px; }
+                #github-library-expander label { display:flex;flex-direction:column;gap:4px;float:none;min-width:0;width:auto;margin:0;font-weight:normal;text-align:left; }
+                #github-library-expander input:not([type="checkbox"]) { box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:30px;padding:4px 6px;border:1px solid #ccc;border-radius:3px; }
+                #github-library-expander .ghle-checkbox { grid-column:1/-1;flex-direction:row;align-items:center;gap:6px; }
+                #github-library-expander input[type="checkbox"] { position:static;float:none;width:auto;margin:0; }
+            </style>
+            <div class="ghle-actions">
+                <button type="button" class="btn btn-default btn-sm" data-action="expand">ライブラリを展開</button>
+                <button type="button" class="btn btn-default btn-sm" data-action="restore" disabled>元に戻す</button>
+                <span role="status" aria-live="polite"></span>
+            </div>
+            <details><summary>GitHub の取得設定</summary>
+                <div class="ghle-settings">
+                    <label>Owner <input data-setting="owner"></label>
+                    <label>Repository <input data-setting="repository"></label>
+                    <label>ブランチ・タグ・コミット <input data-setting="ref"></label>
+                    <label class="ghle-checkbox"><input type="checkbox" data-setting="expandAcl"> ACL も展開する</label>
+                </div>
             </details>`;
-        anchor.parentNode.insertBefore(panel, anchor);
+        container.insertBefore(panel, column ? column.firstChild : anchor);
         const settings = { ...DEFAULTS, ...storage.get() };
         for (const key of Object.keys(DEFAULTS)) {
             const input = panel.querySelector(`[data-setting="${key}"]`);

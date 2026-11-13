@@ -130,7 +130,7 @@ test("plain-text mode, old CodeMirror and the AtCoder getSourceCode helper", () 
 });
 
 // Small DOM stand-in: exercise the actual installed click handlers, not copies.
-function uiFixture(request) {
+function uiFixture(request, { inColumn = false } = {}) {
     const f = editorFixture({ visible: true });
     const controls = new Map();
     const control = (selector) => {
@@ -142,9 +142,12 @@ function uiFixture(request) {
     };
     const panel = { style: {}, querySelector: control };
     control('[role="status"]').style = {};
-    const anchor = { parentNode: { insertBefore() {} } };
+    let placement;
+    const parent = { insertBefore(node, before) { placement = { parent: this, node, before }; } };
+    const column = { ...parent, firstChild: { sidebar: true } };
+    const anchor = { parentNode: parent, closest: () => inColumn ? column : null };
     const baseQuery = f.doc.querySelector;
-    f.doc.querySelector = (selector) => selector.startsWith("#sourceCode,") ? anchor : baseQuery(selector);
+    f.doc.querySelector = (selector) => selector.startsWith("#editor,") ? anchor : baseQuery(selector);
     f.doc.createElement = () => panel;
     f.doc.getElementById = () => null;
     f.page.confirm = () => false;
@@ -156,11 +159,14 @@ function uiFixture(request) {
         expand: control('[data-action="expand"]'),
         restore: control('[data-action="restore"]'),
         status: control('[role="status"]'),
+        placement, panel, anchor, parent, column,
     };
 }
 
 test("UI expands and restores without submitting, and confirms before discarding edits", async () => {
     const f = uiFixture(async () => "struct A {};");
+    assert.equal(f.placement.parent, f.parent);
+    assert.equal(f.placement.before, f.anchor);
     const original = f.plain.value;
     await f.expand.click();
     assert.ok(f.plain.value.includes("struct A {};"));
@@ -175,7 +181,9 @@ test("UI expands and restores without submitting, and confirms before discarding
 });
 
 test("UI leaves current code intact on fetch failure or concurrent edits", async () => {
-    const failed = uiFixture(async () => { throw new Error("offline"); });
+    const failed = uiFixture(async () => { throw new Error("offline"); }, { inColumn: true });
+    assert.equal(failed.placement.parent, failed.column);
+    assert.equal(failed.placement.before, failed.column.firstChild);
     const original = failed.plain.value;
     await failed.expand.click();
     assert.equal(failed.plain.value, original);
