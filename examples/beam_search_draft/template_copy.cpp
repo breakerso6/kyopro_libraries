@@ -47,15 +47,13 @@ struct State {
     }
 
     template<class Emit>
-    void expand(const Info& current, Emit emit) const {
-        // currentには現在ノードの評価情報が渡される。
-        // このひな型はevaluate()で再計算するため、参照しない。
-        (void)current;
+    void preview(const Info& current, Emit emit) const {
         for (const Action& action : legal_actions()) {
-            State next = *this;
-            next.apply(action);
-            Info next_info = next.evaluate();
-            emit(std::move(next), action, std::move(next_info));
+            Info next_info = current;
+            // TODO: 親とactionの差分から子のcost・hash・finished・keyを求める。
+            // 複数ターンを使うならInfoに int turns = 1; を追加し、
+            // ここで毎回next_info.turnsにこの行動の所要ターンを設定する。
+            emit(action, next_info);
         }
     }
 };
