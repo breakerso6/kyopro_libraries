@@ -36,7 +36,7 @@ struct State {
 
     void apply(const Action& action) {
         pos = action.to;
-        seen |= uint32_t(1) << action.to;
+        seen |= uint32_t(1) << pos;
     }
 
     void undo(const Action& action) {
@@ -45,7 +45,7 @@ struct State {
     }
 
     template<class Emit>
-    void expand(const Info& current, Emit emit) {
+    void expand(const Info& current, Emit emit) const {
         int y = pos / W, x = pos % W;
         for (int d = 0; d < 5; ++d) {
             int ny = y + dy[d], nx = x + dx[d];
@@ -53,10 +53,8 @@ struct State {
             int to = ny * W + nx;
             uint32_t bit = uint32_t(1) << to;
             bool fresh = (seen & bit) == 0;
-            Action action{pos, to, fresh, commands[d]};
             long long gain = fresh ? reward[to] : 0;
-
-            // 評価情報だけ計算し、ここではStateを変更しない。
+            Action action{pos, to, fresh, commands[d]};
             emit(action, make_info(to, seen | bit, current.cost - gain));
         }
     }

@@ -440,10 +440,10 @@ void test_first_solution() {
     CopySearch<PlainState, PlainAction, PlainInfo> copy(PlainState{}, PlainInfo(0, nullopt, false));
     config.max_depth = 1;
     auto result = copy.run(FixedBeam{1}, config);
-    assert(result.stop_reason == SearchStopReason::solution_found && result.best && result.best->depth == 1);
+    assert(result.stop_reason == SearchStopReason::depth_limit && !result.best && result.partial && result.partial->depth == 1);
     config.max_depth = 0;
     result = copy.run(FixedBeam{1}, config);
-    assert(result.stop_reason == SearchStopReason::solution_found && result.best && result.best->depth == 0);
+    assert(result.stop_reason == SearchStopReason::depth_limit && !result.best && result.partial && result.partial->depth == 0);
 }
 
 void test_heap_hash_replacement() {

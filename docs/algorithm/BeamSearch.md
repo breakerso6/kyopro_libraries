@@ -44,7 +44,7 @@ struct Info {
 - `key` は探索対象の選抜に使う分類です。位置・残り資源の区分・初手などを問題に応じて指定します。全候補に0を付ければ通常のビームになります。
 - `hash` が `nullopt` の候補は重複除去しません。値を指定した場合は、同じ深さ・key・ハッシュの候補を同一状態とみなします。keyは候補を分類する値、hashはその分類内で状態を同一視する値です。
 - `finished` は問題の実行可能解に到達したかを表します。`true` の候補は結果に記録し、それ以上展開しません。
-- `finished == false` でも `max_depth` に到達した候補は最終解として扱います。固定ターン問題では、途中で `finished` を立てる必要はありません。
+- 既定の探索では `finished == false` でも `max_depth` に到達した候補は最終解として扱います。固定ターン問題では、途中で `finished` を立てる必要はありません。
 - `cost` は候補選抜と最終解比較の両方に使います。最終解を比較するときに実スコアを使いたい場合は、最終候補の `cost` をその値で生成してください。
 - コスト・key・ハッシュは、当該候補が表す状態の値です。初期状態の深さは0で、既定では1回の遷移で深さが1増えます。子のkeyは親と異なって構いません。
 
@@ -60,13 +60,15 @@ struct Info {
 
 ## 状態を作る前に候補を評価する
 
-両方式で `State::preview(const Info&, Emit) const` を実装できます。親の状態と行動の差分から子の `cost`・`hash`・`key`・`finished` を求め、`emit(action, next_info)` で渡します。ライブラリはこの情報を使って選抜します。`preview` と従来の `expand` を両方定義した場合は `preview` を使います。
+両方式で `State::expand(const Info& current, Emit emit) const` を使えます。合法手を見つけたところで、親の状態とその手の差分から子の評価を計算し、`emit(action, next_info)` で渡します。根の `Info` は探索開始時に設定します。
+
+例えばグリッドでは、移動先が初訪問かを調べた時点で獲得点と次の訪問集合が分かります。そこで子のコストとハッシュを決めます。`apply` と `undo` は盤面を更新し、確定済みの評価は候補の `Info` が保持します。[コピー版](../../examples/beam_search_draft/01_copy_fixed.cpp)・[差分更新版](../../examples/beam_search_draft/02_tree_fixed.cpp)
 
 例えば訪問済みタイルの集合をコピーする経路探索で、ハッシュを訪問集合と現在地のZobrist値のXORにすると、候補の評価を次のように書けます。
 
 ```cpp
 template<class Emit>
-void preview(const Info& parent, Emit emit) const {
+void expand(const Info& parent, Emit emit) const {
     for (int to : neighbors[pos]) {
         int tile = tile_id[to];
         if (visited[tile]) continue;
@@ -80,17 +82,19 @@ void preview(const Info& parent, Emit emit) const {
 }
 ```
 
-この例では根のhashを開始タイルと開始位置のZobrist値のXORで初期化します。評価済みの `Info` は次回の `preview` にそのまま渡ります。
+この例では根のhashを開始タイルと開始位置のZobrist値のXORで初期化します。評価済みの `Info` は次回の `expand` にそのまま渡ります。
 
 - **CopySearch** では `State::apply(const Action&)` も実装します。兄弟候補は親の状態を共有し、展開順が来た子だけ親をコピーして1回 `apply` します。一度ビームに入ってから押し出された候補や最終解では、子の状態を作りません。`undo` は不要です。
 - **TreeSearch** では `apply` と `undo` を実装します。候補列挙中は親を参照し、次に展開する状態への木上移動時に行動を適用・復元します。
+
+以前の `preview(current, emit) const` も利用できます。両方定義した既存コードでは従来通り `preview` を優先します。移行時には `preview` を `expand` に改名してください。
 
 ## 複数ターンの行動
 
 問題側の `Info` に `int turns = 1;` を追加すると、子を **現在のターン + 子の turns** に登録します。例えば所要3ターンの行動は、子の `next_info.turns = 3;` としてから `emit` します。親のInfoをコピーして使う場合は、1ターンの行動も含めて毎回設定してください。根は常にターン0です。このメンバを省略すると従来の1ターン専用キューを使います。
 
 - 0→3の行動と0→1→3の経路は、ともにターン3で幅・key・重複除去を競います。固定幅はターンの昇順で処理し、chokudaiは各走査で到着ターンごとに未展開候補を取り出します。空白ターン用のキューは作りません。可変ターン版のキュー検索は、未処理の層数を $L$ として $O(\log(L+1))$ です。
-- `max_depth` は経過ターンの上限です。ちょうど到達すれば最終解、超過した候補は `finished` にかかわらず破棄します。期限内に受け付けた超過候補も `stats.generated` に含まれます。所要ターンが0以下なら `std::invalid_argument` を送出します。
+- `max_depth` は経過ターンの上限です。既定ではちょうど到達すれば最終解です。上限を超過した候補は `finished` にかかわらず破棄します。期限内に受け付けた超過候補も `stats.generated` に含まれます。所要ターンが0以下なら `std::invalid_argument` を送出します。
 - `best->depth` と `partial->depth` は経過ターン数、`actions.size()` は行動回数です。複数ターンの行動も操作列には1回だけ現れます。`apply` と `undo` はその行動全体を1回で処理してください。
 
 ## CopySearch
@@ -102,7 +106,7 @@ CopySearch<State, Action, Info> search(const State& initial_state,
                                      const Info& initial_info);
 ```
 
-初期状態と初期評価情報を保存します。各候補に状態本体を保持します。問題側に `undo` は要求しません。
+初期状態と初期評価情報を保存します。問題側に `undo` は要求しません。
 
 #### 計算量
 
@@ -114,10 +118,11 @@ CopySearch<State, Action, Info> search(const State& initial_state,
 template<class Emit>
 void State::expand(const Info& current, Emit emit) const;
 
-emit(State next_state, Action action, Info next_info);
+emit(action, next_info);             // 展開対象になったら親のコピーにapply(action)
+emit(next_state, action, next_info); // 作成済みの子を渡す従来形
 ```
 
-現在の状態から遷移できる次状態を列挙します。`emit` に、遷移後の状態・実行した操作・遷移後の評価情報を渡してください。候補0個の状態は行き止まりとして処理します。
+2引数形式では `State::apply(const Action&)` を実装します。3引数形式では渡した状態を子として使い、操作を再適用しません。候補0個の状態は行き止まりとして処理します。
 
 `emit` は受け取った候補を保持・選抜します。呼び出した側の状態・評価情報への参照を保持する仕様ではありません。大きい値は `std::move` で渡せます。
 
@@ -288,15 +293,15 @@ struct SearchConfig {
 };
 ```
 
-- `max_depth`: 最大深さ。深さがこの値に達した候補は最終解として記録します。
+- `max_depth`: 最大深さ。既定では、この深さに達した候補を最終解として扱います。
 - `time_limit_sec`: 1回の `run` の時間上限。未指定なら時間で終了しません。
 - `max_expansions`: 展開回数の上限。未指定なら展開回数で終了しません。根の展開も1回です。
 - `deduplicate`: ハッシュがある候補について重複除去するかを指定します。
-- `stop_on_first_solution`: 最初の最終解（`finished == true` または最大深さへの到達）で終了します。既定は `false` です。同じ層の他の完了解も比較したい場合は無効のままにします。
+- `stop_on_first_solution`: `true` なら、保持した探索候補の範囲で `finished == true` の最短ターンが確定した時点で終了します。深さ上限に達した未完了候補は `partial` の対象です。既定の `false` は最終候補をコストで比較します。
 - `time_check_interval`: 時計を実際に読む間隔。正の整数で、既定の1ではすべての確認箇所で読みます。大きくすると時計の読み取りを減らせますが、その間は期限超過の検出が遅れます。時間制限なしでは使いません。
 - `tree_dfs_order`: 固定幅の `TreeSearch` を履歴の木に沿った順で展開し、前進・後退を減らします。既定は `false` でコスト順です。`true` は候補の生成順・同点の選択・評価時の乱数の対応を変え、結果が変わる場合があります。コピー版・chokudaiでは使いません。
 
-時間・展開数を両方指定した場合は、先に達した方で終了します。`max_depth == 0` では根を最終解として返し、展開しません。時間上限・展開上限の0は、初期状態を登録して展開せず終了する指定です。
+時間・展開数を両方指定した場合は、先に達した方で終了します。`max_depth == 0` では根を評価して終了します。最短ターン設定で未完了の根なら `partial` に入ります。時間上限・展開上限の0は、初期状態を登録して展開せず終了する指定です。
 
 #### 制約
 
@@ -317,7 +322,9 @@ struct SearchConfig {
 
 初期情報の `finished == true` なら根を最終解として記録し、展開せず終了します。各 `run` の予算は独立です。既定では、完了解を発見してもほかの候補がある間は探索を続けます。
 
-`stop_on_first_solution == true` では最初に受け付けた最終解を保存して終了します。以後の `emit` は受け付けませんが、実行中の `expand` 自体は中断せず、問題側の `undo` などを最後まで実行させます。複数ターンの行動やchokudaiを使うと、最初に見つかる解よりも早いターンに到着する解が後から見つかる場合があります。
+`stop_on_first_solution == true` では、解の長さを経過ターン数で比較します。例えば根からターン8に飛ぶ完了候補が見つかっても、ターン1に未展開の候補があれば探索を続けます。各行動に最低1ターンかかるので、未展開または列挙中の親の最小ターンを `t` とすると、次の解は早くても `t + 1` です。これが暫定解のターン以上になった時点、または候補が尽きた時点で解を確定します。chokudaiでは前の走査で取り残した浅い候補も対象です。同ターンで最小コストの解を探すために探索を延長することはありません。確定後の `emit` は無視し、列挙関数内の後片付けが終わってから返します。
+
+`solution_found` はビーム幅・重複除去で残った候補の範囲での確定を表します。確定前に時間・展開数の予算が尽きた場合は、対応する終了理由と発見済みの暫定 `best` を返します。未発見なら `best` は空です。
 
 既定の `time_check_interval == 1` では、期限は少なくとも各 `expand` の開始前と各 `emit` の受付時に確認します。間隔を大きくした場合も最初の確認では時計を読み、その後は指定した回数の確認箇所ごとに読みます。問題側の関数実行を途中で強制停止する機能はなく、1回の重い評価などで時間上限を超える場合があります。打ち切り後も実行中の `expand` は終了まで戻し処理を行いますが、新しい候補は受け付けません。
 
@@ -364,7 +371,7 @@ struct SearchResult {
 
 `Cost` は `Info::cost` の型から推論します。`SearchStats` のメンバは `uint64_t expanded`、`generated`、`duplicates` と `double elapsed_sec` です。終了理由は `enum class SearchStopReason` で表します。
 
-- `best`: 発見済み最終解のうち最小コストの操作列。未発見なら `nullopt`。
+- `best`: 既定は発見済み最終解のうち最小コストの操作列。最短ターン設定では発見済み完了解のうち最短ターンの操作列。未発見なら `nullopt`。
 - `partial`: 最終解として扱わなかった候補のうち到達深さ最大、その中で最小コストの操作列。該当する候補が一つもなければ `nullopt`。根や、枝刈り前に受け付けた候補も対象です。
 - `stats`: 展開数・生成候補数・重複除去数・経過秒数。生成候補数は、期限内に受け付けた `emit` の個数とします。
 - `stop_reason`: `depth_limit`、`frontier_empty`、`time_limit`、`expansion_limit`、`solution_found` のいずれか。`solution_found` は `stop_on_first_solution` による終了です。
@@ -375,7 +382,7 @@ struct SearchResult {
 
 初期状態が完了解で `max_depth > 0` の場合は `frontier_empty` とします。固定幅探索の途中で時間切れになった場合、途中の世代で既に発見した解も返しますが、その世代の候補選抜が完了したとはみなしません。
 
-ただし `stop_on_first_solution == true` で根が最終解なら、展開せず `solution_found` を返します。
+ただし `stop_on_first_solution == true` で根の `finished == true` なら、展開せず `solution_found` を返します。
 
 `duplicates` は保持中の候補と同じハッシュ（key使用時は同じkeyも必要）を検出した回数で、却下と置き換えの両方を数えます。`elapsed_sec` は結果の操作列復元までの計測値で、関数を抜ける際の残り候補の解放時間は含みません。展開数の上限はノード間で確認し、最後に許可された1ノードが列挙する候補は、時間切れにならない限り最後まで受け付けます。
 

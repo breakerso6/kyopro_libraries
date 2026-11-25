@@ -227,12 +227,30 @@ private:
     }
 };
 
-// preview lists evaluated actions without constructing their child states.
+// Compatibility with the previous name for action-only expansion.
 template<class State, class Action, class Info, class = void>
 struct HasPreview : std::false_type {};
 template<class State, class Action, class Info>
 struct HasPreview<State, Action, Info, std::void_t<decltype(std::declval<const State&>().preview(
     std::declval<const Info&>(), std::declval<void(*)(const Action&, const Info&)>()))>> : std::true_type {};
+
+template<class State, class Action, class = void> struct HasApply : std::false_type {};
+template<class State, class Action>
+struct HasApply<State, Action, std::void_t<decltype(std::declval<State&>().apply(
+    std::declval<const Action&>()))>> : std::true_type {};
+
+// Both callback forms can be used by a templated expand. A two-argument
+// emit retains the parent; a three-argument emit supplies the child itself.
+template<class State>
+struct CopyPayload {
+    std::shared_ptr<const State> state;
+    bool needs_apply;
+    explicit CopyPayload(const std::shared_ptr<const State>& parent) : state(parent), needs_apply(true) {}
+    template<class S, std::enable_if_t<std::is_constructible_v<State, S&&>, int> = 0>
+    explicit CopyPayload(S&& child) : state(std::make_shared<State>(std::forward<S>(child))), needs_apply(false) {}
+};
+template<class... F> struct Overload : F... { using F::operator()...; };
+template<class... F> Overload(F...) -> Overload<F...>;
 
 template<class Info, class = void> struct HasTurns : std::false_type {};
 template<class Info>
@@ -242,7 +260,7 @@ template<class State, class Action, class Info, bool Tree>
 struct Candidate {
     using Information = Info;
     using Payload = std::conditional_t<Tree, std::monostate,
-        std::conditional_t<HasPreview<State, Action, Info>::value, std::shared_ptr<const State>, State>>;
+        std::conditional_t<HasApply<State, Action>::value, CopyPayload<State>, State>>;
     Info info;
     typename TraceArena<Action>::Handle trace;
     Payload state;
@@ -817,6 +835,9 @@ class Run {
     std::uint64_t serial_ = 0;
     bool stopped_ = false;
     bool reached_horizon_ = false;
+    // Every edge costs at least one turn. Parents at or above this bound
+    // cannot produce a strictly shorter solution.
+    int expand_before_;
     std::uint32_t clock_countdown_ = 1;
 
     double elapsed() const { return std::chrono::duration<double>(Clock::now() - start_).count(); }
@@ -842,17 +863,19 @@ class Run {
     bool improves(const Info& info, int depth, bool terminal) const {
         if constexpr (std::is_floating_point_v<Cost>) assert(std::isfinite(info.cost));
         const auto& slot = terminal ? best_ : partial_;
+        if (terminal && slot && config_.stop_on_first_solution && depth != slot->depth)
+            return depth < slot->depth;
         return !slot || (!terminal && depth > slot->depth) ||
                ((terminal || depth == slot->depth) && info.cost < slot->cost);
     }
     bool consider(const Info& info, const Handle& trace) {
         int depth = arena_.depth(trace.id());
-        bool terminal = info.finished || depth == config_.max_depth;
+        bool terminal = info.finished || (!config_.stop_on_first_solution && depth == config_.max_depth);
         if (improves(info, depth, terminal)) {
             auto& slot = terminal ? best_ : partial_;
             slot = Saved{info.cost, depth, trace};
         }
-        return terminal;
+        return terminal || depth == config_.max_depth;
     }
     template<class... Args>
     Ptr make_node(Args&&... args) {
@@ -869,8 +892,6 @@ class Run {
     Ptr root_node() {
         if constexpr (Tree)
             return make_node(initial_info_, root_, std::monostate{}, serial_++);
-        else if constexpr (preview)
-            return make_node(initial_info_, root_, nullptr, serial_++);
         else
             return make_node(initial_info_, root_, initial_, serial_++);
     }
@@ -892,7 +913,7 @@ class Run {
         cursor_ = std::move(target); // The expanded candidate no longer needs to own this history.
     }
     template<class QueueAt>
-    void expand(const Ptr& node, int turn, QueueAt&& queue_at) {
+    void expand(const Ptr& node, int turn, int earliest_pending, QueueAt&& queue_at) {
         const Handle& parent = Tree ? cursor_ : node->trace;
         // Borrow callback arguments until admission is known. In particular,
         // moving a large inline State by value would copy it even on rejection.
@@ -909,23 +930,26 @@ class Run {
                 if (duration > config_.max_depth - turn) return;
             }
             const int depth = turn + duration;
-            bool terminal = info.finished || depth == config_.max_depth;
+            bool terminal = info.finished || (!config_.stop_on_first_solution && depth == config_.max_depth);
             if constexpr (HasTurns<Info>::value) reached_horizon_ |= depth == config_.max_depth;
             bool save = improves(info, depth, terminal);
-            auto* next = terminal ? nullptr : &queue_at(depth);
+            auto* next = !terminal && depth < expand_before_ ? &queue_at(depth) : nullptr;
             bool retain = next && next->prepare(info, result_.stats);
             if (!save && !retain) return;
             auto trace = arena_.child(parent, action);
             if (save) {
                 auto& slot = terminal ? best_ : partial_;
                 slot = Saved{info.cost, depth, trace};
+                if (terminal && config_.stop_on_first_solution) {
+                    expand_before_ = depth - 1;
+                    if (earliest_pending >= expand_before_) {
+                        stopped_ = true;
+                        result_.stop_reason = SearchStopReason::solution_found;
+                    }
+                }
             }
             if (retain) next->insert_prepared(make_node(std::forward<decltype(info)>(info),
                 std::move(trace), std::forward<decltype(state)>(state), serial_++));
-            if (terminal && config_.stop_on_first_solution) {
-                stopped_ = true;
-                result_.stop_reason = SearchStopReason::solution_found;
-            }
         };
         if constexpr (Tree) {
             move_to(node->trace);
@@ -936,19 +960,20 @@ class Run {
             };
             if constexpr (preview) std::as_const(*work_).preview(node->info, offer);
             else work_->expand(node->info, offer);
-        } else if constexpr (preview) {
-            // Siblings share their expanded parent. Only a popped child applies its action.
-            std::shared_ptr<const State> current;
-            if (node->state) {
-                auto child = std::make_shared<State>(*node->state);
+        } else if constexpr (HasApply<State, Action>::value) {
+            auto current = node->state.state;
+            if (node->state.needs_apply) {
+                auto child = std::make_shared<State>(*current);
                 child->apply(arena_.action(node->trace.id()));
                 current = std::move(child);
-            } else current = std::make_shared<State>(initial_);
+            }
             if (timed_out()) return;
             ++result_.stats.expanded;
-            current->preview(node->info, [&](const Action& action, auto&& info) {
-                emit(current, action, std::forward<decltype(info)>(info));
-            });
+            auto offer = [&](const Action& action, auto&& info) {
+                emit(std::as_const(current), action, std::forward<decltype(info)>(info));
+            };
+            if constexpr (preview) current->preview(node->info, offer);
+            else current->expand(node->info, Overload{offer, emit});
         } else {
             ++result_.stats.expanded;
             static_cast<const State&>(node->state).expand(node->info, emit);
@@ -968,12 +993,14 @@ class Run {
         do {
             for (auto it = layers.begin(); it != layers.end();) {
                 const int turn = it->first;
+                if (turn >= expand_before_) break;
                 reached_last_layer |= turn == config_.max_depth - 1;
                 if (!budget()) return finish(SearchStopReason::frontier_empty);
                 take(it->second, batch);
                 for (auto& node : batch) {
+                    if (turn >= expand_before_) break;
                     if (!budget()) return finish(SearchStopReason::frontier_empty);
-                    expand(node, turn, queue_at);
+                    expand(node, turn, layers.begin()->first, queue_at);
                     node.reset();
                     if (stopped_) return finish(SearchStopReason::frontier_empty);
                 }
@@ -981,12 +1008,14 @@ class Run {
                 if (it->second.empty()) it = layers.erase(it);
                 else ++it;
             }
-        } while (Repeated && !layers.empty());
+        } while (Repeated && !layers.empty() && layers.begin()->first < expand_before_);
         return finish(!Repeated && (reached_last_layer || reached_horizon_)
                       ? SearchStopReason::depth_limit : SearchStopReason::frontier_empty);
     }
     Result finish(SearchStopReason reason) {
-        if (!stopped_) result_.stop_reason = reason;
+        if (!stopped_)
+            result_.stop_reason = config_.stop_on_first_solution && best_
+                ? SearchStopReason::solution_found : reason;
         if (best_) result_.best.emplace(SearchPath<Action, Cost>{arena_.path(best_->trace), best_->cost, best_->depth});
         if (partial_) result_.partial.emplace(SearchPath<Action, Cost>{arena_.path(partial_->trace), partial_->cost, partial_->depth});
         result_.stats.elapsed_sec = elapsed();
@@ -995,7 +1024,7 @@ class Run {
 public:
     Run(const State& state, const Info& info, const SearchConfig& config)
         : initial_(state), initial_info_(info), config_(config),
-          root_(arena_.root()), cursor_(root_) {
+          root_(arena_.root()), cursor_(root_), expand_before_(config.max_depth) {
         assert(config.max_depth >= 0);
         assert(config.time_check_interval > 0);
         assert(!config.time_limit_sec ||
@@ -1006,8 +1035,7 @@ public:
     Result fixed(Policy policy) {
         validate(policy);
         if (consider(initial_info_, root_))
-            return finish(config_.stop_on_first_solution ? SearchStopReason::solution_found :
-                (config_.max_depth == 0 ? SearchStopReason::depth_limit : SearchStopReason::frontier_empty));
+            return finish(config_.max_depth == 0 ? SearchStopReason::depth_limit : SearchStopReason::frontier_empty);
         using Selector = std::conditional_t<std::is_same_v<Policy, FixedBeam>,
             FixedSelector<Node>, std::conditional_t<std::is_same_v<Policy,KeyedBeam>,
                 KeyedSelector<Node>,Frontier<Node, Policy, Keyed>>>;
@@ -1019,11 +1047,11 @@ public:
                  next(policy, config_.deduplicate, candidate_pool_, index_pool_);
         current.insert(root_node(), result_.stats);
         std::vector<typename Selector::Ptr> batch;
-        for (int depth = 0; depth < config_.max_depth; ++depth) {
+        for (int depth = 0; depth < expand_before_; ++depth) {
             current.drain(batch, Tree && config_.tree_dfs_order);
             for (auto& node : batch) {
                 if (!budget()) return finish(SearchStopReason::frontier_empty);
-                expand(node, depth, [&](int) -> Selector& { return next; });
+                expand(node, depth, depth, [&](int) -> Selector& { return next; });
                 node.reset();
                 if (stopped_) return finish(SearchStopReason::frontier_empty);
             }
@@ -1038,8 +1066,7 @@ public:
         validate(policy.expand_per_depth);
         validate(policy.frontier_limit);
         if (consider(initial_info_, root_))
-            return finish(config_.stop_on_first_solution ? SearchStopReason::solution_found :
-                (config_.max_depth == 0 ? SearchStopReason::depth_limit : SearchStopReason::frontier_empty));
+            return finish(config_.max_depth == 0 ? SearchStopReason::depth_limit : SearchStopReason::frontier_empty);
         using Queue = Frontier<Node, Limit, Keyed>;
         if constexpr (HasTurns<Info>::value)
             return turn_layers<true, Queue>(policy.frontier_limit, [&](Queue& q, auto& batch) {
@@ -1054,21 +1081,26 @@ public:
         queue_at(0).insert(root_node(), result_.stats);
         std::vector<Ptr> batch;
         for (;;) {
-            for (std::size_t depth = 0; depth < queues.size(); ++depth) {
+            int earliest_left = expand_before_;
+            for (std::size_t depth = 0; depth < queues.size() && depth < static_cast<std::size_t>(expand_before_); ++depth) {
                 if (queues[depth]->empty()) continue;
                 if (!budget()) return finish(SearchStopReason::frontier_empty);
                 queues[depth]->take(policy.expand_per_depth, batch);
+                const int turn = static_cast<int>(depth);
+                if (!queues[depth]->empty()) earliest_left = std::min(earliest_left, turn);
                 for (auto& node : batch) {
+                    if (turn >= expand_before_) break;
                     if (!budget()) return finish(SearchStopReason::frontier_empty);
                     // Last-depth children are terminal; the destination stays empty.
                     auto& next = queue_at(depth + 1);
-                    expand(node, static_cast<int>(depth), [&](int) -> Queue& { return next; });
+                    expand(node, turn, std::min(turn, earliest_left), [&](int) -> Queue& { return next; });
                     node.reset();
                     if (stopped_) return finish(SearchStopReason::frontier_empty);
                 }
             }
             bool empty = true;
-            for (const auto& queue : queues) if (!queue->empty()) { empty = false; break; }
+            for (std::size_t depth = 0; depth < queues.size() && depth < static_cast<std::size_t>(expand_before_); ++depth)
+                if (!queues[depth]->empty()) { empty = false; break; }
             if (empty) return finish(SearchStopReason::frontier_empty);
         }
     }

@@ -24,11 +24,19 @@ Info make_info(int pos, uint32_t seen, long long cost) {
     return info;
 }
 
-using Action = char;
+struct Action {
+    int to;
+    char command;
+};
 
 struct State {
     int pos = 0;
-    uint32_t seen = 1U; // 左上の得点は最初に取得済み
+    uint32_t seen = 1U;
+
+    void apply(const Action& action) {
+        pos = action.to;
+        seen |= uint32_t(1) << pos;
+    }
 
     template<class Emit>
     void expand(const Info& current, Emit emit) const {
@@ -38,13 +46,10 @@ struct State {
             if (ny < 0 || ny >= H || nx < 0 || nx >= W) continue;
             int to = ny * W + nx;
             uint32_t bit = uint32_t(1) << to;
-            long long gain = (seen & bit) ? 0 : reward[to];
-
-            State next = *this;
-            next.pos = to;
-            next.seen |= bit;
-            auto info = make_info(to, next.seen, current.cost - gain);
-            emit(std::move(next), commands[d], std::move(info));
+            bool fresh = (seen & bit) == 0;
+            long long gain = fresh ? reward[to] : 0;
+            Action action{to, commands[d]};
+            emit(action, make_info(to, seen | bit, current.cost - gain));
         }
     }
 };
@@ -79,6 +84,6 @@ int main() {
     }
 
     cout << -result.best->cost << '\n';
-    for (const auto& action : result.best->actions) cout << action;
+    for (const auto& action : result.best->actions) cout << action.command;
     cout << '\n';
 }

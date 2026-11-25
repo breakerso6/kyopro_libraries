@@ -26,43 +26,28 @@ struct Info {
 };
 
 struct State {
-    // TODO: 盤面・位置・残り資源など、現在状態を定義する。
+    // TODO: 盤面・位置・残り資源など、合法手の列挙に必要な状態を定義する。
 
-    vector<Action> legal_actions() const {
-        // TODO: 合法手を列挙する。
-        // 木上版では、undoに必要な更新前の値も各Actionに持たせる。
-        return {};
+    template<class Emit>
+    void expand(const Info& current, Emit emit) const {
+        // TODO: 合法手を見つけるごとに以下を行う。
+        // Action action{...};  // 状態更新・復元で使う差分
+        // Info next = current;
+        // next.cost = ...;    // この手を適用した後の評価値
+        // 必要なら next.hash, next.key, next.finished, next.turns も更新する。
+        // emit(action, next);
+        (void)current;
+        (void)emit;
     }
 
     void apply(const Action& action) {
-        // TODO: actionを適用して子状態へ進める。
+        // TODO: actionの差分で盤面を更新する。
         (void)action;
     }
 
     void undo(const Action& action) {
-        // TODO: action適用前の状態へ完全に戻す。
-        // 盤面だけでなく、補助データ・キャッシュも復元する。
+        // TODO: actionの差分で盤面を元に戻す。
         (void)action;
-    }
-
-    Info evaluate() const {
-        Info info;
-        // TODO: info.costを計算する。最大化なら、例えばcost = -score。
-        // TODO: 重複除去する場合はinfo.hashを設定する。
-        // TODO: 完了解で打ち切る問題ならinfo.finishedを設定する。
-        // TODO: keyを使う場合は、この状態のinfo.keyを設定する。
-        return info;
-    }
-
-    template<class Emit>
-    void preview(const Info& current, Emit emit) const {
-        for (const Action& action : legal_actions()) {
-            Info next_info = current;
-            // TODO: 親とactionの差分から子のcost・hash・finished・keyを求める。
-            // 複数ターンを使うならInfoに int turns = 1; を追加し、
-            // ここで毎回next_info.turnsにこの行動の所要ターンを設定する。
-            emit(action, next_info);
-        }
     }
 };
 
@@ -78,7 +63,7 @@ int main() {
 
     State initial;
     // TODO: initialを初期状態にする。
-    Info initial_info = initial.evaluate();
+    Info initial_info{}; // TODO: 根のcost・hashなどを設定する。
 
     TreeSearch<State, Action, Info> search(initial, initial_info);
     SearchConfig config;
@@ -91,7 +76,7 @@ int main() {
 
     auto policy = FixedBeam{100}; // TODO: 幅を調整する。
 
-    // key別にする場合はInfoのKey・keyとevaluate()も設定する。
+    // key別にする場合は根と子のInfoにkeyを設定する。
     // auto policy = KeyedBeam{3};
     // auto policy = GlobalPlusKeyedBeam{100, 2};
 
